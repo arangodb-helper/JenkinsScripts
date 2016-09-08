@@ -3,6 +3,7 @@ stage "cloning source"
 node {
   sh "cat /etc/issue"
   sh "pwd"
+  sh "find /etc/"
   git url: 'https://github.com/arangodb/arangodb.git', branch: 'pipeline'
 }
 
