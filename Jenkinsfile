@@ -16,7 +16,9 @@ stage "building ArangoDB"
 node {
   OUT_DIR = ""
   docker.withRegistry("https://192.168.0.1/", '') {
-    docker.image("centosix/build").inside {
+    def myBuildImage=docker.image("centosix/build")
+    sh "docker pull --all-tags ${myBuildImage.imageName()}"
+    myBuildImage.inside {
       sh "mount"
       sh "cat /etc/issue"
 
@@ -25,6 +27,15 @@ node {
       OUT_DIR = "${WORKSPACE}/out"
       sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
     }
+//    docker.image("centosix/build").inside {
+//      sh "mount"
+//      sh "cat /etc/issue"
+//
+//      sh 'pwd > workspace.loc'
+//      WORKSPACE = readFile('workspace.loc').trim()
+//      OUT_DIR = "${WORKSPACE}/out"
+//      sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
+//    }
   }
   OUT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
   env.MD5SUM = readFile("${OUT_FILE}.md5")
