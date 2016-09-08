@@ -17,8 +17,8 @@ node {
   OUT_DIR = ""
   docker.withRegistry("https://192.168.0.1/", '') {
     def myBuildImage=docker.image("centosix/build")
-    sh "docker pull --all-tags ${myBuildImage.imageName()}"
-    myBuildImage.inside {
+    myBuildImage.pull()
+    docker.image(myBuildImage.imageName()).inside() {
       sh "mount"
       sh "cat /etc/issue"
 
