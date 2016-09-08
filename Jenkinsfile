@@ -3,16 +3,11 @@ stage "cloning source"
 node {
   sh "cat /etc/issue"
   sh "pwd"
-  sh "cat /etc/docker/key.json"
-  sh "ps -eaf"
-  sh "find /etc/"
-  sh "docker version"
-  //  sh "/etc/init.d/docker restart"
   git url: 'https://github.com/arangodb/arangodb.git', branch: 'pipeline'
 }
 def REGISTRY="192.168.0.1"
 def REGISTRY_URL="https://${REGISTRY}/"
-def DOCKER_CONTAINER="${REGISTRY}/centosix"
+def DOCKER_CONTAINER="centosix"
 def OS="Linux"
 def RELEASE_OUT_DIR="/var/tmp/"
 // OUT_DIR = "/home/jenkins/shared/out"
