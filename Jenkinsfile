@@ -16,7 +16,7 @@ stage "building ArangoDB"
 node {
   OUT_DIR = ""
   docker.withRegistry("https://192.168.0.1/", '') {
-    docker.image("centosig/build").inside {
+    docker.image("centosix/build").inside {
       sh "mount"
       sh "cat /etc/issue"
 
