@@ -3,6 +3,7 @@ stage "cloning source"
 node {
   sh "cat /etc/issue"
   sh "pwd"
+  sh "mount"
   git url: 'https://github.com/arangodb/arangodb.git', branch: 'pipeline'
 }
 def REGISTRY="192.168.0.1"
