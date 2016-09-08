@@ -7,7 +7,7 @@ node {
   sh "ps -eaf"
   sh "find /etc/"
   sh "docker version"
-  sh "/etc/init.d/docker restart"
+  //  sh "/etc/init.d/docker restart"
   git url: 'https://github.com/arangodb/arangodb.git', branch: 'pipeline'
 }
 
