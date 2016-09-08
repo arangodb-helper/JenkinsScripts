@@ -4,6 +4,7 @@ node {
   sh "cat /etc/issue"
   sh "pwd"
   sh "cat /etc/docker/key.json"
+  sh "ps -eaf"
   sh "find /etc/"
   sh "docker version"
   sh "/etc/init.d/docker restart"
