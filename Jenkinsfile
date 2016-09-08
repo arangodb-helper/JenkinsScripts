@@ -92,7 +92,7 @@ for (int i = 0; i < testCaseSets.size(); i++) {
         docker.withRegistry("${REGISTRY_URL}", '') {
           def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
           myRunImage.pull()
-          docker.image(myRunImage)).inside() {
+          docker.image(myRunImage).inside() {
 
       
             def EXECUTE_TEST="pwd; `pwd`/scripts/unittest ${unitTests} --skipNondeterministic true --skipTimeCritical true"
