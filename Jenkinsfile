@@ -5,7 +5,7 @@ node {
   sh "pwd"
   sh "find /etc/"
   sh "docker version"
-  sh "systemctl restart docker"
+  sh "/etc/init.d/docker restart"
   git url: 'https://github.com/arangodb/arangodb.git', branch: 'pipeline'
 }
 
