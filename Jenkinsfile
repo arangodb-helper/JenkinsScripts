@@ -4,6 +4,7 @@ node {
   sh "cat /etc/issue"
   sh "pwd"
   sh "find /etc/"
+  sh "docker version"
   git url: 'https://github.com/arangodb/arangodb.git', branch: 'pipeline'
 }
 
