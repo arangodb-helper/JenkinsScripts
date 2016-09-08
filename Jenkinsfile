@@ -10,9 +10,9 @@ node {
   //  sh "/etc/init.d/docker restart"
   git url: 'https://github.com/arangodb/arangodb.git', branch: 'pipeline'
 }
-
-def REGISTRY_URL="https://192.168.0.1/"
-def DOCKER_CONTAINER="centosix"
+def REGISTRY="192.168.0.1"
+def REGISTRY_URL="https://${REGISTRY}/"
+def DOCKER_CONTAINER="${REGISTRY}/centosix"
 def OS="Linux"
 def RELEASE_OUT_DIR="/var/tmp/"
 // OUT_DIR = "/home/jenkins/shared/out"
