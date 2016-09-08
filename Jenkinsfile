@@ -15,8 +15,8 @@ def RELEASE_OUT_DIR="/var/tmp/"
 stage "building ArangoDB"
 node {
   OUT_DIR = ""
-  docker.withRegistry("${REGISTRY_URL}", '') {
-    docker.image("${DOCKER_CONTAINER}/build").inside {
+  docker.withRegistry("https://192.168.0.1/", '') {
+    docker.image("centosig/build").inside {
       sh "mount"
       sh "cat /etc/issue"
 
