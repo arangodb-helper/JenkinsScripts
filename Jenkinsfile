@@ -27,6 +27,8 @@ stage("building ArangoDB") {
         sh "mount"
         sh "cat /etc/issue"
 
+        sh "find /home/jenkins"
+        sh "find /net/fileserver"
         sh 'pwd > workspace.loc'
         WORKSPACE = readFile('workspace.loc').trim()
         OUT_DIR = "${WORKSPACE}/out"
