@@ -31,13 +31,11 @@ stage("building ArangoDB") {
         WORKSPACE = readFile('workspace.loc').trim()
         OUT_DIR = "${WORKSPACE}/out"
         sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
-      }
-    }
-    OUT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
-    env.MD5SUM = readFile("${OUT_FILE}.md5")
-    echo "copying result files: "
+        OUT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
+        env.MD5SUM = readFile("${OUT_FILE}.md5")
+        echo "copying result files: "
   
-    def UPLOAD_SHELLSCRIPT="""
+        def UPLOAD_SHELLSCRIPT="""
    set -x
    if test -f ${OUT_FILE}.md5; then
      remote_md5sum=`cat ${OUT_FILE}.md5`
@@ -50,9 +48,12 @@ stage("building ArangoDB") {
         echo 'file not changed - not uploading'
    fi
 """
-    echo "${UPLOAD_SHELLSCRIPT}"
-    lock(resource: 'uploadfiles', inversePrecedence: true) {
-      sh "${UPLOAD_SHELLSCRIPT}"
+        echo "${UPLOAD_SHELLSCRIPT}"
+        lock(resource: 'uploadfiles', inversePrecedence: true) {
+          sh "${UPLOAD_SHELLSCRIPT}"
+        }
+        sh "find ${RELEASE_OUT_DIR}"
+      }
     }
   }
 }
