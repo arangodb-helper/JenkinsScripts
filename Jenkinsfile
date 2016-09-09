@@ -86,6 +86,9 @@ stage("running unittest") {
     def unitTests = testCaseSets.get(i);
     branches["tcs_${i}"] = {
       node {
+        sh "cat /etc/issue"
+        sh "mount"
+        sh "pwd"
         dir("${unitTests}") {
           echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
           sh "${COPY_TARBAL_SHELL_SNIPPET}"
