@@ -28,7 +28,7 @@ stage("building ArangoDB") {
         sh "cat /etc/issue"
 
         //sh "find /home/jenkins"
-        sh "find /net/fileserver"
+        sh "ls -l /net/fileserver"
         sh 'pwd > workspace.loc'
         WORKSPACE = readFile('workspace.loc').trim()
         OUT_DIR = "${WORKSPACE}/out"
@@ -54,7 +54,7 @@ stage("building ArangoDB") {
         lock(resource: 'uploadfiles', inversePrecedence: true) {
           sh "${UPLOAD_SHELLSCRIPT}"
         }
-        sh "find ${RELEASE_OUT_DIR}"
+        sh "ls -l ${RELEASE_OUT_DIR}"
       }
     }
   }
@@ -105,7 +105,7 @@ stage("running unittest") {
               sh "cat /etc/issue"
               sh "mount"
               sh "pwd"
-              sh "find ${RELEASE_OUT_DIR}"
+              sh "ls -l ${RELEASE_OUT_DIR}"
               lock(resource: 'uploadfiles', inversePrecedence: true) {
                 sh "${COPY_TARBAL_SHELL_SNIPPET}"
               }
