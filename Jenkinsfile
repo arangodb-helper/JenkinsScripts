@@ -23,7 +23,7 @@ stage("building ArangoDB") {
     docker.withRegistry("https://192.168.0.1/", '') {
       def myBuildImage=docker.image("centosix/build")
       myBuildImage.pull()
-      docker.image(myBuildImage.imageName()).inside() {
+      docker.image(myBuildImage.imageName()).inside('--volume /net/fileserver') {
         sh "mount"
         sh "cat /etc/issue"
 
@@ -100,7 +100,7 @@ stage("running unittest") {
             echo "got RunImage"
             myRunImage.pull()
             echo "pulled."
-            docker.image(myRunImage.imageName()).inside() {
+            docker.image(myRunImage.imageName()).inside('--volume /net/fileserver') {
               echo "In docker image! xxx 0"
               sh "cat /etc/issue"
               sh "mount"
