@@ -60,8 +60,8 @@ stage("building ArangoDB") {
 stage("running unittest") {
 
   List<String> testCaseSets = [ 
-    'boost.config.dump.importing.upgrade.authentication.authentication_parameters.arangobench',
-    'shell_server.shell_server_aql',
+    //    'boost.config.dump.importing.upgrade.authentication.authentication_parameters.arangobench',
+    // 'shell_server.shell_server_aql',
     //  'http_server.ssl_server.shell_client',
     'arangosh'
   ]
@@ -97,15 +97,15 @@ stage("running unittest") {
             def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
             myRunImage.pull()
             docker.image(myRunImage).inside() {
-              echo "In docker image!"
+              echo "In docker image! xxx 0"
               sh "cat /etc/issue"
               sh "mount"
               sh "pwd"
               def EXECUTE_TEST="pwd; `pwd`/scripts/unittest ${unitTests} --skipNondeterministic true --skipTimeCritical true"
-              echo "1"
+              echo "xxx 1"
               echo "${unitTests}: ${EXECUTE_TEST}"
               sh "${EXECUTE_TEST}"
-              echo "2"
+              echo "xxx 2"
               echo "${unitTests}: recording results"
               step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
             }
@@ -115,6 +115,7 @@ stage("running unittest") {
     }
   
   }
+  echo "-------------------------------------------"
   echo branches.toString();
   parallel branches
 }
