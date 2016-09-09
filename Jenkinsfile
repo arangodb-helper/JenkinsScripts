@@ -2,9 +2,7 @@
 stage("cloning source") {
   node {
     sh "cat /etc/issue"
-    sh "pwd"
-    sh "mount"
-    git url: 'https://github.com/arangodb/arangodb.git', branch: 'pipeline'
+    git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
   }
 }
 def REGISTRY="192.168.0.1"
@@ -15,8 +13,6 @@ def RELEASE_OUT_DIR="/net/fileserver/"
 def LOCAL_TAR_DIR="/jenkins/tmp/"
 def branches = [:]
 
-// OUT_DIR = "/home/jenkins/shared/out"
-
 stage("building ArangoDB") {
   node {
     OUT_DIR = ""
@@ -24,14 +20,12 @@ stage("building ArangoDB") {
       def myBuildImage=docker.image("centosix/build")
       myBuildImage.pull()
       docker.image(myBuildImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
-        sh "mount"
         sh "cat /etc/issue"
 
-        //sh "find /home/jenkins"
-        sh "ls -l /net/fileserver"
         sh 'pwd > workspace.loc'
         WORKSPACE = readFile('workspace.loc').trim()
         OUT_DIR = "${WORKSPACE}/out"
+
         sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
         OUT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
         env.MD5SUM = readFile("${OUT_FILE}.md5")
@@ -69,6 +63,10 @@ stage("running unittest") {
     'arangosh'
   ]
 
+  List<String> CmdLineSwitches = [
+    "--cluster true",
+    ""
+  ]
 
   def COPY_TARBAL_SHELL_SNIPPET= """
    if test ! -d ${LOCAL_TAR_DIR}; then
@@ -87,35 +85,29 @@ stage("running unittest") {
 """
   for (int i = 0; i < testCaseSets.size(); i++) {
     def unitTests = testCaseSets.get(i);
-    branches["tcs_${i}"] = {
-      node {
-        sh "cat /etc/issue"
-        sh "mount"
-        sh "pwd"
-        dir("${unitTests}") {
-          echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
-          docker.withRegistry("${REGISTRY_URL}", '') {
-            echo "InRegistry"
-            def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
-            echo "got RunImage"
-            myRunImage.pull()
-            echo "pulled."
-            docker.image(myRunImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
-              echo "In docker image! xxx 0"
-              sh "cat /etc/issue"
-              sh "mount"
-              sh "pwd"
-              sh "ls -l ${RELEASE_OUT_DIR}"
-              lock(resource: 'uploadfiles', inversePrecedence: true) {
-                sh "${COPY_TARBAL_SHELL_SNIPPET}"
+    for (int j = 0; j < CmdLineSwitches.size(); j++) {
+      def cmdLineArgs = CmdLineSwitches.get(j)
+      branches["tcs_${i}"] = {
+        node {
+          sh "cat /etc/issue"
+          sh "pwd"
+          dir("${unitTests}") {
+            echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
+            docker.withRegistry("${REGISTRY_URL}", '') {
+              def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
+              myRunImage.pull()
+              docker.image(myRunImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
+                sh "cat /etc/issue"
+                sh "ls -l ${RELEASE_OUT_DIR}"
+                lock(resource: 'uploadfiles', inversePrecedence: true) {
+                  sh "${COPY_TARBAL_SHELL_SNIPPET}"
+                }
+                def EXECUTE_TEST="pwd; `pwd`/scripts/unittest ${unitTests} --skipNondeterministic true --skipTimeCritical true ${cmdLineArgs}"
+                echo "${unitTests}: ${EXECUTE_TEST}"
+                sh "${EXECUTE_TEST}"
+                echo "${unitTests}: recording results"
+                step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
               }
-              def EXECUTE_TEST="pwd; `pwd`/scripts/unittest ${unitTests} --skipNondeterministic true --skipTimeCritical true"
-              echo "xxx 1"
-              echo "${unitTests}: ${EXECUTE_TEST}"
-              sh "${EXECUTE_TEST}"
-              echo "xxx 2"
-              echo "${unitTests}: recording results"
-              step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
             }
           }
         }
@@ -123,7 +115,6 @@ stage("running unittest") {
     }
   
   }
-  echo "-------------------------------------------"
   echo branches.toString();
   parallel branches
 }
