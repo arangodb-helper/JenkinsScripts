@@ -97,7 +97,7 @@ stage("running unittest") {
             echo "got RunImage"
             myRunImage.pull()
             echo "pulled."
-            docker.image(myRunImage).inside() {
+            docker.image(myRunImage.imageName()).inside() {
               echo "In docker image! xxx 0"
               sh "cat /etc/issue"
               sh "mount"
