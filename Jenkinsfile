@@ -11,7 +11,9 @@ def REGISTRY="192.168.0.1"
 def REGISTRY_URL="https://${REGISTRY}/"
 def DOCKER_CONTAINER="centosix"
 def OS="Linux"
-def RELEASE_OUT_DIR="/var/tmp/"
+def RELEASE_OUT_DIR="/net/fileserver/"
+def LOCAL_TAR_DIR="/jenkins/tmp/"
+
 // OUT_DIR = "/home/jenkins/shared/out"
 
 stage("building ArangoDB") {
@@ -48,8 +50,9 @@ stage("building ArangoDB") {
    fi
 """
     echo "${UPLOAD_SHELLSCRIPT}"
-    sh "${UPLOAD_SHELLSCRIPT}"
-   
+    lock(resource: 'uploadfiles', inversePrecedence: true) {
+      sh "${UPLOAD_SHELLSCRIPT}"
+    }
   }
 }
 stage("running unittest") {
@@ -64,15 +67,19 @@ stage("running unittest") {
   def branches = [:]
 
   def COPY_TARBAL_SHELL_SNIPPET= """
-   if test -f /tmp/arangodb-${OS}.tar.gz.md5; then
-           local_md5sum=`cat /tmp/arangodb-${OS}.tar.gz.md5`
+   if test ! -d ${LOCAL_TAR_DIR}; then
+        mkdir -p ${LOCAL_TAR_DIR}
+   else
+      if test -f ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz.md5; then
+           local_md5sum=`cat ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz.md5`
+      fi
    fi
    if test \"\${MD5SUM}\" != \"\${local_md5sum}\"; then
-        cp ${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz /var/tmp/
-        echo \"\${MD5SUM}\" > /tmp/arangodb-${OS}.tar.gz.md5
+        cp ${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz ${LOCAL_TAR_DIR}
+        echo \"\${MD5SUM}\" > ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz.md5
    fi
    pwd
-   tar -xzf /var/tmp/arangodb-${OS}.tar.gz
+   tar -xzf ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz
 """
   for (int i = 0; i < testCaseSets.size(); i++) {
     def unitTests = testCaseSets.get(i);
