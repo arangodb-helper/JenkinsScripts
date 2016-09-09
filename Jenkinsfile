@@ -91,16 +91,20 @@ stage("running unittest") {
         sh "pwd"
         dir("${unitTests}") {
           echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
-          sh "${COPY_TARBAL_SHELL_SNIPPET}"
-        
           docker.withRegistry("${REGISTRY_URL}", '') {
+            echo "InRegistry"
             def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
+            echo "got RunImage"
             myRunImage.pull()
+            echo "pulled."
             docker.image(myRunImage).inside() {
               echo "In docker image! xxx 0"
               sh "cat /etc/issue"
               sh "mount"
               sh "pwd"
+              lock(resource: 'uploadfiles', inversePrecedence: true) {
+                sh "${COPY_TARBAL_SHELL_SNIPPET}"
+              }
               def EXECUTE_TEST="pwd; `pwd`/scripts/unittest ${unitTests} --skipNondeterministic true --skipTimeCritical true"
               echo "xxx 1"
               echo "${unitTests}: ${EXECUTE_TEST}"
