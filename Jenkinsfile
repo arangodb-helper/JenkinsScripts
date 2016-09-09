@@ -13,6 +13,7 @@ def DOCKER_CONTAINER="centosix"
 def OS="Linux"
 def RELEASE_OUT_DIR="/net/fileserver/"
 def LOCAL_TAR_DIR="/jenkins/tmp/"
+def branches = [:]
 
 // OUT_DIR = "/home/jenkins/shared/out"
 
@@ -56,7 +57,6 @@ stage("building ArangoDB") {
   }
 }
 
-def branches = [:]
 stage("running unittest") {
 
   List<String> testCaseSets = [ 
@@ -97,11 +97,15 @@ stage("running unittest") {
             def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
             myRunImage.pull()
             docker.image(myRunImage).inside() {
-
-      
+              echo "In docker image!"
+              sh "cat /etc/issue"
+              sh "mount"
+              sh "pwd"
               def EXECUTE_TEST="pwd; `pwd`/scripts/unittest ${unitTests} --skipNondeterministic true --skipTimeCritical true"
+              echo "1"
               echo "${unitTests}: ${EXECUTE_TEST}"
               sh "${EXECUTE_TEST}"
+              echo "2"
               echo "${unitTests}: recording results"
               step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
             }
