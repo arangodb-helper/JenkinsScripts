@@ -102,6 +102,7 @@ stage("running unittest") {
               sh "cat /etc/issue"
               sh "mount"
               sh "pwd"
+              sh "find ${RELEASE_OUT_DIR}"
               lock(resource: 'uploadfiles', inversePrecedence: true) {
                 sh "${COPY_TARBAL_SHELL_SNIPPET}"
               }
