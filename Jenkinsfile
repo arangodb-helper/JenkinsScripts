@@ -55,6 +55,8 @@ stage("building ArangoDB") {
     }
   }
 }
+
+def branches = [:]
 stage("running unittest") {
 
   List<String> testCaseSets = [ 
@@ -64,7 +66,6 @@ stage("running unittest") {
     'arangosh'
   ]
 
-  def branches = [:]
 
   def COPY_TARBAL_SHELL_SNIPPET= """
    if test ! -d ${LOCAL_TAR_DIR}; then
