@@ -57,8 +57,9 @@ stage("building ArangoDB") {
 stage("running unittest") {
 
   List<String> testCaseSets = [ 
-    'boost.config.dump.importing.upgrade.authentication.authentication_parameters.arangobench',
-    'shell_server.shell_server_aql',
+    'config.dump.importing.upgrade.authentication.authentication_parameters.arangobench',
+    'shell_server',
+    'shell_server_aql',
     //  'http_server.ssl_server.shell_client',
     'arangosh'
   ]
