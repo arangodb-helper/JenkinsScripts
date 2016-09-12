@@ -88,7 +88,8 @@ stage("running unittest") {
     for (int j = 0; j < CmdLineSwitches.size(); j++) {
       def cmdLineArgs = CmdLineSwitches.get(j)
       echo "${cmdLineArgs} - ${j}"
-      branches["tcs_${i}"] = {
+      def which = ${i} * CmdLineSwitches.size() + j
+      branches["tcs_${which}"] = {
         node {
           sh "cat /etc/issue"
           sh "pwd"
