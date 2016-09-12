@@ -107,7 +107,7 @@ stage("running unittest") {
                 echo "${unitTests}: ${EXECUTE_TEST}"
                 sh "${EXECUTE_TEST}"
                 echo "${unitTests}: recording results"
-                step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
+                junit 'out/UNITTEST_RESULT_*.xml'
               }
             }
           }
