@@ -87,6 +87,7 @@ stage("running unittest") {
     def unitTests = testCaseSets.get(i);
     for (int j = 0; j < CmdLineSwitches.size(); j++) {
       def cmdLineArgs = CmdLineSwitches.get(j)
+      echo "${cmdLineArgs} - ${j}"
       branches["tcs_${i}"] = {
         node {
           sh "cat /etc/issue"
