@@ -152,5 +152,5 @@ stage("running unittest") {
 
 stage("generating test report") {
   print(failures);
-
+  Mailer(notifyEveryUnstableBuild: true, recipients: 'willi@arangodb.com', sendToIndividuals: true)
 }
