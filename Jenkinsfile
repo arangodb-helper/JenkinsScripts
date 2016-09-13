@@ -82,6 +82,7 @@ stage("running unittest") {
     //                                    "--cluster true --testBuckets 4/4 "],
   def testCaseSets = [ 
     ["fail", 'fail', ""],
+    ["fail", 'fail', ""],
 //    ["shell_server_aql", 'shell_server_aql', "",
 //     "--cluster true --testBuckets 4/1 ",
 //     "--cluster true --testBuckets 4/2 ",
