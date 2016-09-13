@@ -97,8 +97,9 @@ stage("running unittest") {
    pwd
    tar -xzf ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz
 """
-
+  print("getting keyset")
   testCaseNames = testCaseSets.keySet()
+  print("done keyset is: %{testCaseNames}")
   int n = 0;
   for (int i = 0; i < testCaseNames.size(); i++) {
     
