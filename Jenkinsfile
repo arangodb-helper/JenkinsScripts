@@ -105,12 +105,12 @@ stage("running unittest") {
   int n = 0;
   for (int i = 0; i < m; i++) {
     print("in loop")
-    def unitTestName = testCaseNames.get(i);
-    print("unitTestName: ${unitTestName}")
-    def thisTest = testCaseSets[unitTestName]
-    echo "generating short name:"
-    def shortName = unitTestName.take(12)
-    echo "generated short name: ${shortName}"
+//    def unitTestName = testCaseNames.get(i);
+//    print("unitTestName: ${unitTestName}")
+//    def thisTest = testCaseSets[unitTestName]
+//    echo "generating short name:"
+//    def shortName = unitTestName.take(12)
+//    echo "generated short name: ${shortName}"
     
 //    for (int j = 0; j < thisTest.size(); j++) {
 //      def cmdLineArgs = thisTest.get(j)
