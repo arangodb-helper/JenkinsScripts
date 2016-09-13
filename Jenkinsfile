@@ -111,13 +111,8 @@ stage("running unittest") {
     def shortName = unitTestSet.getAt(1);
     print("generated short name: ${shortName}\n")
     for (int j = 2; j < o; j ++ ) {
-      
-      print("unitTestName: ${unitTestName}\n")
-      def thisTestParam = unitTestSet.getAt(j)
-      print("thisTestParam: ${unitTestName} ${thisTestParam}\n")
-
       def cmdLineArgs = unitTestSet.getAt(j)
-      echo "${cmdLineArgs} - ${j}"
+      echo " ${shortName} ${cmdLineArgs} -  ${j}"
       
       branches["${shortName}_${n}"] = {
         node {
