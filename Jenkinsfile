@@ -57,6 +57,22 @@ def branches = [:]
 
 stage("running unittest") {
 
+  def COPY_TARBAL_SHELL_SNIPPET= """
+   if test ! -d ${LOCAL_TAR_DIR}; then
+        mkdir -p ${LOCAL_TAR_DIR}
+   else
+      if test -f ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz.md5; then
+           local_md5sum=`cat ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz.md5`
+      fi
+   fi
+   if test \"\${MD5SUM}\" != \"\${local_md5sum}\"; then
+        cp ${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz ${LOCAL_TAR_DIR}
+        echo \"\${MD5SUM}\" > ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz.md5
+   fi
+   pwd
+   tar -xzf ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz
+"""
+
   def testCaseSets = [ 
     'config.upgrade.authentication.authentication_parameters.arangobench': [ ""],
                        'dump.importing': ["", "--cluster true"],
@@ -82,25 +98,10 @@ stage("running unittest") {
                                         "--cluster true --testBuckets 4/4 "],
   ]
 
-  def COPY_TARBAL_SHELL_SNIPPET= """
-   if test ! -d ${LOCAL_TAR_DIR}; then
-        mkdir -p ${LOCAL_TAR_DIR}
-   else
-      if test -f ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz.md5; then
-           local_md5sum=`cat ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz.md5`
-      fi
-   fi
-   if test \"\${MD5SUM}\" != \"\${local_md5sum}\"; then
-        cp ${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz ${LOCAL_TAR_DIR}
-        echo \"\${MD5SUM}\" > ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz.md5
-   fi
-   pwd
-   tar -xzf ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz
-"""
   print("getting keyset")
-  testCaseNames = testCaseSets.keySet()
-  print("done keyset is: ${testCaseNames}")
-  m = testCaseNames.size()
+  // testCaseNames = testCaseSets.keySet()
+  // print("done keyset is: ${testCaseNames}")
+  m = 1// testCaseNames.size()
   print("size: ${m}")
   int n = 0;
   for (int i = 0; i < m; i++) {
