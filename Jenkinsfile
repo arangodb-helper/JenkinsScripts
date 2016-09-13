@@ -13,7 +13,7 @@ def OS="Linux"
 def RELEASE_OUT_DIR="/net/fileserver/"
 def LOCAL_TAR_DIR="/jenkins/tmp/"
 def branches = [:]
-def failures = [:]
+def failures = ""
 def paralellJobNames = []
 
 stage("building ArangoDB") {
@@ -141,7 +141,7 @@ stage("running unittest") {
                 print("failure?")
                 if (failureOutput.size() > 5) {
                   print("having failure!")
-                  failures[testRunName] = failureOutput;
+                  failures =+ failureOutput;
                   env[testRunName] = failureOutput;
                   
                 }
@@ -168,6 +168,7 @@ stage("generating test report") {
     jobName = paralellJobNames.getAt(i)
     print("doing ${jobName}")
     print(env[jobName])
+    print(failures)
 //    if (env.containsKey(jobName)) {
 //      print("yes!")
 //      msg += env[jobName] + "\n"
@@ -177,5 +178,5 @@ stage("generating test report") {
   }
   mail (to: 'willi@arangodb.com',
         subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed",
-        body: "the failed testcases gave this output: ${msg}\nPlease go to ${env.BUILD_URL}.");
+        body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
 }
