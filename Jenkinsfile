@@ -14,6 +14,7 @@ def RELEASE_OUT_DIR="/net/fileserver/"
 def LOCAL_TAR_DIR="/jenkins/tmp/"
 def branches = [:]
 def failures = [:]
+def paralellJobNames = []
 
 stage("building ArangoDB") {
   node {
@@ -114,6 +115,8 @@ stage("running unittest") {
       def cmdLineArgs = unitTestSet.getAt(j)
       echo " ${shortName} ${cmdLineArgs} -  ${j}"
       testRunName = "${shortName}_${j}_${n}"
+      paralellJobNames[n]=testRunName
+      
       branches[testRunName] = {
         node {
           sh "cat /etc/issue"
@@ -137,6 +140,8 @@ stage("running unittest") {
                 failureOutput=readFile('out/testfailures.txt')
                 if (failureOutput.size() > 5) {
                   failures[testRunName] = failureOutput;
+                  env[testRunName] = failureOutput;
+                  
                 }
               }
             }
@@ -155,8 +160,19 @@ stage("generating test report") {
   print(failures);
   //  Mailer(notifyEveryUnstableBuild: true, recipients: 'willi@arangodb.com', sendToIndividuals: true)
 
-
+  msg = ""
+  for (int i = 0; i < paralellJobNames.size(); i++) {
+    
+    jobName = paralellJobNames.getAt(i)
+    print("doing ${jobName}")
+    if (env.containsKey(jobName)) {
+      print("yes!")
+      msg += env[jobName] + "\n"
+      print(msg)
+    }
+    print(msg)
+  }
   mail (to: 'willi@arangodb.com',
-         subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed",
-         body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
+        subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed",
+        body: "the failed testcases gave this output: ${msg}\nPlease go to ${env.BUILD_URL}.");
 }
