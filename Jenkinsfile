@@ -99,7 +99,7 @@ stage("running unittest") {
   ]
 
   print("getting keyset")
-  // testCaseNames = testCaseSets.keySet()
+  testCaseNames = testCaseSets.keySet()
   // print("done keyset is: ${testCaseNames}")
   m = 1// testCaseNames.size()
   print("size: ${m}")
