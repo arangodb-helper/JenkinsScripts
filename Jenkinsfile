@@ -1,5 +1,7 @@
 #!groovy
 stage("cloning source") {
+  abc="1234567890"
+  abc.take(5)
   def testCaseSets = [ 
     ['config.upgrade.authentication.authentication_parameters.arangobench', ""],
     ['dump.importing', "", "--cluster true"],
