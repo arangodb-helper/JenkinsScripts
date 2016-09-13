@@ -103,7 +103,7 @@ stage("running unittest") {
   m = testCaseNames.size()
   print("size: ${m}")
   int n = 0;
-  for (int i = 0; i < testCaseNames.size(); i++) {
+  for (int i = 0; i < m; i++) {
     print("in loop")
     def unitTestName = testCaseNames.get(i);
     print("unitTestName: ${unitTestName}")
