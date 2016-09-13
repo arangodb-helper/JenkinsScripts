@@ -13,6 +13,7 @@ def OS="Linux"
 def RELEASE_OUT_DIR="/net/fileserver/"
 def LOCAL_TAR_DIR="/jenkins/tmp/"
 def branches = [:]
+def failures = [:]
 
 stage("building ArangoDB") {
   node {
@@ -111,12 +112,12 @@ stage("running unittest") {
     for (int j = 2; j < o; j ++ ) {
       def cmdLineArgs = unitTestSet.getAt(j)
       echo " ${shortName} ${cmdLineArgs} -  ${j}"
-      
-      branches["${shortName}_${j}_${n}"] = {
+      testRunName = "${shortName}_${j}_${n}"
+      branches[testRunName] = {
         node {
           sh "cat /etc/issue"
           sh "pwd"
-          dir("${unitTests}") {
+          dir("${testRunName}") {
             echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
             docker.withRegistry("${REGISTRY_URL}", '') {
               def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
@@ -133,16 +134,23 @@ stage("running unittest") {
                 echo "${unitTests}: recording results"
                 junit 'out/UNITTEST_RESULT_*.xml'
                 failures=readFile('out/testfailures.txt')
-                
+                if (failures.size() > 5) {
+                  failures[testRunName] = failures;
+                }
               }
             }
           }
         }
       }
-    n += 1
+      n += 1
     }
   
   }
   echo branches.toString();
   parallel branches
+}
+
+stage("generating test report") {
+  print(failures);
+
 }
