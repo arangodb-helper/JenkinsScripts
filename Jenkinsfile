@@ -165,12 +165,13 @@ stage("generating test report") {
     
     jobName = paralellJobNames.getAt(i)
     print("doing ${jobName}")
-    if (env.containsKey(jobName)) {
-      print("yes!")
-      msg += env[jobName] + "\n"
-      print(msg)
-    }
-    print(msg)
+    print(env[jobName])
+//    if (env.containsKey(jobName)) {
+//      print("yes!")
+//      msg += env[jobName] + "\n"
+//      print(msg)
+//    }
+//    print(msg)
   }
   mail (to: 'willi@arangodb.com',
         subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed",
