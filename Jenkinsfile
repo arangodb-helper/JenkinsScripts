@@ -1,5 +1,40 @@
 #!groovy
 stage("cloning source") {
+  def testCaseSets = [ 
+    'config.upgrade.authentication.authentication_parameters.arangobench': [ ""],
+                       'dump.importing': ["", "--cluster true"],
+                       'shell_server': ["",
+                                        "--cluster true --testBuckets 4/1 ",
+                                        "--cluster true --testBuckets 4/2 ",
+                                        "--cluster true --testBuckets 4/3 ",
+                                        "--cluster true --testBuckets 4/4 "],
+                       'shell_server_aql': ["",
+                                        "--cluster true --testBuckets 4/1 ",
+                                        "--cluster true --testBuckets 4/2 ",
+                                        "--cluster true --testBuckets 4/3 ",
+                                        "--cluster true --testBuckets 4/4 "],
+                       'arangosh': ["",
+                                        "--cluster true --testBuckets 4/1 ",
+                                        "--cluster true --testBuckets 4/2 ",
+                                        "--cluster true --testBuckets 4/3 ",
+                                        "--cluster true --testBuckets 4/4 "],
+  ]
+
+  print("getting keyset\n")
+  testCaseNames = testCaseSets.keySet()
+  print("done keyset is: ${testCaseNames}\n")
+  m =  testCaseNames.size()
+  print("size: ${m}\n")
+  int n = 0;
+  for (int i = 0; i < m; i++) {
+    print("in loop\n")
+    def unitTestName = testCaseNames.getAt(i);
+    print("unitTestName: ${unitTestName}\n")
+    def thisTest = testCaseSets[unitTestName]
+    print( "generating short name:\n")
+    def shortName = unitTestName.take(12)
+    print("generated short name: ${shortName}\n")
+  }
   node {
     sh "cat /etc/issue"
     git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
