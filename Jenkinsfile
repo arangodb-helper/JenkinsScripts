@@ -1,44 +1,5 @@
 #!groovy
 stage("cloning source") {
-  def testCaseSets = [ 
-    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
-    ["dump_import", 'dump.importing', "", "--cluster true"],
-    ["shell_server", 'shell_server', "",
-     "--cluster true --testBuckets 4/1 ",
-     "--cluster true --testBuckets 4/2 ",
-     "--cluster true --testBuckets 4/3 ",
-     "--cluster true --testBuckets 4/4 "],
-    ["shell_server_aql", 'shell_server_aql', "",
-     "--cluster true --testBuckets 4/1 ",
-     "--cluster true --testBuckets 4/2 ",
-     "--cluster true --testBuckets 4/3 ",
-     "--cluster true --testBuckets 4/4 "],
-    ["arangosh", 'arangosh', "",
-     "--cluster true --testBuckets 4/1 ",
-     "--cluster true --testBuckets 4/2 ",
-     "--cluster true --testBuckets 4/3 ",
-     "--cluster true --testBuckets 4/4 "],
-  ]
-
-  print("getting keyset\n")
-  m = testCaseSets.size()
-  print("size: ${m}\n")
-  int n = 0;
-  for (int i = 0; i < m; i++) {
-    print("in loop\n")
-    def unitTestSet = testCaseSets.getAt(i);
-    o = unitTestSet.size()
-    def unitTestName = unitTestSet.getAt(0);
-    print("generating short name:\n")
-    def shortName = unitTestSet.getAt(1);
-    print("generated short name: ${shortName}\n")
-    for (int j = 2; j < o; j ++ ) {
-      
-      print("unitTestName: ${unitTestName}\n")
-      def thisTestParam = unitTestSet.getAt(j)
-      print("thisTestParam: ${unitTestName} ${thisTestParam}\n")
-    }
-  }
   node {
     sh "cat /etc/issue"
     git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
@@ -118,73 +79,75 @@ stage("running unittest") {
     //                                    "--cluster true --testBuckets 4/3 ",
     //                                    "--cluster true --testBuckets 4/4 "],
   def testCaseSets = [ 
-    'config.upgrade.authentication.authentication_parameters.arangobench': [ ""],
-                       'dump.importing': ["", "--cluster true"],
-                       'shell_server': ["",
-                                        "--cluster true --testBuckets 4/1 ",
-                                        "--cluster true --testBuckets 4/2 ",
-                                        "--cluster true --testBuckets 4/3 ",
-                                        "--cluster true --testBuckets 4/4 "],
-                       'shell_server_aql': ["",
-                                        "--cluster true --testBuckets 4/1 ",
-                                        "--cluster true --testBuckets 4/2 ",
-                                        "--cluster true --testBuckets 4/3 ",
-                                        "--cluster true --testBuckets 4/4 "],
-                       'arangosh': ["",
-                                        "--cluster true --testBuckets 4/1 ",
-                                        "--cluster true --testBuckets 4/2 ",
-                                        "--cluster true --testBuckets 4/3 ",
-                                        "--cluster true --testBuckets 4/4 "],
+    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
+    ["dump_import", 'dump.importing', "", "--cluster true"],
+    ["shell_server", 'shell_server', "",
+     "--cluster true --testBuckets 4/1 ",
+     "--cluster true --testBuckets 4/2 ",
+     "--cluster true --testBuckets 4/3 ",
+     "--cluster true --testBuckets 4/4 "],
+    ["shell_server_aql", 'shell_server_aql', "",
+     "--cluster true --testBuckets 4/1 ",
+     "--cluster true --testBuckets 4/2 ",
+     "--cluster true --testBuckets 4/3 ",
+     "--cluster true --testBuckets 4/4 "],
+    ["arangosh", 'arangosh', "",
+     "--cluster true --testBuckets 4/1 ",
+     "--cluster true --testBuckets 4/2 ",
+     "--cluster true --testBuckets 4/3 ",
+     "--cluster true --testBuckets 4/4 "],
   ]
 
-  print("getting keyset")
-  testCaseNames = testCaseSets.keySet()
-  print("done keyset is: ${testCaseNames}")
-  m = testCaseNames.size()
-  print("size: ${m}")
+  print("getting keyset\n")
+  m = testCaseSets.size()
+  print("size: ${m}\n")
   int n = 0;
   for (int i = 0; i < m; i++) {
-    print("in loop")
-    def unitTestName = testCaseNames.getAt(i);
-    print("unitTestName: ${unitTestName}")
-    def thisTest = testCaseSets[unitTestName]
-    print("generating short name:")
-    def shortName = unitTestName.take(12)
-    print("generated short name: ${shortName}")
-    
-//    for (int j = 0; j < thisTest.size(); j++) {
-//      def cmdLineArgs = thisTest.get(j)
-//      echo "${cmdLineArgs} - ${j}"
-//      
-//      branches["${shortName}_${n}"] = {
-//        node {
-//          sh "cat /etc/issue"
-//          sh "pwd"
-//          dir("${unitTests}") {
-//            echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
-//            docker.withRegistry("${REGISTRY_URL}", '') {
-//              def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
-//              myRunImage.pull()
-//              docker.image(myRunImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
-//                sh "cat /etc/issue"
-//                sh "ls -l ${RELEASE_OUT_DIR}"
-//                lock(resource: 'uploadfiles', inversePrecedence: true) {
-//                  sh "${COPY_TARBAL_SHELL_SNIPPET}"
-//                }
-//                def EXECUTE_TEST="pwd; `pwd`/scripts/unittest ${unitTests} --skipNondeterministic true --skipTimeCritical true ${cmdLineArgs}"
-//                echo "${unitTests}: ${EXECUTE_TEST}"
-//                sh "${EXECUTE_TEST}"
-//                echo "${unitTests}: recording results"
-//                junit 'out/UNITTEST_RESULT_*.xml'
-//              }
-//            }
-//          }
-//        }
-//      }
-//    n += 1
-//    }
+    print("in loop\n")
+    def unitTestSet = testCaseSets.getAt(i);
+    o = unitTestSet.size()
+    def unitTests = unitTestSet.getAt(0);
+    print("generating short name:\n")
+    def shortName = unitTestSet.getAt(1);
+    print("generated short name: ${shortName}\n")
+    for (int j = 2; j < o; j ++ ) {
+      
+      print("unitTestName: ${unitTestName}\n")
+      def thisTestParam = unitTestSet.getAt(j)
+      print("thisTestParam: ${unitTestName} ${thisTestParam}\n")
+
+      def cmdLineArgs = unitTestSet.getAt(j)
+      echo "${cmdLineArgs} - ${j}"
+      
+      branches["${shortName}_${n}"] = {
+        node {
+          sh "cat /etc/issue"
+          sh "pwd"
+          dir("${unitTests}") {
+            echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
+            docker.withRegistry("${REGISTRY_URL}", '') {
+              def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
+              myRunImage.pull()
+              docker.image(myRunImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
+                sh "cat /etc/issue"
+                sh "ls -l ${RELEASE_OUT_DIR}"
+                lock(resource: 'uploadfiles', inversePrecedence: true) {
+                  sh "${COPY_TARBAL_SHELL_SNIPPET}"
+                }
+                def EXECUTE_TEST="pwd; `pwd`/scripts/unittest ${unitTests} --skipNondeterministic true --skipTimeCritical true ${cmdLineArgs}"
+                echo "${unitTests}: ${EXECUTE_TEST}"
+                sh "${EXECUTE_TEST}"
+                echo "${unitTests}: recording results"
+                junit 'out/UNITTEST_RESULT_*.xml'
+              }
+            }
+          }
+        }
+      }
+    n += 1
+    }
   
   }
-  //echo branches.toString();
-//  parallel branches
+  echo branches.toString();
+  parallel branches
 }
