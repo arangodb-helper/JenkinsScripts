@@ -110,7 +110,7 @@ stage("running unittest") {
       def cmdLineArgs = unitTestSet.getAt(j)
       echo " ${shortName} ${cmdLineArgs} -  ${j}"
       
-      branches["${shortName}_${n}"] = {
+      branches["${shortName}_${j}_${n}"] = {
         node {
           sh "cat /etc/issue"
           sh "pwd"
