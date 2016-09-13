@@ -56,20 +56,29 @@ stage("building ArangoDB") {
 
 stage("running unittest") {
 
-  List<String> testCaseSets = [ 
-    'config.dump.importing.upgrade.authentication.authentication_parameters.arangobench',
-    'shell_server',
-    'shell_server_aql',
-    //  'http_server.ssl_server.shell_client',
-    'arangosh'
-  ]
-
-  List<String> CmdLineSwitches = [
-    "--cluster true --testBuckets 4/1 ",
-    "--cluster true --testBuckets 4/2 ",
-    "--cluster true --testBuckets 4/3 ",
-    "--cluster true --testBuckets 4/4 ",
-    ""
+  def testCaseSets = [ 
+    'config.upgrade.authentication.authentication_parameters.arangobench': [ ""],
+                       'dump.importing': ["", "--cluster true"],
+                       'shell_server': ["",
+                                        "--cluster true --testBuckets 4/1 ",
+                                        "--cluster true --testBuckets 4/2 ",
+                                        "--cluster true --testBuckets 4/3 ",
+                                        "--cluster true --testBuckets 4/4 "],
+                       'shell_server_aql': ["",
+                                        "--cluster true --testBuckets 4/1 ",
+                                        "--cluster true --testBuckets 4/2 ",
+                                        "--cluster true --testBuckets 4/3 ",
+                                        "--cluster true --testBuckets 4/4 "],
+    //  'http_server.ssl_server.shell_client': ["",
+    // "--cluster true --testBuckets 4/1 ",
+    //                                    "--cluster true --testBuckets 4/2 ",
+    //                                    "--cluster true --testBuckets 4/3 ",
+    //                                    "--cluster true --testBuckets 4/4 "],
+                       'arangosh': ["",
+                                        "--cluster true --testBuckets 4/1 ",
+                                        "--cluster true --testBuckets 4/2 ",
+                                        "--cluster true --testBuckets 4/3 ",
+                                        "--cluster true --testBuckets 4/4 "],
   ]
 
   def COPY_TARBAL_SHELL_SNIPPET= """
@@ -87,14 +96,22 @@ stage("running unittest") {
    pwd
    tar -xzf ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz
 """
-  for (int i = 0; i < testCaseSets.size(); i++) {
-    def unitTests = testCaseSets.get(i);
-    for (int j = 0; j < CmdLineSwitches.size(); j++) {
-      def cmdLineArgs = CmdLineSwitches.get(j)
+
+  testCaseNames = testCaseSets.keySet()
+  int n = 0;
+  for (int i = 0; i < testCaseNames.size(); i++) {
+    
+    def unitTestName = testCaseNames.get(i);
+    def thisTest = testCaseSets[unitTestName]
+    echo "generating short name:"
+    def shortName = unitTestName.take(12)
+    echo "generated short name: ${shortName}"
+    
+    for (int j = 0; j < thisTest.size(); j++) {
+      def cmdLineArgs = thisTest.get(j)
       echo "${cmdLineArgs} - ${j}"
-      def which = i * CmdLineSwitches.size() + j
-      def shortName = unitTests.take(12)
-      branches["${shortName}_${which}"] = {
+      
+      branches["${shortName}_${n}"] = {
         node {
           sh "cat /etc/issue"
           sh "pwd"
@@ -119,6 +136,7 @@ stage("running unittest") {
           }
         }
       }
+      n += 1
     }
   
   }
