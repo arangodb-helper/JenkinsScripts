@@ -13,47 +13,47 @@ def RELEASE_OUT_DIR="/net/fileserver/"
 def LOCAL_TAR_DIR="/jenkins/tmp/"
 def branches = [:]
 
-//stage("building ArangoDB") {
-//  node {
-//    OUT_DIR = ""
-//    docker.withRegistry("https://192.168.0.1/", '') {
-//      def myBuildImage=docker.image("centosix/build")
-//      myBuildImage.pull()
-//      docker.image(myBuildImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
-//        sh "cat /etc/issue"
-//
-//        sh 'pwd > workspace.loc'
-//        WORKSPACE = readFile('workspace.loc').trim()
-//        OUT_DIR = "${WORKSPACE}/out"
-//
-//        sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
-//        //sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
-//        OUT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
-//        env.MD5SUM = readFile("${OUT_FILE}.md5")
-//        echo "copying result files: "
-//  
-//        def UPLOAD_SHELLSCRIPT="""
-//   set -x
-//   if test -f ${OUT_FILE}.md5; then
-//     remote_md5sum=`cat ${OUT_FILE}.md5`
-//   fi
-//   if test \"\${MD5SUM}\" != \"\${remote_md5sum}\"; then
-//        echo 'uploading file'
-//        cp ${OUT_FILE} ${RELEASE_OUT_DIR}
-//        echo \"\${MD5SUM}\" > ${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz.md5
-//   else
-//        echo 'file not changed - not uploading'
-//   fi
-//"""
-//        echo "${UPLOAD_SHELLSCRIPT}"
-//        lock(resource: 'uploadfiles', inversePrecedence: true) {
-//          sh "${UPLOAD_SHELLSCRIPT}"
-//        }
-//        sh "ls -l ${RELEASE_OUT_DIR}"
-//      }
-//    }
-//  }
-//}
+stage("building ArangoDB") {
+  node {
+    OUT_DIR = ""
+    docker.withRegistry("https://192.168.0.1/", '') {
+      def myBuildImage=docker.image("centosix/build")
+      myBuildImage.pull()
+      docker.image(myBuildImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
+        sh "cat /etc/issue"
+
+        sh 'pwd > workspace.loc'
+        WORKSPACE = readFile('workspace.loc').trim()
+        OUT_DIR = "${WORKSPACE}/out"
+
+        sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
+        //sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
+        OUT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
+        env.MD5SUM = readFile("${OUT_FILE}.md5")
+        echo "copying result files: "
+  
+        def UPLOAD_SHELLSCRIPT="""
+   set -x
+   if test -f ${OUT_FILE}.md5; then
+     remote_md5sum=`cat ${OUT_FILE}.md5`
+   fi
+   if test \"\${MD5SUM}\" != \"\${remote_md5sum}\"; then
+        echo 'uploading file'
+        cp ${OUT_FILE} ${RELEASE_OUT_DIR}
+        echo \"\${MD5SUM}\" > ${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz.md5
+   else
+        echo 'file not changed - not uploading'
+   fi
+"""
+        echo "${UPLOAD_SHELLSCRIPT}"
+        lock(resource: 'uploadfiles', inversePrecedence: true) {
+          sh "${UPLOAD_SHELLSCRIPT}"
+        }
+        sh "ls -l ${RELEASE_OUT_DIR}"
+      }
+    }
+  }
+}
 
 stage("running unittest") {
 
@@ -100,16 +100,12 @@ stage("running unittest") {
 
   print("getting keyset\n")
   m = testCaseSets.size()
-  print("size: ${m}\n")
   int n = 0;
   for (int i = 0; i < m; i++) {
-    print("in loop\n")
     def unitTestSet = testCaseSets.getAt(i);
     o = unitTestSet.size()
     def unitTests = unitTestSet.getAt(0);
-    print("generating short name:\n")
     def shortName = unitTestSet.getAt(1);
-    print("generated short name: ${shortName}\n")
     for (int j = 2; j < o; j ++ ) {
       def cmdLineArgs = unitTestSet.getAt(j)
       echo " ${shortName} ${cmdLineArgs} -  ${j}"
