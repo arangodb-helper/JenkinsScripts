@@ -141,7 +141,7 @@ stage("running unittest") {
                 print("failure?")
                 if (failureOutput.size() > 5) {
                   print("having failure!")
-                  failures =+ failureOutput;
+                  failures = "${failures}\n${failureOutput}"
                   env[testRunName] = failureOutput;
                   
                 }
