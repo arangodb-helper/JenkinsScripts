@@ -152,5 +152,10 @@ stage("running unittest") {
 
 stage("generating test report") {
   print(failures);
-  Mailer(notifyEveryUnstableBuild: true, recipients: 'willi@arangodb.com', sendToIndividuals: true)
+  //  Mailer(notifyEveryUnstableBuild: true, recipients: 'willi@arangodb.com', sendToIndividuals: true)
+
+
+  mail (to: 'willi@arangodb.com',
+         subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed",
+         body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
 }
