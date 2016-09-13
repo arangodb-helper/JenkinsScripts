@@ -104,8 +104,8 @@ stage("running unittest") {
   for (int i = 0; i < m; i++) {
     def unitTestSet = testCaseSets.getAt(i);
     o = unitTestSet.size()
-    def unitTests = unitTestSet.getAt(0);
-    def shortName = unitTestSet.getAt(1);
+    def unitTests = unitTestSet.getAt(1);
+    def shortName = unitTestSet.getAt(0);
     for (int j = 2; j < o; j ++ ) {
       def cmdLineArgs = unitTestSet.getAt(j)
       echo " ${shortName} ${cmdLineArgs} -  ${j}"
