@@ -145,6 +145,6 @@ stage("running unittest") {
 //    }
   
   }
-  echo branches.toString();
+  //echo branches.toString();
 //  parallel branches
 }
