@@ -26,7 +26,8 @@ stage("building ArangoDB") {
         WORKSPACE = readFile('workspace.loc').trim()
         OUT_DIR = "${WORKSPACE}/out"
 
-        sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
+        sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
+        //sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
         OUT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
         env.MD5SUM = readFile("${OUT_FILE}.md5")
         echo "copying result files: "
