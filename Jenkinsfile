@@ -138,12 +138,8 @@ stage("running unittest") {
                 echo "${unitTests}: recording results"
                 junit 'out/UNITTEST_RESULT_*.xml'
                 failureOutput=readFile('out/testfailures.txt')
-                print("failure?")
                 if (failureOutput.size() > 5) {
-                  print("having failure!")
                   failures = "${failures}\n${failureOutput}"
-                  env[testRunName] = failureOutput;
-                  
                 }
               }
             }
@@ -159,23 +155,6 @@ stage("running unittest") {
 }
 
 stage("generating test report") {
-  print(failures);
-  //  Mailer(notifyEveryUnstableBuild: true, recipients: 'willi@arangodb.com', sendToIndividuals: true)
-
-  msg = ""
-  for (int i = 0; i < paralellJobNames.size(); i++) {
-    
-    jobName = paralellJobNames.getAt(i)
-    print("doing ${jobName}")
-    print(env[jobName])
-    print(failures)
-//    if (env.containsKey(jobName)) {
-//      print("yes!")
-//      msg += env[jobName] + "\n"
-//      print(msg)
-//    }
-//    print(msg)
-  }
   mail (to: 'willi@arangodb.com',
         subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed",
         body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
