@@ -1,21 +1,19 @@
 #!groovy
 stage("cloning source") {
-  abc="1234567890"
-  abc.take(5)
   def testCaseSets = [ 
-    ['config.upgrade.authentication.authentication_parameters.arangobench', ""],
-    ['dump.importing', "", "--cluster true"],
-    ['shell_server', "",
+    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
+    ["dump_import", 'dump.importing', "", "--cluster true"],
+    ["shell_server", 'shell_server', "",
      "--cluster true --testBuckets 4/1 ",
      "--cluster true --testBuckets 4/2 ",
      "--cluster true --testBuckets 4/3 ",
      "--cluster true --testBuckets 4/4 "],
-    ['shell_server_aql', "",
+    ["shell_server_aql", 'shell_server_aql', "",
      "--cluster true --testBuckets 4/1 ",
      "--cluster true --testBuckets 4/2 ",
      "--cluster true --testBuckets 4/3 ",
      "--cluster true --testBuckets 4/4 "],
-    ['arangosh', "",
+    ["arangosh", 'arangosh', "",
      "--cluster true --testBuckets 4/1 ",
      "--cluster true --testBuckets 4/2 ",
      "--cluster true --testBuckets 4/3 ",
@@ -32,9 +30,9 @@ stage("cloning source") {
     o = unitTestSet.size()
     def unitTestName = unitTestSet.getAt(0);
     print("generating short name:\n")
-    def shortName = unitTestName.take(12)
+    def shortName = unitTestSet.getAt(1);
     print("generated short name: ${shortName}\n")
-    for (int j = 1; j < o; j ++ ) {
+    for (int j = 2; j < o; j ++ ) {
       
       print("unitTestName: ${unitTestName}\n")
       def thisTestParam = unitTestSet.getAt(j)
