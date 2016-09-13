@@ -112,39 +112,39 @@ stage("running unittest") {
     def shortName = unitTestName.take(12)
     echo "generated short name: ${shortName}"
     
-    for (int j = 0; j < thisTest.size(); j++) {
-      def cmdLineArgs = thisTest.get(j)
-      echo "${cmdLineArgs} - ${j}"
-      
-      branches["${shortName}_${n}"] = {
-        node {
-          sh "cat /etc/issue"
-          sh "pwd"
-          dir("${unitTests}") {
-            echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
-            docker.withRegistry("${REGISTRY_URL}", '') {
-              def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
-              myRunImage.pull()
-              docker.image(myRunImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
-                sh "cat /etc/issue"
-                sh "ls -l ${RELEASE_OUT_DIR}"
-                lock(resource: 'uploadfiles', inversePrecedence: true) {
-                  sh "${COPY_TARBAL_SHELL_SNIPPET}"
-                }
-                def EXECUTE_TEST="pwd; `pwd`/scripts/unittest ${unitTests} --skipNondeterministic true --skipTimeCritical true ${cmdLineArgs}"
-                echo "${unitTests}: ${EXECUTE_TEST}"
-                sh "${EXECUTE_TEST}"
-                echo "${unitTests}: recording results"
-                junit 'out/UNITTEST_RESULT_*.xml'
-              }
-            }
-          }
-        }
-      }
+//    for (int j = 0; j < thisTest.size(); j++) {
+//      def cmdLineArgs = thisTest.get(j)
+//      echo "${cmdLineArgs} - ${j}"
+//      
+//      branches["${shortName}_${n}"] = {
+//        node {
+//          sh "cat /etc/issue"
+//          sh "pwd"
+//          dir("${unitTests}") {
+//            echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
+//            docker.withRegistry("${REGISTRY_URL}", '') {
+//              def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
+//              myRunImage.pull()
+//              docker.image(myRunImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
+//                sh "cat /etc/issue"
+//                sh "ls -l ${RELEASE_OUT_DIR}"
+//                lock(resource: 'uploadfiles', inversePrecedence: true) {
+//                  sh "${COPY_TARBAL_SHELL_SNIPPET}"
+//                }
+//                def EXECUTE_TEST="pwd; `pwd`/scripts/unittest ${unitTests} --skipNondeterministic true --skipTimeCritical true ${cmdLineArgs}"
+//                echo "${unitTests}: ${EXECUTE_TEST}"
+//                sh "${EXECUTE_TEST}"
+//                echo "${unitTests}: recording results"
+//                junit 'out/UNITTEST_RESULT_*.xml'
+//              }
+//            }
+//          }
+//        }
+//      }
       n += 1
     }
   
   }
   echo branches.toString();
-  parallel branches
+//  parallel branches
 }
