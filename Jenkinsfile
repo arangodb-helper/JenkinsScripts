@@ -93,7 +93,8 @@ stage("running unittest") {
       def cmdLineArgs = CmdLineSwitches.get(j)
       echo "${cmdLineArgs} - ${j}"
       def which = i * CmdLineSwitches.size() + j
-      branches["tcs_${which}"] = {
+      def shortName = unitTests.take(12)
+      branches["${shortName}_${which}"] = {
         node {
           sh "cat /etc/issue"
           sh "pwd"
