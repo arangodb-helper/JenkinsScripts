@@ -99,11 +99,12 @@ stage("running unittest") {
 """
   print("getting keyset")
   testCaseNames = testCaseSets.keySet()
-  print("done keyset is: %{testCaseNames}")
+  print("done keyset is: ${testCaseNames}")
   int n = 0;
   for (int i = 0; i < testCaseNames.size(); i++) {
-    
+    print("in loop")
     def unitTestName = testCaseNames.get(i);
+    print("unitTestName: ${unitTestName}")
     def thisTest = testCaseSets[unitTestName]
     echo "generating short name:"
     def shortName = unitTestName.take(12)
