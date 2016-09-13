@@ -3,6 +3,7 @@ stage("cloning source") {
   node {
     sh "cat /etc/issue"
     git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
+    print("GIT_AUTHOR_EMAIL: ${GIT_AUTHOR_EMAIL} ${GIT_COMMITTER_EMAIL}")
   }
 }
 def REGISTRY="192.168.0.1"
