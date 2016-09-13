@@ -138,7 +138,9 @@ stage("running unittest") {
                 echo "${unitTests}: recording results"
                 junit 'out/UNITTEST_RESULT_*.xml'
                 failureOutput=readFile('out/testfailures.txt')
+                print("failure?")
                 if (failureOutput.size() > 5) {
+                  print("having failure!")
                   failures[testRunName] = failureOutput;
                   env[testRunName] = failureOutput;
                   
