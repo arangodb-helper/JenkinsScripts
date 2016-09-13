@@ -65,7 +65,10 @@ stage("running unittest") {
   ]
 
   List<String> CmdLineSwitches = [
-    "--cluster true",
+    "--cluster true --testBuckets 4/1 ",
+    "--cluster true --testBuckets 4/2 ",
+    "--cluster true --testBuckets 4/3 ",
+    "--cluster true --testBuckets 4/4 ",
     ""
   ]
 
