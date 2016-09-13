@@ -3,7 +3,7 @@ stage("cloning source") {
   node {
     sh "cat /etc/issue"
     git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
-    print("GIT_AUTHOR_EMAIL: ${env.GIT_AUTHOR_EMAIL} ${env.GIT_COMMITTER_EMAIL}")
+    print("GIT_AUTHOR_EMAIL: ${env}")
   }
 }
 def REGISTRY="192.168.0.1"
@@ -80,6 +80,7 @@ stage("running unittest") {
     //                                    "--cluster true --testBuckets 4/3 ",
     //                                    "--cluster true --testBuckets 4/4 "],
   def testCaseSets = [ 
+    ["fail", 'fail', ""],
     ["shell_server_aql", 'shell_server_aql', "",
      "--cluster true --testBuckets 4/1 ",
      "--cluster true --testBuckets 4/2 ",
@@ -131,6 +132,8 @@ stage("running unittest") {
                 sh "${EXECUTE_TEST}"
                 echo "${unitTests}: recording results"
                 junit 'out/UNITTEST_RESULT_*.xml'
+                failures=readFile('out/testfailures.txt')
+                
               }
             }
           }
