@@ -166,20 +166,22 @@ stage("running unittest") {
 }
 
 stage("generating test report") {
-  if (failures.size() > 5) {
-    def gitRange = ""
-    if (lastKnownGitRev.size() > 1) {
+  dir("report") {
+    if (failures.size() > 5) {
+      def gitRange = ""
+      if (lastKnownGitRev.size() > 1) {
         gitRange = "${lastKnownGitRev}.."
-    }
-    gitRange = "${gitRange}${currentGitRev}"
+      }
+      gitRange = "${gitRange}${currentGitRev}"
 
-    gitCommitters = sh(returnStdout: true, script: 'git --no-pager show -s --format="%an <%ae>" ${gitRange |sort -u')
-    echo gitCommitters
-    mail (to: 'willi@arangodb.com',
-          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed",
-          body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
-  }
-  else {
-    writeFile(lastKnownGoodGitFile, currentGitRev);
+      gitCommitters = sh(returnStdout: true, script: 'git --no-pager show -s --format="%an <%ae>" ${gitRange |sort -u')
+      echo gitCommitters
+      mail (to: 'willi@arangodb.com',
+            subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed",
+            body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
+    }
+    else {
+      writeFile(lastKnownGoodGitFile, currentGitRev);
+    }
   }
 }
