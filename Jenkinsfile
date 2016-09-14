@@ -173,7 +173,7 @@ stage("generating test report") {
         gitRange = "${lastKnownGitRev}.."
       }
       gitRange = "${gitRange}${currentGitRev}"
-      def gitcmd = 'git --no-pager show -s --format="\\%an <\\%ae>" ${gitRange |sort -u'
+      def gitcmd = 'git --no-pager show -s --format="%an <%ae>" ${gitRange} |sort -u'
       print(gitcmd)
       gitCommitters = sh(returnStdout: true, script: gitcmd)
       echo gitCommitters
