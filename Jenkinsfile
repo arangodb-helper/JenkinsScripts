@@ -15,6 +15,9 @@ def paralellJobNames = []
 def lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
 def lastKnownGitRev=""
 def currentGitRev=""
+
+def fatalError = false
+
 stage("cloning source") {
   node {
     if (fileExists(lastKnownGoodGitFile)) {
@@ -69,8 +72,9 @@ stage("building ArangoDB") {
   }
 }
 
-stage("running unittest") {
-
+stage("running unittest") try {
+  echo "syntax error following: "
+  echo "${barf"
   def COPY_TARBAL_SHELL_SNIPPET= """
    if test ! -d ${LOCAL_TAR_DIR}; then
         mkdir -p ${LOCAL_TAR_DIR}
@@ -162,7 +166,15 @@ stage("running unittest") {
   
   }
   echo branches.toString();
+  
   parallel branches
+} catch (err) {
+  stage 'Send Notification' 
+  mail (to: 'willi@arangodb.com', 
+        subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a fatal error.", 
+        body: err.getCauses()); 
+  currentBuild.result = 'FAILURE'
+  throw(err)
 }
 
 stage("generating test report") {
@@ -177,8 +189,17 @@ stage("generating test report") {
       print(gitcmd)
       gitCommitters = sh(returnStdout: true, script: gitcmd)
       echo gitCommitters
+      
+      def subject = ""
+      if (fatalError) {
+        subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed MISERABLY! "
+      }
+      else {
+        subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed"
+      }
+      
       mail (to: gitCommitters,
-            subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed",
+            subject: subject,
             body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
     }
     else {
