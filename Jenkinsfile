@@ -72,7 +72,7 @@ stage("building ArangoDB") {
   }
 }
 
-stage("running unittest") try {
+stage("running unittest") { try {
   echo "syntax error following: "
   echo "${barf"
   def COPY_TARBAL_SHELL_SNIPPET= """
@@ -175,7 +175,7 @@ stage("running unittest") try {
         body: err.getCauses()); 
   currentBuild.result = 'FAILURE'
   throw(err)
-}
+}}
 
 stage("generating test report") {
   node {
