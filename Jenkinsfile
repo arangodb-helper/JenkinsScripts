@@ -169,12 +169,13 @@ stage("running unittest") { try {
   
   parallel branches
 } catch (err) {
-  stage 'Send Notification' 
-  mail (to: 'willi@arangodb.com', 
-        subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a fatal error.", 
-        body: err.getCauses()); 
-  currentBuild.result = 'FAILURE'
-  throw(err)
+    stage('Send Notification' ) {
+      mail (to: 'willi@arangodb.com', 
+            subject: "Job '${env.JOB_NAME   }' (${env.BUILD_NUMBER}) 'running unittest' has had a fatal error.", 
+            body: err.getCauses()); 
+      currentBuild.result = 'FAILURE'
+      throw(err)
+    }
 }}
 
 stage("generating test report") {
