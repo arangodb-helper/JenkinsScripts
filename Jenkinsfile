@@ -1,11 +1,4 @@
 #!groovy
-stage("cloning source") {
-  node {
-    sh "cat /etc/issue"
-    git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
-    print("GIT_AUTHOR_EMAIL: ${env}")
-  }
-}
 def REGISTRY="192.168.0.1"
 def REGISTRY_URL="https://${REGISTRY}/"
 def DOCKER_CONTAINER="centosix"
@@ -15,6 +8,21 @@ def LOCAL_TAR_DIR="/jenkins/tmp/"
 def branches = [:]
 def failures = ""
 def paralellJobNames = []
+
+def lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
+def lastKnownGitRev=""
+def currentGitRev=""
+stage("cloning source") {
+  node {
+    if (fileExists(lastKnownGoodGitFile)) {
+      lastKnownGitRev=readFile(lastKnownGoodGitFile)
+    }
+    sh "cat /etc/issue"
+    git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
+    currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+    print("GIT_AUTHOR_EMAIL: ${env} %{currentGitRev}")
+  }
+}
 
 stage("building ArangoDB") {
   node {
@@ -155,7 +163,20 @@ stage("running unittest") {
 }
 
 stage("generating test report") {
-  mail (to: 'willi@arangodb.com',
-        subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed",
-        body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
+  if (failures.size() > 5) {
+    def gitRange = ""
+    if (lastKnownGitRev.size() > 1) {
+        gitRange = "${lastKnownGitRev}.."
+    }
+    gitRange = "${gitRange}${currentGitRev}"
+
+    gitCommitters = sh(returnStdout: true, script: "git --no-pager show -s --format='%an <%ae>' ${gitRange |sort -u").trim()
+    echo gitCommitters
+    mail (to: 'willi@arangodb.com',
+          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed",
+          body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
+  }
+  else {
+    writeFile(lastKnownGoodGitFile, currentGitRev);
+  }
 }
