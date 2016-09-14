@@ -173,11 +173,11 @@ stage("generating test report") {
         gitRange = "${lastKnownGitRev}.."
       }
       gitRange = "${gitRange}${currentGitRev}"
-      def gitcmd = 'git --no-pager show -s --format="%an <%ae>" ${gitRange} |sort -u'
+      def gitcmd = 'git --no-pager show -s --format="%an <%ae>" ${gitRange} |sort -u |sed -e :a -e \'$!N;s/\n//;ta\' -e \'s;>;>, ;g\' -e \'s;, $;;\''
       print(gitcmd)
       gitCommitters = sh(returnStdout: true, script: gitcmd)
       echo gitCommitters
-      mail (to: 'willi@arangodb.com',
+      mail (to: gitCommitters,
             subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed",
             body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
     }
