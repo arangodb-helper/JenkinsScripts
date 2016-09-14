@@ -1,4 +1,7 @@
 #!groovy
+// We need these modules:
+//
+// We need permisions for several string manipulation operations, like take()
 def REGISTRY="192.168.0.1"
 def REGISTRY_URL="https://${REGISTRY}/"
 def DOCKER_CONTAINER="centosix"
@@ -19,7 +22,7 @@ stage("cloning source") {
     }
     sh "cat /etc/issue"
     git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
-    currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+    currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').take(40)
     print("GIT_AUTHOR_EMAIL: ${env} %{currentGitRev}")
   }
 }
