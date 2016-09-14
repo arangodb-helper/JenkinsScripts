@@ -74,7 +74,7 @@ stage("building ArangoDB") {
 
 stage("running unittest") { try {
   echo "syntax error following: "
-  echo "${barf"
+  echo "${barf}"
   def COPY_TARBAL_SHELL_SNIPPET= """
    if test ! -d ${LOCAL_TAR_DIR}; then
         mkdir -p ${LOCAL_TAR_DIR}
