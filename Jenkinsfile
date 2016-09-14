@@ -4,7 +4,7 @@
 // We need permisions for several string manipulation operations, like take()
 def REGISTRY="192.168.0.1"
 def REGISTRY_URL="https://${REGISTRY}/"
-def DOCKER_CONTAINER="centosix"
+def DOCKER_CONTAINER="ubuntusixteenofour"
 def OS="Linux"
 def RELEASE_OUT_DIR="/net/fileserver/"
 def LOCAL_TAR_DIR="/jenkins/tmp/"
@@ -96,15 +96,17 @@ stage("running unittest") { try {
    pwd
    tar -xzf ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz
 """
-
-    //  'http_server.ssl_server.shell_client': ["",
-    // "--cluster true --testBuckets 4/1 ",
-    //                                    "--cluster true --testBuckets 4/2 ",
-    //                                    "--cluster true --testBuckets 4/3 ",
-    //                                    "--cluster true --testBuckets 4/4 "],
+.shell_client
   def testCaseSets = [ 
     ["fail", 'fail', ""],
     //    ["fail", 'fail', ""],
+    ['ssl_server', 'ssl_server', ""], // FC: don't need this with clusters.
+    
+    ['http_server', 'http_server', "",
+     "--cluster true --testBuckets 4/1 ",
+     "--cluster true --testBuckets 4/2 ",
+     "--cluster true --testBuckets 4/3 ",
+     "--cluster true --testBuckets 4/4 "],
 //    ["shell_server_aql", 'shell_server_aql', "",
 //     "--cluster true --testBuckets 4/1 ",
 //     "--cluster true --testBuckets 4/2 ",
@@ -192,6 +194,7 @@ stage("generating test report") {
         gitRange = "${lastKnownGitRev}.."
       }
       gitRange = "${gitRange}${currentGitRev}"
+      print(gitrange)
       def gitcmd = 'git --no-pager show -s --format="%ae>" ${gitRange} |sort -u |sed -e :a -e \'$!N;s/\\n//;ta\' -e \'s;>;, ;g\' -e \'s;, $;;\''
       print(gitcmd)
       gitCommitters = sh(returnStdout: true, script: gitcmd)
