@@ -23,7 +23,7 @@ stage("cloning source") {
     sh "cat /etc/issue"
     git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
     currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-    print("GIT_AUTHOR_EMAIL: ${env} %{currentGitRev}")
+    print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
   }
 }
 
@@ -166,7 +166,7 @@ stage("running unittest") {
 }
 
 stage("generating test report") {
-  dir("report") {
+  node {
     if (failures.size() > 5) {
       def gitRange = ""
       if (lastKnownGitRev.size() > 1) {
