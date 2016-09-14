@@ -11,7 +11,7 @@ def LOCAL_TAR_DIR="/jenkins/tmp/"
 def branches = [:]
 def failures = ""
 def paralellJobNames = []
-
+def ADMIN_ACCOUNT = "willi@arangodb.com"
 def lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
 def lastKnownGitRev=""
 def currentGitRev=""
@@ -30,7 +30,7 @@ stage("cloning source") {
   }
 }
 
-stage("building ArangoDB") {
+stage("building ArangoDB") { try {
   node {
     OUT_DIR = ""
     docker.withRegistry("https://192.168.0.1/", '') {
@@ -70,7 +70,15 @@ stage("building ArangoDB") {
       }
     }
   }
-}
+} catch (err) {
+    stage('Send Notification for build' ) {
+      mail (to: ADMIN_ACCOUNT, 
+            subject: "Job '${env.JOB_NAME   }' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
+            body: err.getMessage());
+      currentBuild.result = 'FAILURE'
+      throw(err)
+    }
+}}
 
 stage("running unittest") { try {
   echo "syntax error following: "
@@ -169,12 +177,9 @@ stage("running unittest") { try {
   
   parallel branches
 } catch (err) {
-          print(err.toString());
-         print(err.getMessage());
-         print(err.getStackTrace());
-         stage('Send Notification' ) {
-      mail (to: 'willi@arangodb.com', 
-            subject: "Job '${env.JOB_NAME   }' (${env.BUILD_NUMBER}) 'running unittest' has had a fatal error.", 
+    stage('Send Notification unittest' ) {
+      mail (to: ADMIN_ACCOUNT,
+            subject: "Job '${env.JOB_NAME   }' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 
             body: err.getMessage());
       currentBuild.result = 'FAILURE'
       throw(err)
