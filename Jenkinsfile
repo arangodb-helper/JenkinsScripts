@@ -173,7 +173,7 @@ stage("generating test report") {
     }
     gitRange = "${gitRange}${currentGitRev}"
 
-    gitCommitters = sh(returnStdout: true, script: "git --no-pager show -s --format='%an <%ae>' ${gitRange |sort -u")
+    gitCommitters = sh(returnStdout: true, script: 'git --no-pager show -s --format="%an <%ae>" ${gitRange |sort -u')
     echo gitCommitters
     mail (to: 'willi@arangodb.com',
           subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed",
