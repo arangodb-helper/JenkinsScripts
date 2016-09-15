@@ -96,7 +96,7 @@ stage("running unittest") { try {
    pwd
    tar -xzf ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz
 """
-.shell_client
+  
   def testCaseSets = [ 
     ["fail", 'fail', ""],
     //    ["fail", 'fail', ""],
@@ -107,6 +107,11 @@ stage("running unittest") { try {
      "--cluster true --testBuckets 4/2 ",
      "--cluster true --testBuckets 4/3 ",
      "--cluster true --testBuckets 4/4 "],
+//    ["shell_client", 'shell_client', "",
+//     "--cluster true --testBuckets 4/1 ",
+//     "--cluster true --testBuckets 4/2 ",
+//     "--cluster true --testBuckets 4/3 ",
+//     "--cluster true --testBuckets 4/4 "],
 //    ["shell_server_aql", 'shell_server_aql', "",
 //     "--cluster true --testBuckets 4/1 ",
 //     "--cluster true --testBuckets 4/2 ",
