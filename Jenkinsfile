@@ -63,7 +63,7 @@ stage("building ArangoDB") { try {
    fi
 """
         echo "${UPLOAD_SHELLSCRIPT}"
-        lock(resource: 'uploadfiles', inversePrecedence: true) {
+        lock(resource: 'uploadfiles1', inversePrecedence: true) {
           sh "${UPLOAD_SHELLSCRIPT}"
         }
         sh "ls -l ${RELEASE_OUT_DIR}"
@@ -157,7 +157,7 @@ stage("running unittest") { try {
               docker.image(myRunImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
                 sh "cat /etc/issue"
                 sh "ls -l ${RELEASE_OUT_DIR}"
-                lock(resource: 'uploadfiles', inversePrecedence: true) {
+                lock(resource: 'uploadfiles1', inversePrecedence: true) {
                   sh "${COPY_TARBAL_SHELL_SNIPPET}"
                 }
                 def EXECUTE_TEST="""pwd;
