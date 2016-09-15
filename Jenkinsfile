@@ -98,7 +98,7 @@ stage("running unittest") { try {
 """
   
   def testCaseSets = [ 
-    ["fail", 'fail', ""],
+    //  ["fail", 'fail', ""],
     //    ["fail", 'fail', ""],
     ['ssl_server', 'ssl_server', ""], // FC: don't need this with clusters.
     
@@ -199,7 +199,7 @@ stage("generating test report") {
         gitRange = "${lastKnownGitRev}.."
       }
       gitRange = "${gitRange}${currentGitRev}"
-      print(gitrange)
+      print(gitRange)
       def gitcmd = 'git --no-pager show -s --format="%ae>" ${gitRange} |sort -u |sed -e :a -e \'$!N;s/\\n//;ta\' -e \'s;>;, ;g\' -e \'s;, $;;\''
       print(gitcmd)
       gitCommitters = sh(returnStdout: true, script: gitcmd)
