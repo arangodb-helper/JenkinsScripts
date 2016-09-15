@@ -160,14 +160,14 @@ stage("running unittest") { try {
                 lock(resource: 'uploadfiles', inversePrecedence: true) {
                   sh "${COPY_TARBAL_SHELL_SNIPPET}"
                 }
-                def EXECUTE_TEST="pwd;
+                def EXECUTE_TEST="""pwd;
          TMPDIR=`pwd/out/tmp`
          mkdir -p ${TMPDIR}
          `pwd`/scripts/unittest ${unitTests} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
                 ${cmdLineArgs};
-         echo \$? > out/rc"
+         echo \$? > out/rc"""
                 echo "${unitTests}: ${EXECUTE_TEST}"
                 sh "${EXECUTE_TEST}"
                 shellRC = readFile('out/rc').trim()
