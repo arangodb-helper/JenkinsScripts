@@ -170,7 +170,7 @@ stage("running unittest") { try {
          echo \$? > out/rc"
                 echo "${unitTests}: ${EXECUTE_TEST}"
                 sh "${EXECUTE_TEST}"
-                shellRC = readFile('out/rc')
+                shellRC = readFile('out/rc').trim()
                 if (shellRC != "0") {
                   echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
                   failures = "${failures}\n\n test ${testRunName} exited with ${shellRC}"
