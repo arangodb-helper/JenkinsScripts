@@ -33,8 +33,8 @@ stage("cloning source") {
 stage("building ArangoDB") { try {
   node {
     OUT_DIR = ""
-    docker.withRegistry("https://192.168.0.1/", '') {
-      def myBuildImage=docker.image("centosix/build")
+    docker.withRegistry(REGISTRY_URL, '') {
+      def myBuildImage=docker.image("${DOCKER_CONTAINER}/build")
       myBuildImage.pull()
       docker.image(myBuildImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
         sh "cat /etc/issue"
@@ -146,7 +146,7 @@ stage("running unittest") { try {
           sh "pwd"
           dir("${testRunName}") {
             echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
-            docker.withRegistry("${REGISTRY_URL}", '') {
+            docker.withRegistry(REGISTRY_URL, '') {
               def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
               myRunImage.pull()
               docker.image(myRunImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
