@@ -43,7 +43,7 @@ stage("building ArangoDB") { try {
         WORKSPACE = readFile('workspace.loc').trim()
         OUT_DIR = "${WORKSPACE}/out"
 
-        sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
+        sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package-${DOCKER_CONTAINER} --jemalloc --targetDir ${OUT_DIR} "
         //sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
         OUT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
         env.MD5SUM = readFile("${OUT_FILE}.md5")
@@ -73,7 +73,7 @@ stage("building ArangoDB") { try {
 } catch (err) {
     stage('Send Notification for build' ) {
       mail (to: ADMIN_ACCOUNT, 
-            subject: "Job '${env.JOB_NAME   }' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
+            subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
             body: err.getMessage());
       currentBuild.result = 'FAILURE'
       throw(err)
@@ -179,7 +179,7 @@ stage("running unittest") { try {
 } catch (err) {
     stage('Send Notification unittest' ) {
       mail (to: ADMIN_ACCOUNT,
-            subject: "Job '${env.JOB_NAME   }' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 
+            subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 
             body: err.getMessage());
       currentBuild.result = 'FAILURE'
       throw(err)
