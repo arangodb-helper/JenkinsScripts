@@ -160,9 +160,15 @@ stage("running unittest") { try {
                 lock(resource: 'uploadfiles', inversePrecedence: true) {
                   sh "${COPY_TARBAL_SHELL_SNIPPET}"
                 }
-                def EXECUTE_TEST="pwd; `pwd`/scripts/unittest ${unitTests} --skipNondeterministic true --skipTimeCritical true ${cmdLineArgs}"
+                def EXECUTE_TEST="pwd; `pwd`/scripts/unittest ${unitTests} --skipNondeterministic true --skipTimeCritical true ${cmdLineArgs}; echo $? > out/rc"
                 echo "${unitTests}: ${EXECUTE_TEST}"
                 sh "${EXECUTE_TEST}"
+                shellRC = readFile('out/rc')
+                if (shellRC != "0") {
+                  echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
+                  failures = "${failures}\n\n test ${testRunName} exited with ${shellRC}"
+                  currentBuild.result = 'FAILURE'
+                }
                 echo "${unitTests}: recording results"
                 junit 'out/UNITTEST_RESULT_*.xml'
                 failureOutput=readFile('out/testfailures.txt')
