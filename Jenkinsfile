@@ -20,6 +20,10 @@ def fatalError = false
 
 stage("cloning source") {
   node {
+
+    def someString="1234567890"
+    echo someString.take(5)
+    
     if (fileExists(lastKnownGoodGitFile)) {
       lastKnownGitRev=readFile(lastKnownGoodGitFile)
     }
@@ -161,8 +165,8 @@ stage("running unittest") { try {
                   sh "${COPY_TARBAL_SHELL_SNIPPET}"
                 }
                 def EXECUTE_TEST="""pwd;
-         TMPDIR=`pwd/out/tmp`
-         mkdir -p ${TMPDIR}
+         TMPDIR=`pwd`/out/tmp
+         mkdir -p \${TMPDIR}
          `pwd`/scripts/unittest ${unitTests} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
