@@ -64,7 +64,7 @@ stage("building ArangoDB") { try {
         BUILT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
         DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
         MD5SUM = readFile("${BUILT_FILE}.md5")
-        echo "copying result files: "
+        echo "copying result files: ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE}"
 
         sh "python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE} "
 
