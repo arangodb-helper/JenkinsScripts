@@ -67,7 +67,7 @@ stage("building ArangoDB") { try {
    fi
 """
         echo "${UPLOAD_SHELLSCRIPT}"
-        lock(resource: 'uploadfiles1', inversePrecedence: true) {
+        lock(resource: 'uploadfiles2', inversePrecedence: true) {
           sh "${UPLOAD_SHELLSCRIPT}"
         }
         sh "ls -l ${RELEASE_OUT_DIR}"
@@ -161,7 +161,7 @@ stage("running unittest") { try {
               docker.image(myRunImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
                 sh "cat /etc/issue"
                 sh "ls -l ${RELEASE_OUT_DIR}"
-                lock(resource: 'uploadfiles1', inversePrecedence: true) {
+                lock(resource: 'uploadfiles2', inversePrecedence: true) {
                   sh "${COPY_TARBAL_SHELL_SNIPPET}"
                 }
                 def EXECUTE_TEST="""pwd;
@@ -170,7 +170,7 @@ stage("running unittest") { try {
          `pwd`/scripts/unittest ${unitTests} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
-                ${cmdLineArgs};
+                ${cmdLineArgs} || \
          echo \$? > out/rc"""
                 echo "${unitTests}: ${EXECUTE_TEST}"
                 sh "${EXECUTE_TEST}"
