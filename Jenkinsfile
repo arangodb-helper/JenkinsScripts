@@ -162,6 +162,7 @@ tar -xzf ${localTarball}
                 def EXECUTE_TEST="""pwd;
          TMPDIR=`pwd`/out/tmp
          mkdir -p \${TMPDIR}
+         echo 0 > out/rc
          `pwd`/scripts/unittest ${unitTests} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
