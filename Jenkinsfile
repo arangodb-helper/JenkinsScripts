@@ -43,6 +43,8 @@ stage("building ArangoDB") { try {
       def myBuildImage=docker.image("${DOCKER_CONTAINER}/build")
       myBuildImage.pull()
       docker.image(myBuildImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
+        sh "mount"
+        sh "pwd"
         sh "cat /etc/issue /jenkins/workspace/issue"
 
         sh 'pwd > workspace.loc'
