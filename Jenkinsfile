@@ -44,10 +44,10 @@ stage("building ArangoDB") { try {
     docker.withRegistry(REGISTRY_URL, '') {
       def myBuildImage=docker.image("${DOCKER_CONTAINER}/build")
       myBuildImage.pull()
-      docker.image(myBuildImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
+      docker.image(myBuildImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw --volume /mnt:/:rw ') {
         sh "mount"
         sh "pwd"
-        sh "cat /etc/issue /jenkins/workspace/issue"
+        sh "cat /etc/issue /mnt/workspace/issue"
 
         sh 'pwd > workspace.loc'
         WORKSPACE = readFile('workspace.loc').trim()
