@@ -16,6 +16,8 @@ def lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
 def lastKnownGitRev=""
 def currentGitRev=""
 
+def BUILT_FILE = ""
+def DIST_FILE = ""
 def fatalError = false
 
 stage("cloning source") {
@@ -61,8 +63,8 @@ stage("building ArangoDB") { try {
           }
         }
         //sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
-        def BUILT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
-        def DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
+        BUILT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
+        DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
         MD5SUM = readFile("${BUILT_FILE}.md5").trim()
         echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
 
