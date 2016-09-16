@@ -85,6 +85,7 @@ stage("building ArangoDB") { try {
 }}
 
 stage("running unittest") { try {
+  def localTarball="${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz"
   def COPY_TARBAL_SHELL_SNIPPET = """
 if test ! -d ${LOCAL_TAR_DIR}; then
         mkdir -p ${LOCAL_TAR_DIR}
@@ -92,7 +93,6 @@ fi
 python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${LOCAL_TAR_DIR}/${env.JOB_NAME} ${localTarball}
 tar -xzf ${localTarball}
 """
-  def localTarball="${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz"
   def testCaseSets = [ 
     //  ["fail", 'fail', ""],
     //    ["fail", 'fail', ""],
