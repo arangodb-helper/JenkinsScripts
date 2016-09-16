@@ -47,7 +47,19 @@ stage("building ArangoDB") { try {
         WORKSPACE = readFile('workspace.loc').trim()
         OUT_DIR = "${WORKSPACE}/out"
 
-        sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package-${DOCKER_CONTAINER} --jemalloc --targetDir ${OUT_DIR} "
+        try {
+          sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package-${DOCKER_CONTAINER} --jemalloc --targetDir ${OUT_DIR} "
+        } catch (err) {
+          stage('Send Notification for failed build' ) {
+            gitCommitter = sh(returnStdout: true, script: 'git --no-pager show -s --format="%ae"')
+
+            mail (to: gitCommitter,
+                  subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
+                  body: err.getMessage());
+            currentBuild.result = 'FAILURE'
+            throw(err)
+          }
+        }
         //sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
         BUILT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
         DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
