@@ -43,7 +43,7 @@ stage("building ArangoDB") { try {
       def myBuildImage=docker.image("${DOCKER_CONTAINER}/build")
       myBuildImage.pull()
       docker.image(myBuildImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
-        sh "cat /etc/issue"
+        sh "cat /etc/issue /jenkins/workspace/issue"
 
         sh 'pwd > workspace.loc'
         WORKSPACE = readFile('workspace.loc').trim()
@@ -143,7 +143,7 @@ tar -xzf ${localTarball}
       
       branches[testRunName] = {
         node {
-          sh "cat /etc/issue"
+          sh "cat /etc/issue /jenkins/workspace/issue"
           sh "pwd"
           dir("${testRunName}") {
             echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
