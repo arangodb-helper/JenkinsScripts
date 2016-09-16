@@ -44,7 +44,7 @@ stage("building ArangoDB") { try {
         sh "cat /etc/issue"
 
         sh 'pwd > workspace.loc'
-        WORKSPACE = readFile('workspace.loc').trim()
+        WORKSPACE = readFile('workspace.loc').take(40)
         OUT_DIR = "${WORKSPACE}/out"
 
         try {
