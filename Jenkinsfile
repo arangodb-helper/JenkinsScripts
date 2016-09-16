@@ -49,27 +49,13 @@ stage("building ArangoDB") { try {
 
         sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package-${DOCKER_CONTAINER} --jemalloc --targetDir ${OUT_DIR} "
         //sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
-        OUT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
-        env.MD5SUM = readFile("${OUT_FILE}.md5")
+        BUILT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
+        DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
+        MD5SUM = readFile("${BUILT_FILE}.md5")
         echo "copying result files: "
-  
-        def UPLOAD_SHELLSCRIPT="""
-   set -x
-   if test -f ${OUT_FILE}.md5; then
-     remote_md5sum=`cat ${OUT_FILE}.md5`
-   fi
-   if test \"\${MD5SUM}\" != \"\${remote_md5sum}\"; then
-        echo 'uploading file'
-        cp ${OUT_FILE} ${RELEASE_OUT_DIR}
-        echo \"\${MD5SUM}\" > ${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz.md5
-   else
-        echo 'file not changed - not uploading'
-   fi
-"""
-        echo "${UPLOAD_SHELLSCRIPT}"
-        lock(resource: 'uploadfiles2', inversePrecedence: true) {
-          sh "${UPLOAD_SHELLSCRIPT}"
-        }
+
+        sh "python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE} "
+
         sh "ls -l ${RELEASE_OUT_DIR}"
       }
     }
@@ -85,22 +71,14 @@ stage("building ArangoDB") { try {
 }}
 
 stage("running unittest") { try {
-  def COPY_TARBAL_SHELL_SNIPPET= """
-   if test ! -d ${LOCAL_TAR_DIR}; then
+  def COPY_TARBAL_SHELL_SNIPPET = """
+if test ! -d ${LOCAL_TAR_DIR}; then
         mkdir -p ${LOCAL_TAR_DIR}
-   else
-      if test -f ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz.md5; then
-           local_md5sum=`cat ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz.md5`
-      fi
-   fi
-   if test \"\${MD5SUM}\" != \"\${local_md5sum}\"; then
-        cp ${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz ${LOCAL_TAR_DIR}
-        echo \"\${MD5SUM}\" > ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz.md5
-   fi
-   pwd
-   tar -xzf ${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz
+fi
+python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${LOCAL_TAR_DIR}/${env.JOB_NAME} ${localTarball}
+tar -xzf ${localTarball}
 """
-  
+  def localTarball="${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz"
   def testCaseSets = [ 
     //  ["fail", 'fail', ""],
     //    ["fail", 'fail', ""],
@@ -161,9 +139,9 @@ stage("running unittest") { try {
               docker.image(myRunImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
                 sh "cat /etc/issue"
                 sh "ls -l ${RELEASE_OUT_DIR}"
-                lock(resource: 'uploadfiles2', inversePrecedence: true) {
-                  sh "${COPY_TARBAL_SHELL_SNIPPET}"
-                }
+
+                sh COPY_TARBAL_SHELL_SNIPPET
+
                 def EXECUTE_TEST="""pwd;
          TMPDIR=`pwd`/out/tmp
          mkdir -p \${TMPDIR}
