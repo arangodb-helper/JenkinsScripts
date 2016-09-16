@@ -147,15 +147,14 @@ tar -xzf ${localTarball}
       
       branches[testRunName] = {
         node {
-          sh "cat /etc/issue /jenkins/workspace/issue"
           sh "pwd"
           dir("${testRunName}") {
             echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
             docker.withRegistry(REGISTRY_URL, '') {
               def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
               myRunImage.pull()
-              docker.image(myRunImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw') {
-                sh "cat /etc/issue"
+              docker.image(myRunImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
+                sh "cat /etc/issue /mnt/workspace/issue"
                 sh "ls -l ${RELEASE_OUT_DIR}"
 
                 sh COPY_TARBAL_SHELL_SNIPPET
