@@ -61,9 +61,9 @@ stage("building ArangoDB") { try {
           }
         }
         //sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
-        BUILT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
-        DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
-        MD5SUM = readFile("${BUILT_FILE}.md5")
+        def BUILT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
+        def DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
+        MD5SUM = readFile("${BUILT_FILE}.md5").trim()
         echo "copying result files: ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE}"
 
         sh "python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE} "
