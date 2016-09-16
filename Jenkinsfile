@@ -7,7 +7,7 @@ def REGISTRY_URL="https://${REGISTRY}/"
 def DOCKER_CONTAINER="ubuntusixteenofour"
 def OS="Linux"
 def RELEASE_OUT_DIR="/net/fileserver/"
-def LOCAL_TAR_DIR="/jenkins/tmp/"
+def LOCAL_TAR_DIR="/mnt/workspace/tmp/"
 def branches = [:]
 def failures = ""
 def paralellJobNames = []
@@ -169,6 +169,7 @@ tar -xzf ${localTarball}
          echo \$? > out/rc"""
                 echo "${unitTests}: ${EXECUTE_TEST}"
                 sh "${EXECUTE_TEST}"
+                sh "ls -l out"
                 shellRC = readFile('out/rc').trim()
                 if (shellRC != "0") {
                   echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
