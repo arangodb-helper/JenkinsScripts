@@ -23,13 +23,15 @@ def fatalError = false
 stage("cloning source") {
   node {
 
+    sh "mount"
+    sh "pwd"
+    sh "cat /etc/issue /jenkins/workspace/issue"
     def someString="1234567890"
     echo someString.take(5)
     
     if (fileExists(lastKnownGoodGitFile)) {
       lastKnownGitRev=readFile(lastKnownGoodGitFile)
     }
-    sh "cat /etc/issue"
     git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
     currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
