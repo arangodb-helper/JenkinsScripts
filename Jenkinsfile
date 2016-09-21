@@ -21,7 +21,7 @@ def DIST_FILE = ""
 def fatalError = false
 
 echo "bla"
-stage("cloning source") {
+stage "cloning source" {
   node {
 
     sh "mount"
