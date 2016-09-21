@@ -38,7 +38,7 @@ stage "cloning source"
     print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
   }
 
-stage("building ArangoDB") { try {
+stage("building ArangoDB") try {
   node {
     OUT_DIR = ""
     docker.withRegistry(REGISTRY_URL, '') {
@@ -86,9 +86,9 @@ stage("building ArangoDB") { try {
       currentBuild.result = 'FAILURE'
       throw(err)
     }
-}}
+}
 
-stage("running unittest") { try {
+stage("running unittest") try {
   def localTarball="${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz"
   def COPY_TARBAL_SHELL_SNIPPET = """
 if test ! -d ${LOCAL_TAR_DIR}; then
@@ -203,9 +203,9 @@ tar -xzf ${localTarball}
       currentBuild.result = 'FAILURE'
       throw(err)
     }
-}}
+}
 
-stage("generating test report") {
+stage("generating test report")
   node {
     if (failures.size() > 5) {
       def gitRange = ""
@@ -235,4 +235,4 @@ stage("generating test report") {
       writeFile(lastKnownGoodGitFile, currentGitRev);
     }
   }
-}
+
