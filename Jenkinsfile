@@ -20,6 +20,7 @@ def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
 
+echo "bla"
 stage("cloning source") {
   node {
 
