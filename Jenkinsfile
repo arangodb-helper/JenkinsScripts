@@ -26,6 +26,7 @@ stage("cloning source")
 
     sh "mount"
     sh "pwd"
+    sh "ls -l /jenkins/workspace"
     sh "cat /etc/issue /jenkins/workspace/issue"
     def someString="1234567890"
     echo someString.take(5)
