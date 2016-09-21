@@ -21,7 +21,7 @@ def DIST_FILE = ""
 def fatalError = false
 
 echo "bla"
-stage "cloning source" {
+stage "cloning source"
   node {
 
     sh "mount"
@@ -37,7 +37,6 @@ stage "cloning source" {
     currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
   }
-}
 
 stage("building ArangoDB") { try {
   node {
