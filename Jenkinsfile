@@ -46,7 +46,7 @@ try {
     docker.withRegistry(REGISTRY_URL, '') {
       def myBuildImage=docker.image("${DOCKER_CONTAINER}/build")
       myBuildImage.pull()
-      docker.image(myBuildImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
+      docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
         sh "mount"
         sh "pwd"
         sh "cat /etc/issue /mnt/workspace/issue"
@@ -155,7 +155,7 @@ tar -xzf ${localTarball}
             docker.withRegistry(REGISTRY_URL, '') {
               def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
               myRunImage.pull()
-              docker.image(myRunImage.imageName()).inside('--volume /net/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
+              docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
                 sh "cat /etc/issue /mnt/workspace/issue"
                 sh "ls -l ${RELEASE_OUT_DIR}"
 
