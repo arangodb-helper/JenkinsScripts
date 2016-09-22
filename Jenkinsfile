@@ -81,13 +81,12 @@ try {
     }
   }
 } catch (err) {
-    stage('Send Notification for build' ) {
-      mail (to: ADMIN_ACCOUNT, 
-            subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
-            body: err.getMessage());
-      currentBuild.result = 'FAILURE'
-      throw(err)
-    }
+    stage('Send Notification for build' )
+    mail (to: ADMIN_ACCOUNT, 
+          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
+          body: err.getMessage());
+    currentBuild.result = 'FAILURE'
+    throw(err)
 }
 
 stage("running unittest")
@@ -199,13 +198,12 @@ tar -xzf ${localTarball}
   
   parallel branches
 } catch (err) {
-    stage('Send Notification unittest' ) {
-      mail (to: ADMIN_ACCOUNT,
-            subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 
-            body: err.getMessage());
-      currentBuild.result = 'FAILURE'
-      throw(err)
-    }
+    stage('Send Notification unittest' )
+    mail (to: ADMIN_ACCOUNT,
+          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 
+          body: err.getMessage());
+    currentBuild.result = 'FAILURE'
+    throw(err)
 }
 
 stage("generating test report")
