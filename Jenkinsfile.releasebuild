@@ -1,0 +1,122 @@
+#!groovy
+// We need these modules:
+//
+// We need permisions for several string manipulation operations, like take()
+def REGISTRY="192.168.0.1"
+def REGISTRY_URL="https://${REGISTRY}/"
+def DOCKER_CONTAINER="debianjessie"
+def OS="Linux"
+def RELEASE_OUT_DIR="/net/fileserver/"
+def LOCAL_TAR_DIR="/mnt/workspace/tmp/"
+def branches = [:]
+def failures = ""
+def paralellJobNames = []
+def ADMIN_ACCOUNT = "willi@arangodb.com"
+def lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
+def lastKnownGitRev=""
+def currentGitRev=""
+
+def BUILT_FILE = ""
+def DIST_FILE = ""
+def fatalError = false
+
+echo "bla"
+stage("cloning source")
+  node {
+
+    sh "mount"
+    sh "pwd"
+    sh "ls -l /jenkins/workspace"
+    sh "cat /etc/issue /jenkins/workspace/issue"
+    def someString="1234567890"
+    echo someString.take(5)
+    
+    if (fileExists(lastKnownGoodGitFile)) {
+      lastKnownGitRev=readFile(lastKnownGoodGitFile)
+    }
+    git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
+    currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+    print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
+  }
+
+stage("building ArangoDB")
+try {
+  node {
+    OUT_DIR = ""
+    docker.withRegistry(REGISTRY_URL, '') {
+      def myBuildImage=docker.image("${DOCKER_CONTAINER}/build")
+      myBuildImage.pull()
+      docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
+        sh "mount"
+        sh "pwd"
+        sh "cat /etc/issue /mnt/workspace/issue"
+
+        sh 'pwd > workspace.loc'
+        WORKSPACE = readFile('workspace.loc').trim()
+        OUT_DIR = "${WORKSPACE}/out"
+
+        try {
+          sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package-${DOCKER_CONTAINER} --package DEB --jemalloc --targetDir ${OUT_DIR} "
+        } catch (err) {
+          stage('Send Notification for failed build' ) {
+            gitCommitter = sh(returnStdout: true, script: 'git --no-pager show -s --format="%ae"')
+
+            mail (to: gitCommitter,
+                  subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
+                  body: err.getMessage());
+            currentBuild.result = 'FAILURE'
+            throw(err)
+          }
+        }
+        //sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
+        BUILT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
+        DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
+        MD5SUM = readFile("${BUILT_FILE}.md5").trim()
+        echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
+
+        sh "python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE} "
+
+        sh "ls -l ${RELEASE_OUT_DIR}"
+      }
+    }
+  }
+} catch (err) {
+    stage('Send Notification for build' )
+    mail (to: ADMIN_ACCOUNT, 
+          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
+          body: err.getMessage());
+    currentBuild.result = 'FAILURE'
+    throw(err)
+}
+
+stage("generating test report")
+  node {
+    if (failures.size() > 5) {
+      def gitRange = ""
+      if (lastKnownGitRev.size() > 1) {
+        gitRange = "${lastKnownGitRev}.."
+      }
+      gitRange = "${gitRange}${currentGitRev}"
+      print(gitRange)
+      def gitcmd = 'git --no-pager show -s --format="%ae>" ${gitRange} |sort -u |sed -e :a -e \'$!N;s/\\n//;ta\' -e \'s;>;, ;g\' -e \'s;, $;;\''
+      print(gitcmd)
+      gitCommitters = sh(returnStdout: true, script: gitcmd)
+      echo gitCommitters
+      
+      def subject = ""
+      if (fatalError) {
+        subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed MISERABLY! "
+      }
+      else {
+        subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed"
+      }
+      
+      mail (to: gitCommitters,
+            subject: subject,
+            body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
+    }
+    else {
+      writeFile(lastKnownGoodGitFile, currentGitRev);
+    }
+  }
+
