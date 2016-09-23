@@ -150,7 +150,7 @@ tar -xzf ${localTarball}
       branches[testRunName] = {
         node {
           sh "pwd"
-          dir("${testRunName}") {
+          dir("tstdir") {
             echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
             docker.withRegistry(REGISTRY_URL, '') {
               def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
@@ -160,8 +160,13 @@ tar -xzf ${localTarball}
                 sh "ls -l ${RELEASE_OUT_DIR}"
 
                 sh COPY_TARBAL_SHELL_SNIPPET
-
-                def EXECUTE_TEST="""pwd;
+                
+                dir("${testRunName}") {
+                  sh "ls -ltr .."
+                  sh "mount"
+                  sh "pwd"
+                  sh "echo xxxxxxxxxxxxxxxxxxxxxx"
+                  def EXECUTE_TEST="""pwd;
          TMPDIR=`pwd`/out/tmp
          mkdir -p \${TMPDIR}
          echo 0 > out/rc
@@ -170,20 +175,21 @@ tar -xzf ${localTarball}
                 --skipTimeCritical true \
                 ${cmdLineArgs} || \
          echo \$? > out/rc"""
-                echo "${unitTests}: ${EXECUTE_TEST}"
-                sh "${EXECUTE_TEST}"
-                sh "ls -l out"
-                shellRC = readFile('out/rc').trim()
-                if (shellRC != "0") {
-                  echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
-                  failures = "${failures}\n\n test ${testRunName} exited with ${shellRC}"
-                  currentBuild.result = 'FAILURE'
-                }
-                echo "${unitTests}: recording results"
-                junit 'out/UNITTEST_RESULT_*.xml'
-                failureOutput=readFile('out/testfailures.txt')
-                if (failureOutput.size() > 5) {
-                  failures = "${failures}\n${failureOutput}"
+                  echo "${unitTests}: ${EXECUTE_TEST}"
+                  sh "${EXECUTE_TEST}"
+                  sh "ls -l out"
+                  shellRC = readFile('out/rc').trim()
+                  if (shellRC != "0") {
+                    echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
+                    failures = "${failures}\n\n test ${testRunName} exited with ${shellRC}"
+                    currentBuild.result = 'FAILURE'
+                  }
+                  echo "${unitTests}: recording results"
+                  junit 'out/UNITTEST_RESULT_*.xml'
+                  failureOutput=readFile('out/testfailures.txt')
+                  if (failureOutput.size() > 5) {
+                    failures = "${failures}\n${failureOutput}"
+                  }
                 }
               }
             }
