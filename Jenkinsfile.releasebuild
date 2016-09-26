@@ -5,6 +5,16 @@
 def REGISTRY="192.168.0.1"
 def REGISTRY_URL="https://${REGISTRY}/"
 def DOCKER_CONTAINER="debianjessie"
+
+def CONTAINERS=[
+ [ 'docker': true,  'name': 'centosix', 'packageFormat': 'RPM'],
+ [ 'docker': true,  'name': 'centoseven', 'packageFormat': 'RPM'],
+ [ 'docker': true,  'name': 'debianjessie', 'packageFormat': 'DEB'],
+ [ 'docker': true,  'name': 'opensusethirteen', 'packageFormat': 'RPM'],
+ [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB'],
+ [ 'docker': true,  'name': 'ubuntusixteenofour', 'packageFormat': 'DEB'],
+]
+
 def OS="Linux"
 def RELEASE_OUT_DIR="/net/fileserver/"
 def LOCAL_TAR_DIR="/mnt/workspace/tmp/"
@@ -36,7 +46,7 @@ stage("cloning source")
     }
     echo "git url: 'https://github.com/arangodb/arangodb.git', tag: ${GITTAG}"
 
-    git url: 'https://github.com/arangodb/arangodb.git', tag: ${GITTAG}
+    git url: 'https://github.com/arangodb/arangodb.git', tag: GITTAG
   }
 
 stage("building ArangoDB")
@@ -91,32 +101,11 @@ try {
 
 stage("generating test report")
   node {
-    if (failures.size() > 5) {
-      def gitRange = ""
-      if (lastKnownGitRev.size() > 1) {
-        gitRange = "${lastKnownGitRev}.."
-      }
-      gitRange = "${gitRange}${currentGitRev}"
-      print(gitRange)
-      def gitcmd = 'git --no-pager show -s --format="%ae>" ${gitRange} |sort -u |sed -e :a -e \'$!N;s/\\n//;ta\' -e \'s;>;, ;g\' -e \'s;, $;;\''
-      print(gitcmd)
-      gitCommitters = sh(returnStdout: true, script: gitcmd)
-      echo gitCommitters
       
-      def subject = ""
-      if (fatalError) {
-        subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed MISERABLY! "
-      }
-      else {
-        subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed"
-      }
+      def subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) is finished"
       
       mail (to: gitCommitters,
             subject: subject,
-            body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
-    }
-    else {
-      writeFile(lastKnownGoodGitFile, currentGitRev);
-    }
+            body: "we successfully compiled ${GITTAG} \nfind the results at ${env.BUILD_URL}.");
   }
 
