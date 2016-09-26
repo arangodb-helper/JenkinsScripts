@@ -4,7 +4,7 @@
 // We need permisions for several string manipulation operations, like take()
 def REGISTRY="192.168.0.1"
 def REGISTRY_URL="https://${REGISTRY}/"
-def DOCKER_CONTAINER="debianjessie"
+// def DOCKER_CONTAINER="debianjessie"
 
 def CONTAINERS=[
  [ 'docker': true,  'name': 'centosix', 'packageFormat': 'RPM'],
@@ -53,7 +53,9 @@ stage("cloning source")
 stage("building ArangoDB")
 try {
   node {
-    echo CONTAINERS[0]['name']
+    echo CONTAINERS[2]['name']
+    DOCKER_CONTAINER=CONTAINERS[2]['name']
+    PACKAGE_FORMAT=CONTAINERS[2]['packageFormat']
     OUT_DIR = ""
     docker.withRegistry(REGISTRY_URL, '') {
       def myBuildImage=docker.image("${DOCKER_CONTAINER}/build")
@@ -68,7 +70,7 @@ try {
         OUT_DIR = "${RELEASE_OUT_DIR}/${DOCKER_CONTAINER}"
 
         try {
-          sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package-${DOCKER_CONTAINER} --package DEB --jemalloc --targetDir ${OUT_DIR} "
+          sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package-${DOCKER_CONTAINER} --package ${PACKAGE_FORMAT} --jemalloc --targetDir ${OUT_DIR} "
         } catch (err) {
           stage('Send Notification for failed build' ) {
 
