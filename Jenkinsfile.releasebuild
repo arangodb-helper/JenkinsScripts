@@ -72,14 +72,16 @@ try {
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
           EP=""
+          XEP=""
           if (ENTERPRISE_URL.size() > 10) {
             EP="--enterprise ${ENTERPRISE_URL}"
             OUT_DIR = "${RELEASE_OUT_DIR}/EP/${DOCKER_CONTAINER}"
+            XEP="EP"
           } else {
             OUT_DIR = "${RELEASE_OUT_DIR}/${DOCKER_CONTAINER}"
           }
           try {
-            sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 8 --buildDir build-package-${DOCKER_CONTAINER} --package ${PACKAGE_FORMAT} ${EP} --jemalloc --targetDir ${OUT_DIR} "
+            sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 8 --buildDir build-${XEP}package-${DOCKER_CONTAINER} --package ${PACKAGE_FORMAT} ${EP} --jemalloc --targetDir ${OUT_DIR} "
           } catch (err) {
             stage('Send Notification for failed build' ) {
 
@@ -90,8 +92,6 @@ try {
               throw(err)
             }
           }
-          //sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
-
           sh "ls -l ${OUT_DIR}"
         }
       }
