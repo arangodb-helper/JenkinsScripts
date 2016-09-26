@@ -21,7 +21,7 @@ def LOCAL_TAR_DIR="/mnt/workspace/tmp/"
 def branches = [:]
 def failures = ""
 def paralellJobNames = []
-def ADMIN_ACCOUNT = "willi@arangodb.com"
+def ADMIN_ACCOUNT = "release-bot@arangodb.com"
 def lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
 def lastKnownGitRev=""
 def currentGitRev=""
@@ -71,9 +71,8 @@ try {
           sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package-${DOCKER_CONTAINER} --package DEB --jemalloc --targetDir ${OUT_DIR} "
         } catch (err) {
           stage('Send Notification for failed build' ) {
-            gitCommitter = sh(returnStdout: true, script: 'git --no-pager show -s --format="%ae"')
 
-            mail (to: gitCommitter,
+            mail (to: release-bot@arangodb.com,
                   subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
                   body: err.getMessage());
             currentBuild.result = 'FAILURE'
@@ -100,7 +99,7 @@ stage("generating test report")
       
       def subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) is finished"
       
-      mail (to: gitCommitters,
+      mail (to: release-bot@arangodb.com,
             subject: subject,
             body: "we successfully compiled ${GITTAG} \nfind the results at ${env.BUILD_URL}.");
   }
