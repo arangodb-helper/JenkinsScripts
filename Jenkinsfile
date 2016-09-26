@@ -92,12 +92,12 @@ try {
 stage("running unittest")
 try {
   def localTarball="${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz"
+  def localExtractDir="${LOCAL_TAR_DIR}/${env.JOB_NAME}/x/"
   def COPY_TARBAL_SHELL_SNIPPET = """
 if test ! -d ${LOCAL_TAR_DIR}; then
         mkdir -p ${LOCAL_TAR_DIR}
 fi
-python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${LOCAL_TAR_DIR}/${env.JOB_NAME} ${localTarball}
-tar -xzf ${localTarball}
+python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${LOCAL_TAR_DIR}/${env.JOB_NAME} ${localTarball} 'cd ${localExtractDir} tar -xzf ../${localTarball}'
 """
   def testCaseSets = [ 
     //  ["fail", 'fail', ""],
@@ -150,7 +150,7 @@ tar -xzf ${localTarball}
       branches[testRunName] = {
         node {
           sh "pwd"
-          dir("tstdir") {
+          dir("${testRunName}") {
             echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
             docker.withRegistry(REGISTRY_URL, '') {
               def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
@@ -161,12 +161,13 @@ tar -xzf ${localTarball}
 
                 sh COPY_TARBAL_SHELL_SNIPPET
                 
-                dir("${testRunName}") {
-                  sh "ls -ltr .."
-                  sh "mount"
-                  sh "pwd"
-                  sh "echo xxxxxxxxxxxxxxxxxxxxxx"
-                  def EXECUTE_TEST="""pwd;
+                sh "ls -ltr .."
+                sh "mount"
+                sh "pwd"
+                sh "rm -f out/*"
+                sh "echo xxxxxxxxxxxxxxxxxxxxxx"
+                sh "ln -s ${localExtractDir}/* ."
+                def EXECUTE_TEST="""pwd;
          TMPDIR=`pwd`/out/tmp
          mkdir -p \${TMPDIR}
          echo 0 > out/rc
@@ -175,21 +176,20 @@ tar -xzf ${localTarball}
                 --skipTimeCritical true \
                 ${cmdLineArgs} || \
          echo \$? > out/rc"""
-                  echo "${unitTests}: ${EXECUTE_TEST}"
-                  sh "${EXECUTE_TEST}"
-                  sh "ls -l out"
-                  shellRC = readFile('out/rc').trim()
-                  if (shellRC != "0") {
-                    echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
-                    failures = "${failures}\n\n test ${testRunName} exited with ${shellRC}"
-                    currentBuild.result = 'FAILURE'
-                  }
-                  echo "${unitTests}: recording results"
-                  junit 'out/UNITTEST_RESULT_*.xml'
-                  failureOutput=readFile('out/testfailures.txt')
-                  if (failureOutput.size() > 5) {
-                    failures = "${failures}\n${failureOutput}"
-                  }
+                echo "${unitTests}: ${EXECUTE_TEST}"
+                sh "${EXECUTE_TEST}"
+                sh "ls -l out"
+                shellRC = readFile('out/rc').trim()
+                if (shellRC != "0") {
+                  echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
+                  failures = "${failures}\n\n test ${testRunName} exited with ${shellRC}"
+                  currentBuild.result = 'FAILURE'
+                }
+                echo "${unitTests}: recording results"
+                junit 'out/UNITTEST_RESULT_*.xml'
+                failureOutput=readFile('out/testfailures.txt')
+                if (failureOutput.size() > 5) {
+                  failures = "${failures}\n${failureOutput}"
                 }
               }
             }
