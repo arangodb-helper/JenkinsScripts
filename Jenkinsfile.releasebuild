@@ -52,57 +52,60 @@ stage("cloning source")
 
 stage("building ArangoDB")
 try {
-  node {
-    echo CONTAINERS[2]['name']
-    DOCKER_CONTAINER=CONTAINERS[2]['name']
-    PACKAGE_FORMAT=CONTAINERS[2]['packageFormat']
-    OUT_DIR = ""
-    docker.withRegistry(REGISTRY_URL, '') {
-      def myBuildImage=docker.image("${DOCKER_CONTAINER}/build")
-      myBuildImage.pull()
-      docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
-        sh "mount"
-        sh "pwd"
-        sh "cat /etc/issue /mnt/workspace/issue"
+  for (int c=0; c < CONTAINERS.size(); c++) {
+    echo "building No. ${c}: "
+    echo CONTAINERS[c]['name']
+    node {
+      DOCKER_CONTAINER=CONTAINERS[c]['name']
+      PACKAGE_FORMAT=CONTAINERS[c]['packageFormat']
+      OUT_DIR = ""
+      docker.withRegistry(REGISTRY_URL, '') {
+        def myBuildImage=docker.image("${DOCKER_CONTAINER}/build")
+        myBuildImage.pull()
+        docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
+          sh "mount"
+          sh "pwd"
+          sh "cat /etc/issue /mnt/workspace/issue"
 
-        sh 'pwd > workspace.loc'
-        WORKSPACE = readFile('workspace.loc').trim()
-        OUT_DIR = "${RELEASE_OUT_DIR}/${DOCKER_CONTAINER}"
+          sh 'pwd > workspace.loc'
+          WORKSPACE = readFile('workspace.loc').trim()
+          OUT_DIR = "${RELEASE_OUT_DIR}/${DOCKER_CONTAINER}"
 
-        try {
-          sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package-${DOCKER_CONTAINER} --package ${PACKAGE_FORMAT} --jemalloc --targetDir ${OUT_DIR} "
-        } catch (err) {
-          stage('Send Notification for failed build' ) {
+          try {
+            sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package-${DOCKER_CONTAINER} --package ${PACKAGE_FORMAT} --jemalloc --targetDir ${OUT_DIR} "
+          } catch (err) {
+            stage('Send Notification for failed build' ) {
 
-            mail (to: 'release-bot@arangodb.com',
-                  subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
-                  body: err.getMessage());
-            currentBuild.result = 'FAILURE'
-            throw(err)
+              mail (to: 'release-bot@arangodb.com',
+                    subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
+                    body: err.getMessage());
+              currentBuild.result = 'FAILURE'
+              throw(err)
+            }
           }
-        }
-        //sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
+          //sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
 
-        sh "ls -l ${OUT_DIR}"
+          sh "ls -l ${OUT_DIR}"
+        }
       }
     }
   }
 } catch (err) {
-    stage('Send FAIL-Notification for build' )
-    mail (to: ADMIN_ACCOUNT, 
-          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
-          body: err.getMessage());
-    currentBuild.result = 'FAILURE'
-    throw(err)
+  stage('Send FAIL-Notification for build' )
+  mail (to: ADMIN_ACCOUNT, 
+        subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
+        body: err.getMessage());
+  currentBuild.result = 'FAILURE'
+  throw(err)
 }
 
 stage("generating test report")
   node {
       
-      def subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) is finished"
+    def subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) is finished"
       
-      mail (to: 'release-bot@arangodb.com',
-            subject: subject,
-            body: "we successfully compiled ${GITTAG} \nfind the results at ${env.BUILD_URL}.");
+    mail (to: 'release-bot@arangodb.com',
+          subject: subject,
+          body: "we successfully compiled ${GITTAG} \nfind the results at ${env.BUILD_URL}.");
   }
 
