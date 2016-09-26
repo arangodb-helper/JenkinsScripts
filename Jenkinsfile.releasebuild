@@ -53,6 +53,7 @@ stage("cloning source")
 stage("building ArangoDB")
 try {
   node {
+    echo CONTAINERS[0]['name']
     OUT_DIR = ""
     docker.withRegistry(REGISTRY_URL, '') {
       def myBuildImage=docker.image("${DOCKER_CONTAINER}/build")
