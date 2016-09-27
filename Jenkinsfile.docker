@@ -69,5 +69,3 @@ node {
         docker push ${REGISTRY}/arangodb/arangodb-mesos:E-build7
         git push --follow-tags"
 }
-
-
