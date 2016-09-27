@@ -7,12 +7,12 @@ def REGISTRY_URL="https://${REGISTRY}/"
 // def DOCKER_CONTAINER="debianjessie"
 
 def CONTAINERS=[
- [ 'docker': true,  'name': 'centosix', 'packageFormat': 'RPM'],
- // [ 'docker': true,  'name': 'centoseven', 'packageFormat': 'RPM'],
- [ 'docker': true,  'name': 'opensusethirteen', 'packageFormat': 'RPM'],
- [ 'docker': true,  'name': 'debianjessie', 'packageFormat': 'DEB'],
- [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB'],
- [ 'docker': true,  'name': 'ubuntusixteenofour', 'packageFormat': 'DEB'],
+  [ 'docker': true,  'name': 'centosix', 'packageFormat': 'RPM'],
+  // [ 'docker': true,  'name': 'centoseven', 'packageFormat': 'RPM'],
+  [ 'docker': true,  'name': 'opensusethirteen', 'packageFormat': 'RPM'],
+  [ 'docker': true,  'name': 'debianjessie', 'packageFormat': 'DEB'],
+  [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB'],
+  [ 'docker': true,  'name': 'ubuntusixteenofour', 'packageFormat': 'DEB'],
 ]
 
 def OS="Linux"
@@ -32,40 +32,40 @@ def fatalError = false
 
 echo "bla"
 stage("cloning source")
-  node {
-
-    sh "mount"
-    sh "pwd"
-    sh "ls -l /jenkins/workspace"
-    sh "cat /etc/issue /jenkins/workspace/issue"
-    def someString="1234567890"
-    echo someString.take(5)
+node {
+  sh "mount"
+  sh "pwd"
+  sh "ls -l /jenkins/workspace"
+  sh "cat /etc/issue /jenkins/workspace/issue"
+  def someString="1234567890"
+  echo someString.take(5)
     
-    if (fileExists(lastKnownGoodGitFile)) {
-      lastKnownGitRev=readFile(lastKnownGoodGitFile)
-    }
-    echo "git url: 'https://github.com/arangodb/arangodb-docker', branch: official"
-
-    git url: 'https://github.com/arangodb/arangodb-docker', branch: "official"
-    sh "git clone https://github.com/ArangoDB/arangodb-mesos-docker"
-    sh "find"
+  if (fileExists(lastKnownGoodGitFile)) {
+    lastKnownGitRev=readFile(lastKnownGoodGitFile)
   }
+  echo "git url: 'https://github.com/arangodb/arangodb-docker', branch: official"
+
+  git url: 'https://github.com/arangodb/arangodb-docker', branch: "official"
+  sh "git clone https://github.com/ArangoDB/arangodb-mesos-docker"
+  sh "find"
+}
 
 
 
 stage("building docker container")
 
 node {
-     sh "cp /net/fileserver/EP/debianjessie/arangodb3e-3.1.rc0-1_amd64.deb arangodb.deb"
-     sh "docker build -t arangodbenterprise/arangodb:3.1 -f Dockerfile3.local ."
-     sh "docker tag -f arangodbenterprise/arangodb:3.1 '${REGISTRY}/arangodbenterprise/arangodb:3.1'"
-     sh "docker tag -f arangodbenterprise/arangodb:3.1 '${REGISTRY}/arangodb/arangodb:3.1'"
-     sh "docker push '${REGISTRY}/arangodbenterprise/arangodb:3.1'"
-     sh """
+  sh "cp /net/fileserver/EP/debianjessie/arangodb3e-3.1.rc0-1_amd64.deb arangodb.deb"
+  sh "docker build -t arangodbenterprise/arangodb:3.1 -f Dockerfile3.local ."
+  sh "docker tag -f arangodbenterprise/arangodb:3.1 '${REGISTRY}/arangodbenterprise/arangodb:3.1'"
+  sh "docker tag -f arangodbenterprise/arangodb:3.1 '${REGISTRY}/arangodb/arangodb:3.1'"
+  sh "docker push '${REGISTRY}/arangodbenterprise/arangodb:3.1'"
+  sh """
         cd arangodb-mesos-docker
         ./release.sh arangodb/arangodb-mesos mesosphere-V2 E-build7
         docker tag arangodb/arangodb-mesos:E-build7 ${REGISTRY}/arangodb/arangodb-mesos:E-build7
         docker push ${REGISTRY}/arangodb/arangodb-mesos:E-build7
         docker push ${REGISTRY}/arangodb/arangodb-mesos:E-build7
-        git push --follow-tags"
+        git push --follow-tags
+"""
 }
