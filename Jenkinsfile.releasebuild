@@ -7,7 +7,7 @@ def REGISTRY_URL="https://${REGISTRY}/"
 // def DOCKER_CONTAINER="debianjessie"
 
 def CONTAINERS=[
- [ 'docker': true,  'name': 'centosix', 'packageFormat': 'RPM'],
+  // [ 'docker': true,  'name': 'centosix', 'packageFormat': 'RPM'],
  // [ 'docker': true,  'name': 'centoseven', 'packageFormat': 'RPM'],
  [ 'docker': true,  'name': 'opensusethirteen', 'packageFormat': 'RPM'],
  [ 'docker': true,  'name': 'debianjessie', 'packageFormat': 'DEB'],
