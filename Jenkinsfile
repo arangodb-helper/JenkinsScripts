@@ -91,15 +91,22 @@ try {
 
 stage("running unittest")
 try {
+  def localWSDir="${LOCAL_TAR_DIR}/${env.JOB_NAME}"
   def localTarball="${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz"
-  def localExtractDir="${LOCAL_TAR_DIR}/${env.JOB_NAME}/x/"
+  def localExtractDir="${localWSDir}/x/"
   def COPY_TARBAL_SHELL_SNIPPET = """
 if test ! -d ${LOCAL_TAR_DIR}; then
         mkdir -p ${LOCAL_TAR_DIR}
 fi
+if test ! -d ${localWSDir}; then
+        mkdir -p ${localWSDir}
+fi
+if test ! -d ${localExtractDir}; then
+        mkdir -p ${localExtractDir}
+fi
 mount
 ls /mnt/workspace
-python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${LOCAL_TAR_DIR}/${env.JOB_NAME} ${localTarball} 'mkdir $localExtractDir}; cd ${localExtractDir}; tar -xzf ../${localTarball}'
+python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${localWSDir} ${localTarball} 'mkdir $localExtractDir}; cd ${localExtractDir}; tar -xzf ${localTarball}'
 """
   def testCaseSets = [ 
     //  ["fail", 'fail', ""],
