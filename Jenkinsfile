@@ -181,7 +181,6 @@ python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${localWSDir} ${
          echo \$? > out/rc"""
                 echo "${unitTests}: ${EXECUTE_TEST}"
                 sh "${EXECUTE_TEST}"
-                sh "ls -l out"
                 shellRC = readFile('out/rc').trim()
                 if (shellRC != "0") {
                   echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
