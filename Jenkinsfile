@@ -97,6 +97,8 @@ try {
 if test ! -d ${LOCAL_TAR_DIR}; then
         mkdir -p ${LOCAL_TAR_DIR}
 fi
+mount
+ls /mnt/workspace
 python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${LOCAL_TAR_DIR}/${env.JOB_NAME} ${localTarball} 'mkdir $localExtractDir}; cd ${localExtractDir}; tar -xzf ../${localTarball}'
 """
   def testCaseSets = [ 
@@ -104,33 +106,33 @@ python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${LOCAL_TAR_DIR}
     //    ["fail", 'fail', ""],
     ['ssl_server', 'ssl_server', ""], // FC: don't need this with clusters.
     
-    ['http_server', 'http_server', "",
-     "--cluster true --testBuckets 4/1 ",
-     "--cluster true --testBuckets 4/2 ",
-     "--cluster true --testBuckets 4/3 ",
-     "--cluster true --testBuckets 4/4 "],
-    ["shell_client", 'shell_client', "",
-     "--cluster true --testBuckets 4/1 ",
-     "--cluster true --testBuckets 4/2 ",
-     "--cluster true --testBuckets 4/3 ",
-     "--cluster true --testBuckets 4/4 "],
-    ["shell_server_aql", 'shell_server_aql', "",
-     "--cluster true --testBuckets 4/1 ",
-     "--cluster true --testBuckets 4/2 ",
-     "--cluster true --testBuckets 4/3 ",
-     "--cluster true --testBuckets 4/4 "],
-    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
-    ["dump_import", 'dump.importing', "", "--cluster true"],
-    ["shell_server", 'shell_server', "",
-     "--cluster true --testBuckets 4/1 ",
-     "--cluster true --testBuckets 4/2 ",
-     "--cluster true --testBuckets 4/3 ",
-     "--cluster true --testBuckets 4/4 "],
-    ["arangosh", 'arangosh', "",
-     "--cluster true --testBuckets 4/1 ",
-     "--cluster true --testBuckets 4/2 ",
-     "--cluster true --testBuckets 4/3 ",
-     "--cluster true --testBuckets 4/4 "],
+//    ['http_server', 'http_server', "",
+//     "--cluster true --testBuckets 4/1 ",
+//     "--cluster true --testBuckets 4/2 ",
+//     "--cluster true --testBuckets 4/3 ",
+//     "--cluster true --testBuckets 4/4 "],
+//    ["shell_client", 'shell_client', "",
+//     "--cluster true --testBuckets 4/1 ",
+//     "--cluster true --testBuckets 4/2 ",
+//     "--cluster true --testBuckets 4/3 ",
+//     "--cluster true --testBuckets 4/4 "],
+//    ["shell_server_aql", 'shell_server_aql', "",
+//     "--cluster true --testBuckets 4/1 ",
+//     "--cluster true --testBuckets 4/2 ",
+//     "--cluster true --testBuckets 4/3 ",
+//     "--cluster true --testBuckets 4/4 "],
+//    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
+//    ["dump_import", 'dump.importing', "", "--cluster true"],
+//    ["shell_server", 'shell_server', "",
+//     "--cluster true --testBuckets 4/1 ",
+//     "--cluster true --testBuckets 4/2 ",
+//     "--cluster true --testBuckets 4/3 ",
+//     "--cluster true --testBuckets 4/4 "],
+//    ["arangosh", 'arangosh', "",
+//     "--cluster true --testBuckets 4/1 ",
+//     "--cluster true --testBuckets 4/2 ",
+//     "--cluster true --testBuckets 4/3 ",
+//     "--cluster true --testBuckets 4/4 "],
   ]
 
   print("getting keyset\n")
