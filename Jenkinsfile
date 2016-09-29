@@ -104,42 +104,40 @@ fi
 if test ! -d ${localExtractDir}; then
         mkdir -p ${localExtractDir}
 fi
-mount
-ls /mnt/workspace
-python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${localWSDir} ${localTarball} 'mkdir ${localExtractDir}; cd ${localExtractDir}; tar -xzf ${localTarball}'
+python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${localWSDir} ${localTarball} 'rm -rf ${localExtractDir}; mkdir ${localExtractDir}; cd ${localExtractDir}; tar -xzf ${localTarball}'
 """
   def testCaseSets = [ 
     //  ["fail", 'fail', ""],
     //    ["fail", 'fail', ""],
     ['ssl_server', 'ssl_server', ""], // FC: don't need this with clusters.
     
-//    ['http_server', 'http_server', "",
-//     "--cluster true --testBuckets 4/1 ",
-//     "--cluster true --testBuckets 4/2 ",
-//     "--cluster true --testBuckets 4/3 ",
-//     "--cluster true --testBuckets 4/4 "],
-//    ["shell_client", 'shell_client', "",
-//     "--cluster true --testBuckets 4/1 ",
-//     "--cluster true --testBuckets 4/2 ",
-//     "--cluster true --testBuckets 4/3 ",
-//     "--cluster true --testBuckets 4/4 "],
-//    ["shell_server_aql", 'shell_server_aql', "",
-//     "--cluster true --testBuckets 4/1 ",
-//     "--cluster true --testBuckets 4/2 ",
-//     "--cluster true --testBuckets 4/3 ",
-//     "--cluster true --testBuckets 4/4 "],
-//    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
-//    ["dump_import", 'dump.importing', "", "--cluster true"],
-//    ["shell_server", 'shell_server', "",
-//     "--cluster true --testBuckets 4/1 ",
-//     "--cluster true --testBuckets 4/2 ",
-//     "--cluster true --testBuckets 4/3 ",
-//     "--cluster true --testBuckets 4/4 "],
-//    ["arangosh", 'arangosh', "",
-//     "--cluster true --testBuckets 4/1 ",
-//     "--cluster true --testBuckets 4/2 ",
-//     "--cluster true --testBuckets 4/3 ",
-//     "--cluster true --testBuckets 4/4 "],
+    ['http_server', 'http_server', "",
+     "--cluster true --testBuckets 4/1 ",
+     "--cluster true --testBuckets 4/2 ",
+     "--cluster true --testBuckets 4/3 ",
+     "--cluster true --testBuckets 4/4 "],
+    ["shell_client", 'shell_client', "",
+     "--cluster true --testBuckets 4/1 ",
+     "--cluster true --testBuckets 4/2 ",
+     "--cluster true --testBuckets 4/3 ",
+     "--cluster true --testBuckets 4/4 "],
+    ["shell_server_aql", 'shell_server_aql', "",
+     "--cluster true --testBuckets 4/1 ",
+     "--cluster true --testBuckets 4/2 ",
+     "--cluster true --testBuckets 4/3 ",
+     "--cluster true --testBuckets 4/4 "],
+    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
+    ["dump_import", 'dump.importing', "", "--cluster true"],
+    ["shell_server", 'shell_server', "",
+     "--cluster true --testBuckets 4/1 ",
+     "--cluster true --testBuckets 4/2 ",
+     "--cluster true --testBuckets 4/3 ",
+     "--cluster true --testBuckets 4/4 "],
+    ["arangosh", 'arangosh', "",
+     "--cluster true --testBuckets 4/1 ",
+     "--cluster true --testBuckets 4/2 ",
+     "--cluster true --testBuckets 4/3 ",
+     "--cluster true --testBuckets 4/4 "],
   ]
 
   print("getting keyset\n")
@@ -166,16 +164,12 @@ python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${localWSDir} ${
               myRunImage.pull()
               docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
                 sh "cat /etc/issue /mnt/workspace/issue"
-                sh "ls -l ${RELEASE_OUT_DIR}"
 
                 sh COPY_TARBAL_SHELL_SNIPPET
                 
-                sh "ls -ltr .."
-                sh "mount"
-                sh "pwd"
                 sh "rm -f out/*"
-                sh "echo xxxxxxxxxxxxxxxxxxxxxx"
                 sh "ln -s ${localExtractDir}/* ."
+
                 def EXECUTE_TEST="""pwd;
          TMPDIR=`pwd`/out/tmp
          mkdir -p \${TMPDIR}
