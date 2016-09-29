@@ -106,7 +106,7 @@ if test ! -d ${localExtractDir}; then
 fi
 mount
 ls /mnt/workspace
-python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${localWSDir} ${localTarball} 'mkdir $localExtractDir}; cd ${localExtractDir}; tar -xzf ${localTarball}'
+python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${localWSDir} ${localTarball} 'mkdir ${localExtractDir}; cd ${localExtractDir}; tar -xzf ${localTarball}'
 """
   def testCaseSets = [ 
     //  ["fail", 'fail', ""],
