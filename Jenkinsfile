@@ -168,7 +168,7 @@ python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${localWSDir} ${
                 sh COPY_TARBAL_SHELL_SNIPPET
                 
                 sh "rm -rf out/*"
-                sh "find -type l -exec rm -f {} \; ; ln -s ${localExtractDir}/* ."
+                sh "find -type l -exec rm -f {} \\; ; ln -s ${localExtractDir}/* ."
 
                 def EXECUTE_TEST="""pwd;
          TMPDIR=`pwd`/out/tmp
