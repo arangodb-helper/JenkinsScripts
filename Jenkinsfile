@@ -97,7 +97,7 @@ try {
 if test ! -d ${LOCAL_TAR_DIR}; then
         mkdir -p ${LOCAL_TAR_DIR}
 fi
-python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${LOCAL_TAR_DIR}/${env.JOB_NAME} ${localTarball} 'cd ${localExtractDir} tar -xzf ../${localTarball}'
+python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${LOCAL_TAR_DIR}/${env.JOB_NAME} ${localTarball} 'mkdir $localExtractDir}; cd ${localExtractDir}; tar -xzf ../${localTarball}'
 """
   def testCaseSets = [ 
     //  ["fail", 'fail', ""],
