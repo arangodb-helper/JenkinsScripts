@@ -35,6 +35,7 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
 
 
 def copyExtractTarBall (where) {
+  print("copyExtractTarBall\n")
   print("xxx" + where['localTarball']+ "yyy\n")
   print("saonteuh\n")
   xx  = sprintf("""xxx %1s yyy\n""", [where['localTarball']])
