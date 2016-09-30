@@ -20,18 +20,10 @@ def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
 
-def class foo {
-  private String myBar
-  foo(String bar) {
-    myBar = bar
-    //echo "foo?"
-    //echo "in foo(${bar})"
-  }
-  def blarg(String zoink) {
-    print("zoink: ${zoink} ${myBar}\n")
-  }
-}
-
+def foo = [
+  "bar" : [ 1, 3, 5],
+  "blub" : [ "z": [5, 7]]
+];
 
 
 
@@ -119,10 +111,18 @@ echo "bla"
 stage("cloning source")
   node {
     echo "new foo: "
-    x = new foo("bar?")
-    echo "zoink?"
-    x.blarg("ZOINK!")
-    echo "haha!"
+    print(foo)
+    echo "haha!1"
+    print(foo["bar"])
+    echo "haha!2"
+    z = foo["blub"]
+    echo "haha!3"
+    z["z"] = [0987]
+    echo "haha!4"
+    print(z)
+    echo "haha!5"
+    print(foo)
+    echo "haha!6"
     sh "mount"
     sh "pwd"
     sh "ls -l /jenkins/workspace"
