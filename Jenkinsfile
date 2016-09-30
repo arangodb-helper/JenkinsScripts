@@ -28,7 +28,7 @@ class foo {
     //echo "in foo(${bar})"
   }
   def blarg(String zoink) {
-    print("zoink: ${zoink} ${bar}\n")
+    print("zoink: ${zoink} ${myBar}\n")
   }
 }
 
