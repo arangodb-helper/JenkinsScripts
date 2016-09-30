@@ -22,8 +22,8 @@ def fatalError = false
 
 class foo {
   foo(String bar) {
-    echo "foo?"
-    echo "in foo(${bar})"
+    //echo "foo?"
+    //echo "in foo(${bar})"
   }
   def blarg(String zoink) {
     echo "zoink: ${zoink}"
