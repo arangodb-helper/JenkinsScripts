@@ -239,23 +239,23 @@ try {
                 test.runTests()
 
               }
+            }
           }
         }
+        n += 1
       }
-      n += 1
     }
-  
   }
   echo branches.toString();
   
   parallel branches
 } catch (err) {
-    stage('Send Notification unittest' )
-    mail (to: ADMIN_ACCOUNT,
-          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 
-          body: err.getMessage());
-    currentBuild.result = 'FAILURE'
-    throw(err)
+  stage('Send Notification unittest' )
+  mail (to: ADMIN_ACCOUNT,
+        subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 
+        body: err.getMessage());
+  currentBuild.result = 'FAILURE'
+  throw(err)
 }
 
 stage("generating test report")
