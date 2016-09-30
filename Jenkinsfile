@@ -31,7 +31,6 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
    where['localWSDir']="${localTarDir}/${jobName}"
    where['localExtractDir']=where['localWSDir'] + "/x/"
    where['MD5SUM'] = MD5SUM
-   
 }
 
 
@@ -50,39 +49,39 @@ def copyExtractTarBall (where) {
 //fi
 //python /usr/bin/copyFileLockedIfNewer.py ${myMD5SUM} ${myDIST_FILE} ${mylocalWSDir} ${localTarball} 'rm -rf ${localExtractDir}; mkdir ${localExtractDir}; cd ${localExtractDir}; tar -xzf ${localTarball}'
 //"""
-//  }
+}
 //
 //def setupTestArea(where) {
 //  sh "rm -rf ${testWorkingDirectory}/out/*"
 //  sh "find -type l -exec rm -f {} \\; ; ln -s ${localExtractDir}/* ${testWorkingDirectory}/"
-}
-def Boolean runTests (where) {
-  def EXECUTE_TEST="""pwd;
-         TMPDIR=${testWorkingDirectory}/out/tmp
-         mkdir -p \${TMPDIR}
-         echo 0 > ${testWorkingDirectory}/out/rc
-         `pwd`/scripts/unittest ${unitTests} \
-                --skipNondeterministic true \
-                --skipTimeCritical true \
-                ${cmdLineArgs} || \
-         echo \$? > ${testWorkingDirectory}/out/rc"""
-  echo "${unitTests}: ${EXECUTE_TEST}"
-  sh "${EXECUTE_TEST}"
-  shellRC = readFile('${testWorkingDirectory}/out/rc').trim()
-  if (shellRC != "0") {
-    echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
-    failures = "${failures}\n\n test ${testRunName} exited with ${shellRC}"
-    currentBuild.result = 'FAILURE'
-  }
-  echo "${unitTests}: recording results"
-  junit '${failureOutput}/out/UNITTEST_RESULT_*.xml'
-  failureOutput=readFile('${testWorkingDirectory}/out/testfailures.txt')
-  if (failureOutput.size() > 5) {
-    failures = "${failureOutput}"
-    return false;
-  }
-  return true;
-}
+// }
+//def Boolean runTests (where) {
+//  def EXECUTE_TEST="""pwd;
+//         TMPDIR=${testWorkingDirectory}/out/tmp
+//         mkdir -p \${TMPDIR}
+//         echo 0 > ${testWorkingDirectory}/out/rc
+//         `pwd`/scripts/unittest ${unitTests} \
+//                --skipNondeterministic true \
+//                --skipTimeCritical true \
+//                ${cmdLineArgs} || \
+//         echo \$? > ${testWorkingDirectory}/out/rc"""
+//  echo "${unitTests}: ${EXECUTE_TEST}"
+//  sh "${EXECUTE_TEST}"
+//  shellRC = readFile('${testWorkingDirectory}/out/rc').trim()
+//  if (shellRC != "0") {
+//    echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
+//    failures = "${failures}\n\n test ${testRunName} exited with ${shellRC}"
+//    currentBuild.result = 'FAILURE'
+//  }
+//  echo "${unitTests}: recording results"
+//  junit '${failureOutput}/out/UNITTEST_RESULT_*.xml'
+//  failureOutput=readFile('${testWorkingDirectory}/out/testfailures.txt')
+//  if (failureOutput.size() > 5) {
+//    failures = "${failureOutput}"
+//    return false;
+//  }
+//  return true;
+//}
 
 echo "bla"
 stage("cloning source")
@@ -97,7 +96,7 @@ stage("cloning source")
     z["z"] = [987, 345]
     echo "haha!4"
     print(z)
-    setDirectories(z, "/somewhere", "linux", 'sanoteuh')
+    setDirectories(z, "/somewhere", "linux", 'sanoteuh', "xxx")
     
     echo "haha!5"
     print(foo)
