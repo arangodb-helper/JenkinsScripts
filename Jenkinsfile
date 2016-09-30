@@ -162,7 +162,7 @@ try {
         node {
           sh "pwd"
           dir("${testRunName}") {
-            echo "${unitTests}: ${COPY_TARBAL_SHELL_SNIPPET}"
+            echo "${unitTests}"
             docker.withRegistry(REGISTRY_URL, '') {
               def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
               myRunImage.pull()
