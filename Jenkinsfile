@@ -40,19 +40,27 @@ def copyExtractTarBall (where) {
   xx  = sprintf("""xxx %1s yyy\n""", [where['localTarball']])
   print("saonteuh\n")
   print(xx)
-//
-//    sh """
-//if test ! -d ${myLocalTarDir}; then
-//        mkdir -p ${myLocalTarDir}
-//fi
-//if test ! -d ${localWSDir}; then
-//        mkdir -p ${localWSDir}
-//fi
-//if test ! -d ${localExtractDir}; then
-//        mkdir -p ${localExtractDir}
-//fi
-//python /usr/bin/copyFileLockedIfNewer.py ${myMD5SUM} ${myDIST_FILE} ${mylocalWSDir} ${localTarball} 'rm -rf ${localExtractDir}; mkdir ${localExtractDir}; cd ${localExtractDir}; tar -xzf ${localTarball}'
-//"""
+
+  CMD = sprintf("""
+if test ! -d %1s; then
+        mkdir -p %1s
+fi
+if test ! -d %2s; then
+        mkdir -p %2s
+fi
+if test ! -d %3s; then
+        mkdir -p %3s
+fi
+python /usr/bin/copyFileLockedIfNewer.py %4s %5s %2s %6s 'rm -rf %3s; mkdir %3s; cd %3s; tar -xzf %6s'
+""", [
+  where['localTarDir'],
+  where['localWSDir'],
+  where['localExtractDir'],
+  where['MD5SUM'],
+  DIST_FILE,
+  where['localTarball'],
+])
+  print(CMD)
 }
 //
 //def setupTestArea(where) {
