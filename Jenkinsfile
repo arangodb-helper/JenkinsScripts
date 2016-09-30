@@ -22,6 +22,7 @@ def fatalError = false
 
 def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile) {
    localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
+   where['localTarDir'] = localTarDir
    where['localTarball'] = localTarball
    where['localWSDir']="${localTarDir}/${jobName}"
    where['localExtractDir']=where['localWSDir'] + "/x/"
