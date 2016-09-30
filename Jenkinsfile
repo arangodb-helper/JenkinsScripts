@@ -220,7 +220,7 @@ try {
       testRunName = "${shortName}_${j}_${n}"
       paralellJobNames[n]=testRunName
       
-      branches[testRunName] = {
+      //      branches[testRunName] = {
         node {
           sh "pwd"
           dir("${testRunName}") {
@@ -241,7 +241,7 @@ try {
               }
             }
           }
-        }
+          //}
         n += 1
       }
     }
