@@ -20,6 +20,17 @@ def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
 
+class foo {
+  foo(String bar) {
+    echo "in foo(${bar})"
+  }
+  blarg(String zoink) {
+    echo "zoink: ${zoink}"
+  }
+}
+
+
+
 
 class testRunner {
   
@@ -104,7 +115,11 @@ python /usr/bin/copyFileLockedIfNewer.py ${myMD5SUM} ${myDIST_FILE} ${mylocalWSD
 echo "bla"
 stage("cloning source")
   node {
-
+    echo "new foo: "
+    x = new foo("bar?")
+    echo "zoink?"
+    x.blarg("ZOINK!")
+    echo "haha!"
     sh "mount"
     sh "pwd"
     sh "ls -l /jenkins/workspace"
