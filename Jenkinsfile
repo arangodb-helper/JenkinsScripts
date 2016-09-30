@@ -43,7 +43,7 @@ def copyExtractTarBall (where) {
   where['distFile'],
   where['localTarball']]);
 
-  print(sprintf("""1: %1s 2: %2s 3: %3s 4: %4s 5: %5s
+  print(sprintf("""
 
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -59,15 +59,9 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
- 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s 6: %6s
+ 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s
 """,
-[
-  where['localTarDir'],
-  where['localWSDir'],
-  where['localExtractDir'],
-  where['MD5SUM'],
-  where['distFile'],
-  where['localTarball']]))
+[  "this is a long string. this is a long string. this is a long string. this is a long string. this is a long string. this is a long string. this is a long string. this is a long string. "]))
         
   
   CMD = sprintf("""
