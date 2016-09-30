@@ -21,12 +21,14 @@ def DIST_FILE = ""
 def fatalError = false
 
 class foo {
+  private String myBar
   foo(String bar) {
+    myBar = bar
     //echo "foo?"
     //echo "in foo(${bar})"
   }
   def blarg(String zoink) {
-    print("zoink: ${zoink}\n")
+    print("zoink: ${zoink} ${bar}\n")
   }
 }
 
