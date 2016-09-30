@@ -20,7 +20,7 @@ def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
 
-class foo {
+def class foo {
   private String myBar
   foo(String bar) {
     myBar = bar
