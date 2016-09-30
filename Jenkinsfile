@@ -34,9 +34,6 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
    where['distFile'] = distFile
 }
 
-def someFunction(someparam, anotherParam) {
-}
-
 
 def copyExtractTarBall (where) {
   print("copyExtractTarBall\n")
@@ -104,7 +101,6 @@ echo "bla"
 stage("cloning source")
   node {
     echo "new foo: "
-    someFunction("onlyOneParam")
 
     
     print(foo)
@@ -116,7 +112,7 @@ stage("cloning source")
     z["z"] = [987, 345]
     echo "haha!4"
     print(z)
-    setDirectories(z, "/somewhere", "linux", 'sanoteuh', "xxx")
+    //setDirectories(z, "/somewhere", "linux", 'sanoteuh', "xxx")
     
     echo "haha!5"
     print(foo)
