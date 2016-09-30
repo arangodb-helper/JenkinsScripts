@@ -117,7 +117,7 @@ stage("cloning source")
     echo "haha!5"
     print(foo)
     echo "haha!6"
-    copyExtractTarBall(z)
+    ///copyExtractTarBall(z)
     sh "mount"
     sh "pwd"
     sh "ls -l /jenkins/workspace"
