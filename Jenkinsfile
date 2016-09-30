@@ -25,12 +25,13 @@ def foo = [
   "blub" : [ "z": [5, 7]]
 ];
 
-def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM) {
+def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, string distFile) {
    localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
    where['localTarball'] = localTarball
    where['localWSDir']="${localTarDir}/${jobName}"
    where['localExtractDir']=where['localWSDir'] + "/x/"
    where['MD5SUM'] = MD5SUM
+   where['distFile'] = distFile
 }
 
 
@@ -58,7 +59,7 @@ python /usr/bin/copyFileLockedIfNewer.py %4s %5s %2s %6s 'rm -rf %3s; mkdir %3s;
   where['localWSDir'],
   where['localExtractDir'],
   where['MD5SUM'],
-  DIST_FILE,
+  where['distFile'],
   where['localTarball'],
 ])
   print(CMD)
@@ -231,7 +232,7 @@ try {
       testRunName = "${shortName}_${j}_${n}"
       paralellJobNames[n]=testRunName
       params[testRunName] = [:]
-      setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM)
+      setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM, DIST_FILE)
       
       //      branches[testRunName] = {
         node {
