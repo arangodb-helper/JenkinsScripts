@@ -25,7 +25,7 @@ def foo = [
   "blub" : [ "z": [5, 7]]
 ];
 
-def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, string distFile) {
+def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile) {
    localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
    where['localTarball'] = localTarball
    where['localWSDir']="${localTarDir}/${jobName}"
