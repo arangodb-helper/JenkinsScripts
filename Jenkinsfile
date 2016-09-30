@@ -101,8 +101,6 @@ python /usr/bin/copyFileLockedIfNewer.py ${myMD5SUM} ${myDIST_FILE} ${mylocalWSD
   }
 }
 
-}
-
 echo "bla"
 stage("cloning source")
   node {
