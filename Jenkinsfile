@@ -25,7 +25,7 @@ def foo = [
   "blub" : [ "z": [5, 7]]
 ];
 
-def setDirectories(where, String localTarDir) {
+def setDirectories(where, String localTarDir, String OS, String jobName) {
    localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
    where['localTarball'] = localTarball
    where['localWSDir']="${localTarDir}/${jobName}"
@@ -125,7 +125,7 @@ stage("cloning source")
     z["z"] = [987, 345]
     echo "haha!4"
     print(z)
-    setDirectories(z, "/somewhere")
+    setDirectories(z, "/somewhere", "linux", 'sanoteuh')
     
     echo "haha!5"
     print(foo)
