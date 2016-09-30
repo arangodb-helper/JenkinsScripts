@@ -117,7 +117,7 @@ stage("cloning source")
     echo "haha!2"
     z = foo["blub"]
     echo "haha!3"
-    z["z"] = [0987]
+    z["z"] = [987, 345]
     echo "haha!4"
     print(z)
     echo "haha!5"
