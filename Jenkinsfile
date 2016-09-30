@@ -231,10 +231,10 @@ try {
                 sh "cat /etc/issue /mnt/workspace/issue"
 
                 echo "${env}"
-                test = new testRunner(LOCAL_TAR_DIR, MD5SUM, env.JOB_NAME, testRunName, OS, testRunName, "", unitTests, cmdLineArgs)
-                test.copyExtractTarBall()
-                test.setupTestArea()
-                test.runTests()
+                //test = new testRunner(LOCAL_TAR_DIR, MD5SUM, env.JOB_NAME, testRunName, OS, testRunName, "", unitTests, cmdLineArgs)
+                //test.copyExtractTarBall()
+                //test.setupTestArea()
+                //test.runTests()
 
               }
             }
