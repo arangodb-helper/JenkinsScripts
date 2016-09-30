@@ -262,7 +262,6 @@ try {
   echo branches.toString();
   
   // parallel branches
-  branches['ssl_server']()
 } catch (err) {
   stage('Send Notification unittest' )
   mail (to: ADMIN_ACCOUNT,
