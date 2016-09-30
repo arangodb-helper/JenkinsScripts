@@ -72,7 +72,7 @@ python /usr/bin/copyFileLockedIfNewer.py ${myMD5SUM} ${myDIST_FILE} ${mylocalWSD
     sh "rm -rf ${testWorkingDirectory}/out/*"
     sh "find -type l -exec rm -f {} \\; ; ln -s ${localExtractDir}/* ${testWorkingDirectory}/"
   }
-  def Bool runTests () {
+  def Boolean runTests () {
     def EXECUTE_TEST="""pwd;
          TMPDIR=${testWorkingDirectory}/out/tmp
          mkdir -p \${TMPDIR}
