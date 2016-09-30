@@ -20,20 +20,87 @@ def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
 
-Closure copyExtractTarBall = {
-    myLOCAL_TAR_DIR, mylocalWSDir, mylocalExtractDir, myMD5SUM, myDIST_FILE, mylocalTarball -> 
-    sh """
-if test ! -d ${myLOCAL_TAR_DIR}; then
-        mkdir -p ${myLOCAL_TAR_DIR}
+
+class testRunner {
+  
+  private String localTarball;
+  private String localWSDir;
+  private String localExtractDir;
+  private String localTarDir;
+  private String MD5SUM;
+  private String baseName;
+  private String UnitTests;
+  private String testWorkingDirectory;
+  private String cmdLineArgs;
+  String failures;
+  
+  testRunner(String localTarDir,
+             String theMD5Sum,
+             String jobName,
+             String theBaseName,
+             String OS,
+             String theUnitTests,
+             String theTestDir,
+             String theCmdLineArgs) {
+    MD5SUM = theMD5Sum
+    localTarDir = localTarDir
+    baseName = theBaseName
+    UnitTests = theUnitTests
+    cmdLineArgs = theCmdLineArgs
+    localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
+    localWSDir="${localTarDir}/${jobName}"
+    localExtractDir="${localWSDir}/x/"
+    testWorkingDirectory = 
+  }
+
+  def copyExtractTarBall () {
+      sh """
+if test ! -d ${myLocalTarDir}; then
+        mkdir -p ${myLocalTarDir}
 fi
-if test ! -d ${mylocalWSDir}; then
-        mkdir -p ${mylocalWSDir}
+if test ! -d ${localWSDir}; then
+        mkdir -p ${localWSDir}
 fi
-if test ! -d ${mylocalExtractDir}; then
-        mkdir -p ${mylocalExtractDir}
+if test ! -d ${localExtractDir}; then
+        mkdir -p ${localExtractDir}
 fi
-python /usr/bin/copyFileLockedIfNewer.py ${myMD5SUM} ${myDIST_FILE} ${mylocalWSDir} ${mylocalTarball} 'rm -rf ${mylocalExtractDir}; mkdir ${mylocalExtractDir}; cd ${mylocalExtractDir}; tar -xzf ${mylocalTarball}'
+python /usr/bin/copyFileLockedIfNewer.py ${myMD5SUM} ${myDIST_FILE} ${mylocalWSDir} ${localTarball} 'rm -rf ${localExtractDir}; mkdir ${localExtractDir}; cd ${localExtractDir}; tar -xzf ${localTarball}'
 """
+  }
+
+  def setupTestArea() {
+    sh "rm -rf ${testWorkingDirectory}/out/*"
+    sh "find -type l -exec rm -f {} \\; ; ln -s ${localExtractDir}/* ${testWorkingDirectory}/"
+  }
+  def Bool runTests () {
+    def EXECUTE_TEST="""pwd;
+         TMPDIR=${testWorkingDirectory}/out/tmp
+         mkdir -p \${TMPDIR}
+         echo 0 > ${testWorkingDirectory}/out/rc
+         `pwd`/scripts/unittest ${unitTests} \
+                --skipNondeterministic true \
+                --skipTimeCritical true \
+                ${cmdLineArgs} || \
+         echo \$? > ${testWorkingDirectory}/out/rc"""
+    echo "${unitTests}: ${EXECUTE_TEST}"
+    sh "${EXECUTE_TEST}"
+    shellRC = readFile('${testWorkingDirectory}/out/rc').trim()
+    if (shellRC != "0") {
+      echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
+      failures = "${failures}\n\n test ${testRunName} exited with ${shellRC}"
+      currentBuild.result = 'FAILURE'
+    }
+    echo "${unitTests}: recording results"
+    junit '${failureOutput}/out/UNITTEST_RESULT_*.xml'
+    failureOutput=readFile('${testWorkingDirectory}/out/testfailures.txt')
+    if (failureOutput.size() > 5) {
+      failures = "${failureOutput}"
+      return false;
+    }
+    return true;
+  }
+}
+
 }
 
 echo "bla"
@@ -107,9 +174,6 @@ try {
 
 stage("running unittest")
 try {
-  def localWSDir="${LOCAL_TAR_DIR}/${env.JOB_NAME}"
-  def localTarball="${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz"
-  def localExtractDir="${localWSDir}/x/"
   def testCaseSets = [ 
     //  ["fail", 'fail', ""],
     //    ["fail", 'fail', ""],
@@ -163,42 +227,20 @@ try {
           sh "pwd"
           dir("${testRunName}") {
             echo "${unitTests}"
+            echo "${env}"
             docker.withRegistry(REGISTRY_URL, '') {
               def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
               myRunImage.pull()
               docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
                 sh "cat /etc/issue /mnt/workspace/issue"
 
-                copyExtractTarBall(LOCAL_TAR_DIR, localWSDir, localExtractDir, MD5SUM, DIST_FILE, localTarball)
+                echo "${env}"
+                test = new testRunner(LOCAL_TAR_DIR, MD5SUM, env.JOB_NAME, testRunName, OS, testRunName, , unitTests, cmdLineArgs)
+                test.copyExtractTarBall()
+                test.setupTestArea()
+                test.runTests()
 
-                sh "rm -rf out/*"
-                sh "find -type l -exec rm -f {} \\; ; ln -s ${localExtractDir}/* ."
-
-                def EXECUTE_TEST="""pwd;
-         TMPDIR=`pwd`/out/tmp
-         mkdir -p \${TMPDIR}
-         echo 0 > out/rc
-         `pwd`/scripts/unittest ${unitTests} \
-                --skipNondeterministic true \
-                --skipTimeCritical true \
-                ${cmdLineArgs} || \
-         echo \$? > out/rc"""
-                echo "${unitTests}: ${EXECUTE_TEST}"
-                sh "${EXECUTE_TEST}"
-                shellRC = readFile('out/rc').trim()
-                if (shellRC != "0") {
-                  echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
-                  failures = "${failures}\n\n test ${testRunName} exited with ${shellRC}"
-                  currentBuild.result = 'FAILURE'
-                }
-                echo "${unitTests}: recording results"
-                junit 'out/UNITTEST_RESULT_*.xml'
-                failureOutput=readFile('out/testfailures.txt')
-                if (failureOutput.size() > 5) {
-                  failures = "${failures}\n${failureOutput}"
-                }
               }
-            }
           }
         }
       }
