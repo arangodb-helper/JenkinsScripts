@@ -46,7 +46,7 @@ fi
 if test ! -d %3s; then
         mkdir -p %3s
 fi
-python /usr/bin/copyFileLockedIfNewer.py %4s %5s %2s %6s 'rm -rf %3s; mkdir %3s; cd %3s; tar -xzf %6s'
+python /usr/bin/copyFileLockedIfNewer.py 4s %5s %2s %6s 'rm -rf %3s; mkdir %3s; cd %3s; tar -xzf %6s'
 """, [
   where['localTarDir'],
   where['localWSDir'],
