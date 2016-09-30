@@ -50,11 +50,11 @@ class testRunner {
     localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
     localWSDir="${localTarDir}/${jobName}"
     localExtractDir="${localWSDir}/x/"
-    testWorkingDirectory = 
+    testWorkingDirectory = theTestDir
   }
 
   def copyExtractTarBall () {
-      sh """
+    sh """
 if test ! -d ${myLocalTarDir}; then
         mkdir -p ${myLocalTarDir}
 fi
