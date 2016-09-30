@@ -218,6 +218,7 @@ try {
   print("getting keyset\n")
   m = testCaseSets.size()
   int n = 0;
+  def params = [:]
   for (int i = 0; i < m; i++) {
     def unitTestSet = testCaseSets.getAt(i);
     o = unitTestSet.size()
@@ -228,6 +229,8 @@ try {
       echo " ${shortName} ${cmdLineArgs} -  ${j}"
       testRunName = "${shortName}_${j}_${n}"
       paralellJobNames[n]=testRunName
+      params[testRunName] = [:]
+      setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM)
       
       //      branches[testRunName] = {
         node {
@@ -240,10 +243,11 @@ try {
               myRunImage.pull()
               docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
                 sh "cat /etc/issue /mnt/workspace/issue"
+                
 
                 echo "${env}"
                 //test = new testRunner(LOCAL_TAR_DIR, MD5SUM, env.JOB_NAME, testRunName, OS, testRunName, "", unitTests, cmdLineArgs)
-                //test.copyExtractTarBall()
+                copyExtractTarBall(params[testRunName])
                 //test.setupTestArea()
                 //test.runTests()
 
