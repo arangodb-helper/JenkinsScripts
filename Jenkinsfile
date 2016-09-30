@@ -36,7 +36,7 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
 
 def copyExtractTarBall (where) {
   print("xxx" + where['localTarball']+ "yyy\n")
-  print("""xxx where['localTarball']yyy\n""")
+  xx  = sprintf("""xxx %1$s ]yyy\n""", [swhere['localTarball']])
 //
 //    sh """
 //if test ! -d ${myLocalTarDir}; then
