@@ -20,7 +20,7 @@ def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
 
-def copyExtractTarBall{
+Closure copyExtractTarBall = {
     LOCAL_TAR_DIR, localWSDir, localExtractDir, MD5SUM, DIST_FILE, localTarball -> 
     sh """
 if test ! -d ${LOCAL_TAR_DIR}; then
