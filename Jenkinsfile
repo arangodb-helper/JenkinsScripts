@@ -21,18 +21,18 @@ def DIST_FILE = ""
 def fatalError = false
 
 Closure copyExtractTarBall = {
-    LOCAL_TAR_DIR, localWSDir, localExtractDir, MD5SUM, DIST_FILE, localTarball -> 
+    myLOCAL_TAR_DIR, mylocalWSDir, mylocalExtractDir, myMD5SUM, myDIST_FILE, mylocalTarball -> 
     sh """
-if test ! -d ${LOCAL_TAR_DIR}; then
-        mkdir -p ${LOCAL_TAR_DIR}
+if test ! -d ${myLOCAL_TAR_DIR}; then
+        mkdir -p ${myLOCAL_TAR_DIR}
 fi
-if test ! -d ${localWSDir}; then
-        mkdir -p ${localWSDir}
+if test ! -d ${mylocalWSDir}; then
+        mkdir -p ${mylocalWSDir}
 fi
-if test ! -d ${localExtractDir}; then
-        mkdir -p ${localExtractDir}
+if test ! -d ${mylocalExtractDir}; then
+        mkdir -p ${mylocalExtractDir}
 fi
-python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${localWSDir} ${localTarball} 'rm -rf ${localExtractDir}; mkdir ${localExtractDir}; cd ${localExtractDir}; tar -xzf ${localTarball}'
+python /usr/bin/copyFileLockedIfNewer.py ${myMD5SUM} ${myDIST_FILE} ${mylocalWSDir} ${mylocalTarball} 'rm -rf ${mylocalExtractDir}; mkdir ${mylocalExtractDir}; cd ${mylocalExtractDir}; tar -xzf ${mylocalTarball}'
 """
 }
 
