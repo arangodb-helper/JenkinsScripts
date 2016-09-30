@@ -25,66 +25,39 @@ def foo = [
   "blub" : [ "z": [5, 7]]
 ];
 
-def setDirectories(where, String localTarDir, String OS, String jobName) {
+def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM) {
    localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
    where['localTarball'] = localTarball
    where['localWSDir']="${localTarDir}/${jobName}"
    where['localExtractDir']=where['localWSDir'] + "/x/"
+   where['MD5SUM'] = MD5SUM
+   
 }
 
-class testRunner {
-  
-  private String localTarball;
-  private String localWSDir;
-  private String localExtractDir;
-  private String localTarDir;
-  private String MD5SUM;
-  private String baseName;
-  private String UnitTests;
-  private String testWorkingDirectory;
-  private String cmdLineArgs;
-  String failures;
-  
-  testRunner(String localTarDir,
-             String theMD5Sum,
-             String jobName,
-             String theBaseName,
-             String OS,
-             String theUnitTests,
-             String theTestDir,
-             String theCmdLineArgs) {
-    MD5SUM = theMD5Sum
-    localTarDir = localTarDir
-    baseName = theBaseName
-    UnitTests = theUnitTests
-    cmdLineArgs = theCmdLineArgs
-    localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
-    localWSDir="${localTarDir}/${jobName}"
-    localExtractDir="${localWSDir}/x/"
-    testWorkingDirectory = theTestDir
-  }
 
-  def copyExtractTarBall () {
-    sh """
-if test ! -d ${myLocalTarDir}; then
-        mkdir -p ${myLocalTarDir}
-fi
-if test ! -d ${localWSDir}; then
-        mkdir -p ${localWSDir}
-fi
-if test ! -d ${localExtractDir}; then
-        mkdir -p ${localExtractDir}
-fi
-python /usr/bin/copyFileLockedIfNewer.py ${myMD5SUM} ${myDIST_FILE} ${mylocalWSDir} ${localTarball} 'rm -rf ${localExtractDir}; mkdir ${localExtractDir}; cd ${localExtractDir}; tar -xzf ${localTarball}'
-"""
-  }
-
-  def setupTestArea() {
-    sh "rm -rf ${testWorkingDirectory}/out/*"
-    sh "find -type l -exec rm -f {} \\; ; ln -s ${localExtractDir}/* ${testWorkingDirectory}/"
-  }
-  def Boolean runTests () {
-    def EXECUTE_TEST="""pwd;
+def copyExtractTarBall (where) {
+  print("${where}['localTarball']")
+//
+//    sh """
+//if test ! -d ${myLocalTarDir}; then
+//        mkdir -p ${myLocalTarDir}
+//fi
+//if test ! -d ${localWSDir}; then
+//        mkdir -p ${localWSDir}
+//fi
+//if test ! -d ${localExtractDir}; then
+//        mkdir -p ${localExtractDir}
+//fi
+//python /usr/bin/copyFileLockedIfNewer.py ${myMD5SUM} ${myDIST_FILE} ${mylocalWSDir} ${localTarball} 'rm -rf ${localExtractDir}; mkdir ${localExtractDir}; cd ${localExtractDir}; tar -xzf ${localTarball}'
+//"""
+//  }
+//
+//def setupTestArea(where) {
+//  sh "rm -rf ${testWorkingDirectory}/out/*"
+//  sh "find -type l -exec rm -f {} \\; ; ln -s ${localExtractDir}/* ${testWorkingDirectory}/"
+}
+def Boolean runTests (where) {
+  def EXECUTE_TEST="""pwd;
          TMPDIR=${testWorkingDirectory}/out/tmp
          mkdir -p \${TMPDIR}
          echo 0 > ${testWorkingDirectory}/out/rc
@@ -93,23 +66,22 @@ python /usr/bin/copyFileLockedIfNewer.py ${myMD5SUM} ${myDIST_FILE} ${mylocalWSD
                 --skipTimeCritical true \
                 ${cmdLineArgs} || \
          echo \$? > ${testWorkingDirectory}/out/rc"""
-    echo "${unitTests}: ${EXECUTE_TEST}"
-    sh "${EXECUTE_TEST}"
-    shellRC = readFile('${testWorkingDirectory}/out/rc').trim()
-    if (shellRC != "0") {
-      echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
-      failures = "${failures}\n\n test ${testRunName} exited with ${shellRC}"
-      currentBuild.result = 'FAILURE'
-    }
-    echo "${unitTests}: recording results"
-    junit '${failureOutput}/out/UNITTEST_RESULT_*.xml'
-    failureOutput=readFile('${testWorkingDirectory}/out/testfailures.txt')
-    if (failureOutput.size() > 5) {
-      failures = "${failureOutput}"
-      return false;
-    }
-    return true;
+  echo "${unitTests}: ${EXECUTE_TEST}"
+  sh "${EXECUTE_TEST}"
+  shellRC = readFile('${testWorkingDirectory}/out/rc').trim()
+  if (shellRC != "0") {
+    echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
+    failures = "${failures}\n\n test ${testRunName} exited with ${shellRC}"
+    currentBuild.result = 'FAILURE'
   }
+  echo "${unitTests}: recording results"
+  junit '${failureOutput}/out/UNITTEST_RESULT_*.xml'
+  failureOutput=readFile('${testWorkingDirectory}/out/testfailures.txt')
+  if (failureOutput.size() > 5) {
+    failures = "${failureOutput}"
+    return false;
+  }
+  return true;
 }
 
 echo "bla"
@@ -130,6 +102,7 @@ stage("cloning source")
     echo "haha!5"
     print(foo)
     echo "haha!6"
+    copyExtractTarBall(z)
     sh "mount"
     sh "pwd"
     sh "ls -l /jenkins/workspace"
