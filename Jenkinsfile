@@ -20,11 +20,6 @@ def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
 
-def foo = [
-  "bar" : [ 1, 3, 5],
-  "blub" : [ "z": [5, 7]]
-];
-
 def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile) {
    localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
    where['localTarball'] = localTarball
@@ -37,12 +32,9 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
 
 def copyExtractTarBall (where) {
   print("copyExtractTarBall\n")
-  print("xxx" + where['localTarball']+ "yyy\n")
-  print("saonteuh\n")
-  xx  = sprintf("""xxx %1s yyy\n""", [where['localTarball']])
-  print("saonteuh\n")
-  print(xx)
-
+  
+  print(where)
+  
   CMD = sprintf("""
 if test ! -d %1s; then
         mkdir -p %1s
@@ -64,11 +56,11 @@ python /usr/bin/copyFileLockedIfNewer.py %4s %5s %2s %6s 'rm -rf %3s; mkdir %3s;
 ])
   print(CMD)
 }
-//
-//def setupTestArea(where) {
-//  sh "rm -rf ${testWorkingDirectory}/out/*"
-//  sh "find -type l -exec rm -f {} \\; ; ln -s ${localExtractDir}/* ${testWorkingDirectory}/"
-// }
+
+def setupTestArea(where) {
+  sh "rm -rf " + where['testWorkingDirectory'] + "/out/*"
+  sh "find -type l -exec rm -f {} \\; ; ln -s " + where['localExtractDir'] + "/* " + where['testWorkingDirectory'] + "/"
+}
 //def Boolean runTests (where) {
 //  def EXECUTE_TEST="""pwd;
 //         TMPDIR=${testWorkingDirectory}/out/tmp
@@ -100,24 +92,6 @@ python /usr/bin/copyFileLockedIfNewer.py %4s %5s %2s %6s 'rm -rf %3s; mkdir %3s;
 echo "bla"
 stage("cloning source")
   node {
-    echo "new foo: "
-
-    
-    print(foo)
-    echo "haha!1"
-    print(foo["bar"])
-    echo "haha!2"
-    z = foo["blub"]
-    echo "haha!3"
-    z["z"] = [987, 345]
-    echo "haha!4"
-    print(z)
-    //setDirectories(z, "/somewhere", "linux", 'sanoteuh', "xxx")
-    
-    echo "haha!5"
-    print(foo)
-    echo "haha!6"
-    ///copyExtractTarBall(z)
     sh "mount"
     sh "pwd"
     sh "ls -l /jenkins/workspace"
