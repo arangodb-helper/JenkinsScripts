@@ -35,6 +35,23 @@ def copyExtractTarBall (where) {
   print("copyExtractTarBall\n")
   
   print(where)
+  print([
+  where['localTarDir'],
+  where['localWSDir'],
+  where['localExtractDir'],
+  where['MD5SUM'],
+  where['distFile'],
+  where['localTarball']]);
+
+  print(sprintf("%1s %2s",
+[
+  where['localTarDir'],
+  where['localWSDir'],
+  where['localExtractDir'],
+  where['MD5SUM'],
+  where['distFile'],
+  where['localTarball']]))
+        
   
   CMD = sprintf("""
 if test ! -d %1s; then
