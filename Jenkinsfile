@@ -43,7 +43,7 @@ def copyExtractTarBall (where) {
   where['distFile'],
   where['localTarball']]);
 
-  print(sprintf("%1s %2s",
+  print(sprintf("1: %1s 2: %2s 3: %3s 4: %4s\n",
 [
   where['localTarDir'],
   where['localWSDir'],
