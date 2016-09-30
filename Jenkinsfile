@@ -34,6 +34,9 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
    where['distFile'] = distFile
 }
 
+def someFunction(someparam, anotherParam) {
+}
+
 
 def copyExtractTarBall (where) {
   print("copyExtractTarBall\n")
@@ -101,6 +104,9 @@ echo "bla"
 stage("cloning source")
   node {
     echo "new foo: "
+    someFunction("onlyOneParam")
+
+    
     print(foo)
     echo "haha!1"
     print(foo["bar"])
