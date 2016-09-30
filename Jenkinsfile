@@ -20,6 +20,22 @@ def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
 
+def copyExtractTarBall{
+    LOCAL_TAR_DIR, localWSDir, localExtractDir, MD5SUM, DIST_FILE, localTarball -> 
+    sh """
+if test ! -d ${LOCAL_TAR_DIR}; then
+        mkdir -p ${LOCAL_TAR_DIR}
+fi
+if test ! -d ${localWSDir}; then
+        mkdir -p ${localWSDir}
+fi
+if test ! -d ${localExtractDir}; then
+        mkdir -p ${localExtractDir}
+fi
+python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${localWSDir} ${localTarball} 'rm -rf ${localExtractDir}; mkdir ${localExtractDir}; cd ${localExtractDir}; tar -xzf ${localTarball}'
+"""
+}
+
 echo "bla"
 stage("cloning source")
   node {
@@ -94,18 +110,6 @@ try {
   def localWSDir="${LOCAL_TAR_DIR}/${env.JOB_NAME}"
   def localTarball="${LOCAL_TAR_DIR}/arangodb-${OS}.tar.gz"
   def localExtractDir="${localWSDir}/x/"
-  def COPY_TARBAL_SHELL_SNIPPET = """
-if test ! -d ${LOCAL_TAR_DIR}; then
-        mkdir -p ${LOCAL_TAR_DIR}
-fi
-if test ! -d ${localWSDir}; then
-        mkdir -p ${localWSDir}
-fi
-if test ! -d ${localExtractDir}; then
-        mkdir -p ${localExtractDir}
-fi
-python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${localWSDir} ${localTarball} 'rm -rf ${localExtractDir}; mkdir ${localExtractDir}; cd ${localExtractDir}; tar -xzf ${localTarball}'
-"""
   def testCaseSets = [ 
     //  ["fail", 'fail', ""],
     //    ["fail", 'fail', ""],
@@ -165,8 +169,8 @@ python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${DIST_FILE} ${localWSDir} ${
               docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
                 sh "cat /etc/issue /mnt/workspace/issue"
 
-                sh COPY_TARBAL_SHELL_SNIPPET
-                
+                copyExtractTarBall(LOCAL_TAR_DIR, localWSDir, localExtractDir, MD5SUM, DIST_FILE, localTarball)
+
                 sh "rm -rf out/*"
                 sh "find -type l -exec rm -f {} \\; ; ln -s ${localExtractDir}/* ."
 
