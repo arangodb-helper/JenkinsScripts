@@ -43,46 +43,19 @@ def copyExtractTarBall (where) {
   where['distFile'],
   where['localTarball']]);
 
-  print(sprintf("""
 
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
- 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s 1: %1s
-""",
-[  "this is a long string. this is a long string. this is a long string. this is a long string. this is a long string. this is a long string. this is a long string. this is a long string. "]))
-        
-  
-  CMD = sprintf("""
-if test ! -d %1s; then
-        mkdir -p %1s
+  CMD = """
+if test ! -d ${where['localTarDir']}; then
+        mkdir -p ${where['localTarDir']}
 fi
-if test ! -d %2s; then
-        mkdir -p %2s
+if test ! -d ${where['localWSDir']}; then
+        mkdir -p ${where['localWSDir']}
 fi
-if test ! -d %3s; then
-        mkdir -p %3s
+if test ! -d ${where['localExtractDir']}; then
+        mkdir -p ${where['localExtractDir']}
 fi
-python /usr/bin/copyFileLockedIfNewer.py 4s %5s %2s %6s 'rm -rf %3s; mkdir %3s; cd %3s; tar -xzf %6s'
-""", [
-  where['localTarDir'],
-  where['localWSDir'],
-  where['localExtractDir'],
-  where['MD5SUM'],
-  where['distFile'],
-  where['localTarball'],
-])
+python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']} ${where['localWSDir']} ${where['localTarball']} 'rm -rf ${where['localExtractDir']}; mkdir ${where['localExtractDir']}; cd ${where['localExtractDir']}; tar -xzf ${where['localTarball']}'
+"""
   print(CMD)
 }
 
