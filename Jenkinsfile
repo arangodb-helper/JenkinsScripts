@@ -156,7 +156,7 @@ try {
   def testCaseSets = [ 
     //  ["fail", 'fail', ""],
     //    ["fail", 'fail', ""],
-    ['ssl_server', 'ssl_server', ""], // FC: don't need this with clusters.
+    ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
     
 //    ['http_server', 'http_server', "",
 //     "--cluster true --testBuckets 4/1 ",
@@ -214,14 +214,15 @@ try {
               def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
               myRunImage.pull()
               docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
-                sh "cat /etc/issue /mnt/workspace/issue"
+                sh "cat /etc/issue"
+                sh "cat /mnt/workspace/issue"
                 
 
                 echo "${env}"
                 //test = new testRunner(LOCAL_TAR_DIR, MD5SUM, env.JOB_NAME, testRunName, OS, testRunName, "", unitTests, cmdLineArgs)
                 copyExtractTarBall(params[testRunName])
-                //test.setupTestArea()
-                //test.runTests()
+                test.setupTestArea()
+                test.runTests()
 
               }
             }
