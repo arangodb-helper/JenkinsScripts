@@ -34,16 +34,6 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
 def copyExtractTarBall (where) {
   print("copyExtractTarBall\n")
   
-  print(where)
-  print([
-  where['localTarDir'],
-  where['localWSDir'],
-  where['localExtractDir'],
-  where['MD5SUM'],
-  where['distFile'],
-  where['localTarball']]);
-
-
   CMD = """
 if test ! -d ${where['localTarDir']}; then
         mkdir -p ${where['localTarDir']}
@@ -60,10 +50,12 @@ python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']}
 }
 
 def setupTestArea(where) {
+  print("setupTestArea\n")
   sh "rm -rf ${where['testWorkingDirectory']}/out/*"
   sh "find -type l -exec rm -f {} \\; ; ln -s ${where['localExtractDir']}/* ${where['testWorkingDirectory']}/"
 }
-def Boolean runTests (where) {
+def Boolean runTests(where) {
+  print("runTests")
   def EXECUTE_TEST="""pwd;
          export TMPDIR=${where['testWorkingDirectory']}/out/tmp
          mkdir -p \${TMPDIR}
