@@ -61,7 +61,7 @@ def setupTestArea(where) {
   sh "rm -rf ${where['testWorkingDirectory']}/out/*"
   sh "find -type l -exec rm -f {} \\; ; ln -s ${where['localExtractDir']}/* ${where['testWorkingDirectory']}/"
 }
-def Boolean runTests(where) {
+def runTests(where) {
   print("runTests")
   def EXECUTE_TEST="""pwd;
          export TMPDIR=${where['testWorkingDirectory']}/out/tmp
@@ -86,9 +86,7 @@ def Boolean runTests(where) {
   failureOutput=readFile("${where['testWorkingDirectory']}/out/testfailures.txt")
   if (failureOutput.size() > 5) {
     failures = "${failureOutput}"
-    return false;
   }
-  return true;
 }
 
 def runThisTest(where, REGISTRY_URL) {
