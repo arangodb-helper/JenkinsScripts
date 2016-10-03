@@ -67,7 +67,7 @@ def Boolean runTests(where) {
          export TMPDIR=${where['testWorkingDirectory']}/out/tmp
          mkdir -p \${TMPDIR}
          echo 0 > ${where['testWorkingDirectory']}/out/rc
-         `pwd`/scripts/unittest ${where['unitTests']} \
+         ${where['testWorkingDirectory']}/scripts/unittest ${where['unitTests']} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
                 ${where['cmdLineArgs']} || \
