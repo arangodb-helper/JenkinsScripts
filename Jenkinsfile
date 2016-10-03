@@ -74,7 +74,7 @@ def Boolean runTests(where) {
          echo \$? > ${where['testWorkingDirectory']}/out/rc"""
   echo "${where['unitTests']}: ${EXECUTE_TEST}"
   sh EXECUTE_TEST
-  shellRC = readFile('${testWorkingDirectory}/out/rc').trim()
+  shellRC = readFile("${where['testWorkingDirectory']}/out/rc").trim()
   if (shellRC != "0") {
     echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
     failures = "${failures}\n\n test ${where['testRunName']} exited with ${shellRC}"
