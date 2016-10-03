@@ -13,9 +13,9 @@ def failures = ""
 def paralellJobNames = []
 def ADMIN_ACCOUNT = "willi@arangodb.com"
 def lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
-def lastKnownGitRev=""
-def currentGitRev=""
-
+def lastKnownGitRev = ""
+def currentGitRev = ""
+def WORKSPACE = ""
 def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
@@ -194,8 +194,6 @@ try {
   print("getting keyset\n")
   m = testCaseSets.size()
   int n = 0;
-  sh 'pwd > workspace.loc'
-  WORKSPACE = readFile('workspace.loc').trim()
   def params = [:]
   for (int i = 0; i < m; i++) {
     def unitTestSet = testCaseSets.getAt(i);
@@ -212,6 +210,8 @@ try {
       
       //      branches[testRunName] = {
         node {
+          sh 'pwd > workspace.loc'
+          WORKSPACE = readFile('workspace.loc').trim()
           sh "pwd"
           dir("${testRunName}") {
             echo "${unitTests}"
