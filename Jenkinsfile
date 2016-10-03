@@ -210,7 +210,7 @@ try {
       params[testRunName] = [:]
       setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
       
-      //      branches[testRunName] = {
+      branches[testRunName] = { where ->
         node {
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
@@ -227,22 +227,21 @@ try {
                 
 
                 echo "${env}"
-                //test = new testRunner(LOCAL_TAR_DIR, MD5SUM, env.JOB_NAME, testRunName, OS, testRunName, "", unitTests, cmdLineArgs)
-                copyExtractTarBall(params[testRunName])
-                setupTestArea(params[testRunName])
-                runTests(params[testRunName])
+                copyExtractTarBall(where)
+                setupTestArea(where)
+                runTests(where)
 
               }
             }
           }
-          //}
-        n += 1
+      }(params[testRunName])
+      n += 1
       }
     }
   }
   echo branches.toString();
   
-  // parallel branches
+  parallel branches
 } catch (err) {
   stage('Send Notification unittest' )
   mail (to: ADMIN_ACCOUNT,
