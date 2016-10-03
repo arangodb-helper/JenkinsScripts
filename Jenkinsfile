@@ -2,23 +2,23 @@
 // We need these modules:
 //
 // We need permisions for several string manipulation operations, like take()
-def REGISTRY="192.168.0.1"
-def REGISTRY_URL="https://${REGISTRY}/"
-def DOCKER_CONTAINER="ubuntusixteenofour"
-def OS="Linux"
-def RELEASE_OUT_DIR="/net/fileserver/"
-def LOCAL_TAR_DIR="/mnt/workspace/tmp/"
-def branches = [:]
-def failures = ""
-def paralellJobNames = []
-def ADMIN_ACCOUNT = "willi@arangodb.com"
-def lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
-def lastKnownGitRev = ""
-def currentGitRev = ""
-def WORKSPACE = ""
-def BUILT_FILE = ""
-def DIST_FILE = ""
-def fatalError = false
+REGISTRY="192.168.0.1"
+REGISTRY_URL="https://${REGISTRY}/"
+DOCKER_CONTAINER="ubuntusixteenofour"
+OS="Linux"
+RELEASE_OUT_DIR="/net/fileserver/"
+LOCAL_TAR_DIR="/mnt/workspace/tmp/"
+branches = [:]
+failures = ""
+paralellJobNames = []
+ADMIN_ACCOUNT = "willi@arangodb.com"
+lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
+lastKnownGitRev = ""
+currentGitRev = ""
+WORKSPACE = ""
+BUILT_FILE = ""
+DIST_FILE = ""
+fatalError = false
 
 def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile, String WD, String testRunName, String unitTests, String cmdLineArgs) {
    localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
