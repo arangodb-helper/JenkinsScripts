@@ -238,7 +238,6 @@ try {
       
       branches[testRunName] = runThisTest(params[testRunName])
       n += 1
-      }
     }
   }
   echo branches.toString();
