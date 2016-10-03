@@ -20,7 +20,7 @@ def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
 
-def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile) {
+def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile, String WD) {
    localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
    where['localTarDir'] = localTarDir
    where['localTarball'] = localTarball
@@ -28,6 +28,8 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
    where['localExtractDir']=where['localWSDir'] + "/x/"
    where['MD5SUM'] = MD5SUM
    where['distFile'] = distFile
+        
+   where['testWorkingDirectory'] = "${WD}/${jobName}"
 }
 
 
@@ -192,6 +194,8 @@ try {
   print("getting keyset\n")
   m = testCaseSets.size()
   int n = 0;
+  sh 'pwd > workspace.loc'
+  WORKSPACE = readFile('workspace.loc').trim()
   def params = [:]
   for (int i = 0; i < m; i++) {
     def unitTestSet = testCaseSets.getAt(i);
@@ -204,7 +208,7 @@ try {
       testRunName = "${shortName}_${j}_${n}"
       paralellJobNames[n]=testRunName
       params[testRunName] = [:]
-      setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM, DIST_FILE)
+      setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE)
       
       //      branches[testRunName] = {
         node {
