@@ -20,7 +20,7 @@ def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
 
-def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile, String WD, String testRunName) {
+def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile, String WD, String testRunName, String unitTests, String cmdLineArgs) {
    localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
    where['localTarDir'] = localTarDir
    where['localTarball'] = localTarball
@@ -30,6 +30,9 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
    where['distFile'] = distFile
         
    where['testWorkingDirectory'] = "${WD}/${testRunName}"
+   where['testRunName'] = testRunName
+   where['unitTests'] = unitTests
+   where['cmdLineArgs'] = cmdLineArgs
 }
 
 
@@ -64,17 +67,17 @@ def Boolean runTests(where) {
          export TMPDIR=${where['testWorkingDirectory']}/out/tmp
          mkdir -p \${TMPDIR}
          echo 0 > ${where['testWorkingDirectory']}/out/rc
-         `pwd`/scripts/unittest ${unitTests} \
+         `pwd`/scripts/unittest ${where['unitTests']} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
-                ${cmdLineArgs} || \
+                ${where['cmdLineArgs']} || \
          echo \$? > ${where['testWorkingDirectory']}/out/rc"""
-  echo "${unitTests}: ${EXECUTE_TEST}"
+  echo "${where['unitTests'}: ${EXECUTE_TEST}"
   sh EXECUTE_TEST
   shellRC = readFile('${testWorkingDirectory}/out/rc').trim()
   if (shellRC != "0") {
     echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
-    failures = "${failures}\n\n test ${testRunName} exited with ${shellRC}"
+    failures = "${failures}\n\n test ${where['testRunName']} exited with ${shellRC}"
     currentBuild.result = 'FAILURE'
   }
   echo "${unitTests}: recording results"
@@ -206,7 +209,7 @@ try {
       testRunName = "${shortName}_${j}_${n}"
       paralellJobNames[n]=testRunName
       params[testRunName] = [:]
-      setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName)
+      setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
       
       //      branches[testRunName] = {
         node {
