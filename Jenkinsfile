@@ -80,7 +80,7 @@ def Boolean runTests(where) {
     failures = "${failures}\n\n test ${where['testRunName']} exited with ${shellRC}"
     currentBuild.result = 'FAILURE'
   }
-  echo "${unitTests}: recording results"
+        echo "${where['unitTests']}: recording results"
   junit "${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml"
   failureOutput=readFile("${where['testWorkingDirectory']}/out/testfailures.txt")
   if (failureOutput.size() > 5) {
