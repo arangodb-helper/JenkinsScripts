@@ -90,7 +90,7 @@ def Boolean runTests(where) {
   return true;
 }
 
-def runThisTest(where) {
+def runThisTest(where, REGISTRY_URL) {
   node {
       sh 'pwd > workspace.loc'
       WORKSPACE = readFile('workspace.loc').trim()
@@ -237,7 +237,7 @@ try {
       params[testRunName] = [:]
       setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
       
-      branches[testRunName] = runThisTest(params[testRunName])
+      branches[testRunName] = runThisTest(params[testRunName], REGISTRY_URL)
       n += 1
     }
   }
