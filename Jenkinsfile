@@ -72,7 +72,7 @@ def Boolean runTests(where) {
                 --skipTimeCritical true \
                 ${where['cmdLineArgs']} || \
          echo \$? > ${where['testWorkingDirectory']}/out/rc"""
-  echo "${where['unitTests'}: ${EXECUTE_TEST}"
+  echo "${where['unitTests']}: ${EXECUTE_TEST}"
   sh EXECUTE_TEST
   shellRC = readFile('${testWorkingDirectory}/out/rc').trim()
   if (shellRC != "0") {
