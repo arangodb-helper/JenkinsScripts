@@ -90,6 +90,32 @@ def Boolean runTests(where) {
   return true;
 }
 
+def runThisTest(where) {
+  node {
+      sh 'pwd > workspace.loc'
+      WORKSPACE = readFile('workspace.loc').trim()
+      sh "pwd"
+      dir("${where['testRunName']}") {
+          echo "${where['unitTests']}"
+          echo "${env}"
+          docker.withRegistry(REGISTRY_URL, '') {
+              def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
+              myRunImage.pull()
+              docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
+                  sh "cat /etc/issue"
+                  sh "cat /mnt/workspace/issue"
+                  
+
+                echo "${env}"
+                  copyExtractTarBall(where)
+                  setupTestArea(where)
+                  runTests(where)
+
+              }
+          }
+      }
+  }
+
 echo "bla"
 stage("cloning source")
   node {
@@ -210,31 +236,7 @@ try {
       params[testRunName] = [:]
       setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
       
-      branches[testRunName] = { where ->
-        node {
-          sh 'pwd > workspace.loc'
-          WORKSPACE = readFile('workspace.loc').trim()
-          sh "pwd"
-          dir("${testRunName}") {
-            echo "${unitTests}"
-            echo "${env}"
-            docker.withRegistry(REGISTRY_URL, '') {
-              def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
-              myRunImage.pull()
-              docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
-                sh "cat /etc/issue"
-                sh "cat /mnt/workspace/issue"
-                
-
-                echo "${env}"
-                copyExtractTarBall(where)
-                setupTestArea(where)
-                runTests(where)
-
-              }
-            }
-          }
-      }(params[testRunName])
+      branches[testRunName] = runThisTest(params[testRunName])
       n += 1
       }
     }
