@@ -46,6 +46,8 @@ if test ! -d ${where['localExtractDir']}; then
 fi
 python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']} ${where['localWSDir']} ${where['localTarball']} 'rm -rf ${where['localExtractDir']}; mkdir ${where['localExtractDir']}; cd ${where['localExtractDir']}; tar -xzf ${where['localTarball']}'
 """
+
+  print CMD
   sh CMD
 }
 
@@ -221,8 +223,8 @@ try {
                 echo "${env}"
                 //test = new testRunner(LOCAL_TAR_DIR, MD5SUM, env.JOB_NAME, testRunName, OS, testRunName, "", unitTests, cmdLineArgs)
                 copyExtractTarBall(params[testRunName])
-                test.setupTestArea()
-                test.runTests()
+                setupTestArea(params[testRunName])
+                runTests(params[testRunName])
 
               }
             }
