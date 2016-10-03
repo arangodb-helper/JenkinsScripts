@@ -82,7 +82,7 @@ def Boolean runTests(where) {
   }
   echo "${where['unitTests']}: recording results [ ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml ]:"
   sh "ls -l ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml"
-  junit "${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml"
+  junit "out/UNITTEST_RESULT_*.xml"
   failureOutput=readFile("${where['testWorkingDirectory']}/out/testfailures.txt")
   if (failureOutput.size() > 5) {
     failures = "${failureOutput}"
