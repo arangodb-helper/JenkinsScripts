@@ -98,7 +98,7 @@ def runThisTest(where)
     WORKSPACE = readFile('workspace.loc').trim()
     sh "pwd"
     dir("${where['testRunName']}") {
-      echo "${where['unitTests']}"
+      echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
       echo "${env}"
       docker.withRegistry(REGISTRY_URL, '') {
         def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
