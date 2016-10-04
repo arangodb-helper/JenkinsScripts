@@ -21,18 +21,18 @@ DIST_FILE = ""
 fatalError = false
 
 def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile, String WD, String testRunName, String unitTests, String cmdLineArgs) {
-   localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
-   where['localTarDir'] = localTarDir
-   where['localTarball'] = localTarball
-   where['localWSDir']="${localTarDir}/${jobName}"
-   where['localExtractDir']=where['localWSDir'] + "/x/"
-   where['MD5SUM'] = MD5SUM
-   where['distFile'] = distFile
+  localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
+  where['localTarDir'] = localTarDir
+  where['localTarball'] = localTarball
+  where['localWSDir']="${localTarDir}/${jobName}"
+  where['localExtractDir']=where['localWSDir'] + "/x/"
+  where['MD5SUM'] = MD5SUM
+  where['distFile'] = distFile
         
-   where['testWorkingDirectory'] = "${WD}/${testRunName}"
-   where['testRunName'] = testRunName
-   where['unitTests'] = unitTests
-   where['cmdLineArgs'] = cmdLineArgs
+  where['testWorkingDirectory'] = "${WD}/${testRunName}"
+  where['testRunName'] = testRunName
+  where['unitTests'] = unitTests
+  where['cmdLineArgs'] = cmdLineArgs
 }
 
 
@@ -91,48 +91,48 @@ def runTests(where) {
 
 closure runThisTest { where -> 
   node {
-      sh 'pwd > workspace.loc'
-      WORKSPACE = readFile('workspace.loc').trim()
-      sh "pwd"
-      dir("${where['testRunName']}") {
-          echo "${where['unitTests']}"
-          echo "${env}"
-          docker.withRegistry(REGISTRY_URL, '') {
-              def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
-              myRunImage.pull()
-              docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
-                  sh "cat /etc/issue"
-                  sh "cat /mnt/workspace/issue"
+    sh 'pwd > workspace.loc'
+    WORKSPACE = readFile('workspace.loc').trim()
+    sh "pwd"
+    dir("${where['testRunName']}") {
+      echo "${where['unitTests']}"
+      echo "${env}"
+      docker.withRegistry(REGISTRY_URL, '') {
+        def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
+        myRunImage.pull()
+        docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
+          sh "cat /etc/issue"
+          sh "cat /mnt/workspace/issue"
                   
 
-                echo "${env}"
-                  copyExtractTarBall(where)
-                  setupTestArea(where)
-                  runTests(where)
+          echo "${env}"
+          copyExtractTarBall(where)
+          setupTestArea(where)
+          runTests(where)
 
-              }
-          }
+        }
       }
+    }
   }
 }
 
 echo "bla"
 stage("cloning source")
-  node {
-    sh "mount"
-    sh "pwd"
-    sh "ls -l /jenkins/workspace"
-    sh "cat /etc/issue /jenkins/workspace/issue"
-    def someString="1234567890"
-    echo someString.take(5)
+node {
+  sh "mount"
+  sh "pwd"
+  sh "ls -l /jenkins/workspace"
+  sh "cat /etc/issue /jenkins/workspace/issue"
+  def someString="1234567890"
+  echo someString.take(5)
     
-    if (fileExists(lastKnownGoodGitFile)) {
-      lastKnownGitRev=readFile(lastKnownGoodGitFile)
-    }
-    git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
-    currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-    print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
+  if (fileExists(lastKnownGoodGitFile)) {
+    lastKnownGitRev=readFile(lastKnownGoodGitFile)
   }
+  git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
+  currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+  print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
+}
 
 stage("building ArangoDB")
 try {
@@ -176,12 +176,12 @@ try {
     }
   }
 } catch (err) {
-    stage('Send Notification for build' )
-    mail (to: ADMIN_ACCOUNT, 
-          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
-          body: err.getMessage());
-    currentBuild.result = 'FAILURE'
-    throw(err)
+  stage('Send Notification for build' )
+  mail (to: ADMIN_ACCOUNT, 
+        subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
+        body: err.getMessage());
+  currentBuild.result = 'FAILURE'
+  throw(err)
 }
 
 stage("running unittest")
@@ -253,33 +253,33 @@ try {
 }
 
 stage("generating test report")
-  node {
-    if (failures.size() > 5) {
-      def gitRange = ""
-      if (lastKnownGitRev.size() > 1) {
-        gitRange = "${lastKnownGitRev}.."
-      }
-      gitRange = "${gitRange}${currentGitRev}"
-      print(gitRange)
-      def gitcmd = 'git --no-pager show -s --format="%ae>" ${gitRange} |sort -u |sed -e :a -e \'$!N;s/\\n//;ta\' -e \'s;>;, ;g\' -e \'s;, $;;\''
-      print(gitcmd)
-      gitCommitters = sh(returnStdout: true, script: gitcmd)
-      echo gitCommitters
+node {
+  if (failures.size() > 5) {
+    def gitRange = ""
+    if (lastKnownGitRev.size() > 1) {
+      gitRange = "${lastKnownGitRev}.."
+    }
+    gitRange = "${gitRange}${currentGitRev}"
+    print(gitRange)
+    def gitcmd = 'git --no-pager show -s --format="%ae>" ${gitRange} |sort -u |sed -e :a -e \'$!N;s/\\n//;ta\' -e \'s;>;, ;g\' -e \'s;, $;;\''
+    print(gitcmd)
+    gitCommitters = sh(returnStdout: true, script: gitcmd)
+    echo gitCommitters
       
-      def subject = ""
-      if (fatalError) {
-        subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed MISERABLY! "
-      }
-      else {
-        subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed"
-      }
-      
-      mail (to: gitCommitters,
-            subject: subject,
-            body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
+    def subject = ""
+    if (fatalError) {
+      subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed MISERABLY! "
     }
     else {
-      writeFile(lastKnownGoodGitFile, currentGitRev);
+      subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed"
     }
+      
+    mail (to: gitCommitters,
+          subject: subject,
+          body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
   }
+  else {
+    writeFile(lastKnownGoodGitFile, currentGitRev);
+  }
+}
 
