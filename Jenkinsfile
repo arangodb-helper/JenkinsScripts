@@ -238,7 +238,11 @@ try {
       
       branches[testRunName] = {
         baz = "ghi"
-        this.binding.variables.each {k,v -> println "$k = $v"}
+
+        
+        for(int i = 0; i < this.binding.variables.size(); i++) {
+          print this.binding.variables.each[i]// {k,v -> println "$k = $v"}
+        }
       }
     // where -> runThisTest(where)}(params[testRunName])
       n += 1
