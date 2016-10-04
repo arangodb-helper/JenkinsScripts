@@ -117,7 +117,6 @@ def runThisTest(where)
   }
 }
 
-echo "bla"
 stage("cloning source")
 node {
   sh "mount"
@@ -237,7 +236,11 @@ try {
       params[testRunName] = [:]
       setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
       
-      branches[testRunName] = { where -> runThisTest(where)}(params[testRunName])
+      branches[testRunName] = {
+
+    baz = "ghi"
+    this.binding.variables.each {k,v -> println "$k = $v"}
+    // where -> runThisTest(where)}(params[testRunName])
       n += 1
     }
   }
