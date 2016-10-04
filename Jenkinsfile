@@ -19,6 +19,7 @@ WORKSPACE = ""
 BUILT_FILE = ""
 DIST_FILE = ""
 fatalError = false
+VERBOSE = true
 
 def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile, String WD, String testRunName, String unitTests, String cmdLineArgs) {
   localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
@@ -37,7 +38,7 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
 
 
 def copyExtractTarBall (where) {
-  print("copyExtractTarBall\n")
+  print("${where['unitTests']}: copyExtractTarBall\n")
   
   CMD = """
 if test ! -d ${where['localTarDir']}; then
@@ -52,31 +53,41 @@ fi
 python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']} ${where['localWSDir']} ${where['localTarball']} 'rm -rf ${where['localExtractDir']}; mkdir ${where['localExtractDir']}; cd ${where['localExtractDir']}; tar -xzf ${where['localTarball']}'
 """
 
-  print CMD
+  if (VERBOSE) {
+    print CMD
+  }
   sh CMD
 }
 
 def setupTestArea(where) {
-  print("setupTestArea\n")
+  if (VERBOSE) {
+    print("${where['unitTests']}: setupTestArea\n")
+    print(where)
+  }
   sh "mkdir -p ${where['testWorkingDirectory']}/"
   sh "rm -rf ${where['testWorkingDirectory']}/out/*"
   sh "cd ${where['testWorkingDirectory']}/; find -type l -exec rm -f {} \\;;"
   sh "ln -s ${where['localExtractDir']}/* ${where['testWorkingDirectory']}/"
 }
 def runTests(where) {
-  print("runTests")
+  if (VERBOSE) {
+    print("${where['unitTests']}: runTests")
+  }
+  def RCFile = "${where['testWorkingDirectory']}/out/rc"
   def EXECUTE_TEST="""pwd;
          export TMPDIR=${where['testWorkingDirectory']}/out/tmp
          mkdir -p \${TMPDIR}
-         echo 0 > ${where['testWorkingDirectory']}/out/rc
+         echo 0 > ${RCFile}
          ${where['testWorkingDirectory']}/scripts/unittest ${where['unitTests']} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
                 ${where['cmdLineArgs']} || \
-         echo \$? > ${where['testWorkingDirectory']}/out/rc"""
-  echo "${where['unitTests']}: ${EXECUTE_TEST}"
+         echo \$? > ${RCFile}"""
+  if (VERBOSE) {
+    echo "${where['unitTests']}: ${EXECUTE_TEST}"
+  }
   sh EXECUTE_TEST
-  shellRC = readFile("${where['testWorkingDirectory']}/out/rc").trim()
+  shellRC = readFile("${RCFile}").trim()
   if (shellRC != "0") {
     echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
     failures = "${failures}\n\n test ${where['testRunName']} exited with ${shellRC}"
@@ -106,7 +117,7 @@ def runThisTest(where)
         docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
           sh "cat /etc/issue"
           sh "cat /mnt/workspace/issue"
-                  
+          sh "pwd"
 
           echo "${env}"
           copyExtractTarBall(where)
