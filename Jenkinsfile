@@ -4,8 +4,8 @@
 // We need permisions for several string manipulation operations, like take()
 REGISTRY="192.168.0.1"
 REGISTRY_URL="https://${REGISTRY}/"
+
 DOCKER_CONTAINER="ubuntusixteenofour"
-OS="Linux"
 RELEASE_OUT_DIR="/net/fileserver/"
 LOCAL_TAR_DIR="/mnt/workspace/tmp/"
 branches = [:]
@@ -20,6 +20,18 @@ BUILT_FILE = ""
 DIST_FILE = ""
 fatalError = false
 VERBOSE = true
+
+def CONTAINERS=[
+  [ 'docker': true,  'name': 'centosix',            'packageFormat': 'RPM', 'OS': "Linux" ],
+  [ 'docker': true,  'name': 'centoseven',          'packageFormat': 'RPM', 'OS': "Linux" ],
+  [ 'docker': true,  'name': 'opensusethirteen',    'packageFormat': 'RPM', 'OS': "Linux" ],
+  [ 'docker': true,  'name': 'debianjessie',        'packageFormat': 'DEB', 'OS': "Linux" ],
+  [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB', 'OS': "Linux" ],
+  [ 'docker': true,  'name': 'ubuntusixteenofour',  'packageFormat': 'DEB', 'OS': "Linux" ],
+]
+
+DOCKER_CONTAINER = CONTAINERS[5] // ubuntu 16
+OS = DOCKER_CONTAINER['OS'] /// todo wech.
 
 def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile, String WD, String testRunName, String unitTests, String cmdLineArgs) {
   localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
@@ -87,14 +99,16 @@ def runTests(where) {
     echo "${where['unitTests']}: ${EXECUTE_TEST}"
   }
   sh EXECUTE_TEST
-  shellRC = readFile("${RCFile}").trim()
+  shellRC = sh(returnStdout: true, script: "cat ${RCFile}").trim()
   if (shellRC != "0") {
     echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
     failures = "${failures}\n\n test ${where['testRunName']} exited with ${shellRC}"
     currentBuild.result = 'FAILURE'
   }
-  echo "${where['unitTests']}: recording results [ ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml ]:"
-  sh "ls -l ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml"
+  if (VERBOSE) {
+    echo "${where['unitTests']}: recording results [ ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml ]:"
+    sh "ls -l ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml"
+  }
   junit "out/UNITTEST_RESULT_*.xml"
   failureOutput=readFile("${where['testWorkingDirectory']}/out/testfailures.txt")
   if (failureOutput.size() > 5) {
@@ -107,25 +121,101 @@ def runThisTest(where)
   node {
     sh 'pwd > workspace.loc'
     WORKSPACE = readFile('workspace.loc').trim()
-    sh "pwd"
+    if (VERBOSE) {
+      sh "pwd"
+    }
     dir("${where['testRunName']}") {
-      echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
-      echo "${env}"
+      if (VERBOSE) {
+        echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
+        echo "${env}"
+      }
       docker.withRegistry(REGISTRY_URL, '') {
         def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
         myRunImage.pull()
         docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
-          sh "cat /etc/issue"
-          sh "cat /mnt/workspace/issue"
-          sh "pwd"
+          if (VERBOSE) {
+            sh "cat /etc/issue"
+            sh "cat /mnt/workspace/issue"
+            sh "pwd"
 
-          echo "${env}"
+            echo "${env}"
+          }
           copyExtractTarBall(where)
           setupTestArea(where)
           runTests(where)
 
         }
       }
+    }
+  }
+}
+
+
+def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl) {
+  try {
+    def EP=""
+    def XEP=""
+    if (enterpriseUrl.size() > 10) {
+      EP="--enterprise ${ENTERPRISE_URL}"
+      OUT_DIR = "${RELEASE_OUT_DIR}/EP/${buildEnv['name']}"
+      XEP="EP"
+    }
+    BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --jemalloc --targetDir ${OUT_DIR} "
+    if (! buildUnittestTarball) {
+      BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} "
+    }
+    if (VERBOSE) {
+      print(BUILDSCRIPT)
+    }
+    
+    sh BUILDSCRIPT
+    
+    if (buildUnittestTarball) {
+      BUILT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
+      DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
+      MD5SUM = readFile("${BUILT_FILE}.md5").trim()
+      echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
+
+      sh "python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE} "
+    }
+    else {
+      // TODO: release?
+    }
+    sh "ls -l ${RELEASE_OUT_DIR}"
+  } catch (err) {
+    stage('Send Notification for failed build' ) {
+      gitCommitter = sh(returnStdout: true, script: 'git --no-pager show -s --format="%ae"')
+
+      mail (to: gitCommitter,
+            subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
+            body: err.getMessage());
+      currentBuild.result = 'FAILURE'
+      throw(err)
+    }
+  }
+}
+
+def setupEnvCompileSource(buildEnv, Boolean buildUnittestTarball) {
+  node {
+    OUT_DIR = ""
+    if (buildEnv['docker']) {
+      docker.withRegistry(REGISTRY_URL, '') {
+        def myBuildImage = docker.image("${buildEnv['name']}/build")
+        myBuildImage.pull()
+        docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
+          sh "mount"
+          sh "pwd"
+          sh "cat /etc/issue /mnt/workspace/issue"
+
+          sh 'pwd > workspace.loc'
+          WORKSPACE = readFile('workspace.loc').trim()
+          OUT_DIR = "${WORKSPACE}/out"
+          compileSource(buildEnv, buildUnittestTarball)
+        }
+      }
+    } else {
+      echo "NON-Docker not yet supported!"
+      throw("Not yet implemented: non-docker build")
     }
   }
 }
@@ -149,45 +239,7 @@ node {
 
 stage("building ArangoDB")
 try {
-  node {
-    OUT_DIR = ""
-    docker.withRegistry(REGISTRY_URL, '') {
-      def myBuildImage=docker.image("${DOCKER_CONTAINER}/build")
-      myBuildImage.pull()
-      docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
-        sh "mount"
-        sh "pwd"
-        sh "cat /etc/issue /mnt/workspace/issue"
-
-        sh 'pwd > workspace.loc'
-        WORKSPACE = readFile('workspace.loc').trim()
-        OUT_DIR = "${WORKSPACE}/out"
-
-        try {
-          sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-package-${DOCKER_CONTAINER} --jemalloc --targetDir ${OUT_DIR} "
-        } catch (err) {
-          stage('Send Notification for failed build' ) {
-            gitCommitter = sh(returnStdout: true, script: 'git --no-pager show -s --format="%ae"')
-
-            mail (to: gitCommitter,
-                  subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
-                  body: err.getMessage());
-            currentBuild.result = 'FAILURE'
-            throw(err)
-          }
-        }
-        //sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --package RPM --buildDir build-package --jemalloc --targetDir ${OUT_DIR} "
-        BUILT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
-        DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
-        MD5SUM = readFile("${BUILT_FILE}.md5").trim()
-        echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
-
-        sh "python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE} "
-
-        sh "ls -l ${RELEASE_OUT_DIR}"
-      }
-    }
-  }
+  setupEnvCompileSource(DOCKER_CONTAINER, true)
 } catch (err) {
   stage('Send Notification for build' )
   mail (to: ADMIN_ACCOUNT, 
@@ -195,13 +247,6 @@ try {
         body: err.getMessage());
   currentBuild.result = 'FAILURE'
   throw(err)
-}
-
-@NonCPS dumpVars() {
-  for(int ix = 0; ix < this.binding.variables.size(); ix++) {
-    print this.binding.variables.each[ix]// {k,v -> println "$k = $v"}
-    
-  }
 }
 
 stage("running unittest")
