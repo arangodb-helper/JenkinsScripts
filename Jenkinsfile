@@ -240,8 +240,8 @@ try {
         baz = "ghi"
 
         
-        for(int i = 0; i < this.binding.variables.size(); i++) {
-          print this.binding.variables.each[i]// {k,v -> println "$k = $v"}
+        for(int ix = 0; ix < this.binding.variables.size(); ix++) {
+          print this.binding.variables.each[ix]// {k,v -> println "$k = $v"}
         }
       }
     // where -> runThisTest(where)}(params[testRunName])
