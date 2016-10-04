@@ -240,7 +240,6 @@ node {
 
 stage("building ArangoDB")
 try {
-  if 
   setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
 } catch (err) {
   stage('Send Notification for build' )
