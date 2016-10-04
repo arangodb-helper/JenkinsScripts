@@ -195,7 +195,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl) 
   }
 }
 
-def setupEnvCompileSource(buildEnv, Boolean buildUnittestTarball) {
+def setupEnvCompileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl) {
   node {
     OUT_DIR = ""
     if (buildEnv['docker']) {
@@ -210,7 +210,7 @@ def setupEnvCompileSource(buildEnv, Boolean buildUnittestTarball) {
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
           OUT_DIR = "${WORKSPACE}/out"
-          compileSource(buildEnv, buildUnittestTarball)
+          compileSource(buildEnv, buildUnittestTarball, enterpriseUrl)
         }
       }
     } else {
@@ -239,7 +239,7 @@ node {
 
 stage("building ArangoDB")
 try {
-  setupEnvCompileSource(DOCKER_CONTAINER, true)
+  setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
 } catch (err) {
   stage('Send Notification for build' )
   mail (to: ADMIN_ACCOUNT, 
