@@ -58,8 +58,10 @@ python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']}
 
 def setupTestArea(where) {
   print("setupTestArea\n")
+  sh "mkdir -p ${where['testWorkingDirectory']}/"
   sh "rm -rf ${where['testWorkingDirectory']}/out/*"
-  sh "find -type l -exec rm -f {} \\; ; ln -s ${where['localExtractDir']}/* ${where['testWorkingDirectory']}/"
+  sh "cd ${where['testWorkingDirectory']}/; find -type l -exec rm -f {} \\;;"
+  sh "ln -s ${where['localExtractDir']}/* ${where['testWorkingDirectory']}/"
 }
 def runTests(where) {
   print("runTests")
@@ -196,7 +198,6 @@ try {
   def testCaseSets = [ 
     //  ["fail", 'fail', ""],
     //    ["fail", 'fail', ""],
-    ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
     ['http_server', 'http_server', "",
      "--cluster true --testBuckets 4/1 ",
      "--cluster true --testBuckets 4/2 ",
@@ -212,18 +213,15 @@ try {
      "--cluster true --testBuckets 4/2 ",
      "--cluster true --testBuckets 4/3 ",
      "--cluster true --testBuckets 4/4 "],
-    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
     ["dump_import", 'dump.importing', "", "--cluster true"],
     ["shell_server", 'shell_server', "",
      "--cluster true --testBuckets 4/1 ",
      "--cluster true --testBuckets 4/2 ",
      "--cluster true --testBuckets 4/3 ",
      "--cluster true --testBuckets 4/4 "],
-    ["arangosh", 'arangosh', "",
-     "--cluster true --testBuckets 4/1 ",
-     "--cluster true --testBuckets 4/2 ",
-     "--cluster true --testBuckets 4/3 ",
-     "--cluster true --testBuckets 4/4 "],
+    ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
+    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
+    ["arangosh", 'arangosh', ""],
   ]
 
   print("getting keyset\n")
@@ -244,7 +242,7 @@ try {
       setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
       
       branches[testRunName] = {
-        where = params[testRunName]
+        def where = params[testRunName]
         runThisTest(where)
       }
       n += 1
