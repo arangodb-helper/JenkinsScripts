@@ -89,7 +89,7 @@ def runTests(where) {
   }
 }
 
-def runThisTest(where, REGISTRY_URL) {
+closure<Boolean> runThisTest(where) {
   node {
       sh 'pwd > workspace.loc'
       WORKSPACE = readFile('workspace.loc').trim()
@@ -114,6 +114,7 @@ def runThisTest(where, REGISTRY_URL) {
           }
       }
   }
+  return true
 }
 
 echo "bla"
