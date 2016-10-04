@@ -96,10 +96,6 @@ def setupTestArea(where) {
   sh createNewSymlinks
 }
 
-/jenkins/workspace/ArangoDB_Devel_Build/http_server_6_4
-/jenkins/workspace/ArangoDB_Devel_Build/http_server_4_2/
-
-
 def runTests(where) {
   if (VERBOSE) {
     print("${where['unitTests']}: runTests")
