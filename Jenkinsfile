@@ -89,7 +89,8 @@ def runTests(where) {
   }
 }
 
-closure runThisTest { where -> 
+def runThisTest(where)
+{
   node {
     sh 'pwd > workspace.loc'
     WORKSPACE = readFile('workspace.loc').trim()
