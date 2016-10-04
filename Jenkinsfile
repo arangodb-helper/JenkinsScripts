@@ -240,11 +240,12 @@ try {
         baz = "ghi"
         node {
           sh 'env'
+          @NonCPS
+          for(int ix = 0; ix < this.binding.variables.size(); ix++) {
+            print this.binding.variables.each[ix]// {k,v -> println "$k = $v"}
+            
+          }
         }
-        //        for(int ix = 0; ix < this.binding.variables.size(); ix++) {
-        //          print this.binding.variables.each[ix]// {k,v -> println "$k = $v"}
-      
-      }
     // where -> runThisTest(where)}(params[testRunName])
       n += 1
     }
