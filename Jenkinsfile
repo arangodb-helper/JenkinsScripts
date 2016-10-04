@@ -89,7 +89,7 @@ def runTests(where) {
   }
 }
 
-closure<Boolean> runThisTest(where) {
+closure runThisTest(where) {
   node {
       sh 'pwd > workspace.loc'
       WORKSPACE = readFile('workspace.loc').trim()
@@ -114,7 +114,6 @@ closure<Boolean> runThisTest(where) {
           }
       }
   }
-  return true
 }
 
 echo "bla"
