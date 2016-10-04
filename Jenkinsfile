@@ -244,12 +244,8 @@ try {
       setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
       
       branches[testRunName] = {
-        baz = "ghi"
-        node {
-          sh 'env'
-          dumpVars()
-        }
-    // where -> runThisTest(where)}(params[testRunName])
+        where = params[testRunName]
+        runThisTest(where)
       }
       n += 1
       
