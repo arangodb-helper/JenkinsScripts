@@ -77,10 +77,23 @@ def setupTestArea(where) {
     print("${where['unitTests']}: setupTestArea\n")
     print(where)
   }
-  sh "mkdir -p ${where['testWorkingDirectory']}/"
-  sh "rm -rf ${where['testWorkingDirectory']}/out/*"
-  sh "cd ${where['testWorkingDirectory']}/; find -type l -exec rm -f {} \\;;"
-  sh "ln -s ${where['localExtractDir']}/* ${where['testWorkingDirectory']}/"
+  createDirectory = "mkdir -p ${where['testWorkingDirectory']}/out/"
+  cleanOutFiles = "rm -rf ${where['testWorkingDirectory']}/out/*"
+  removeOldSymlinks = "cd ${where['testWorkingDirectory']}/; find -type l -exec rm -f {} \\;;"
+  createNewSymlinks = "ln -s ${where['localExtractDir']}/* ${where['testWorkingDirectory']}/"
+  if (VERBOSE) {
+    sh "cat /mnt/workspace/issue"
+    print(cleanOutFiles)
+    print(createDirectory)
+    print(cleanOutFiles)
+    print(removeOldSymlinks)
+    print(createNewSymlinks)
+  }
+  sh cleanOutFiles
+  sh createDirectory
+  sh cleanOutFiles
+  sh removeOldSymlinks
+  sh createNewSymlinks
 }
 def runTests(where) {
   if (VERBOSE) {
@@ -88,6 +101,7 @@ def runTests(where) {
   }
   def RCFile = "${where['testWorkingDirectory']}/out/rc"
   def EXECUTE_TEST="""pwd;
+         cat /mnt/workspace/issue
          export TMPDIR=${where['testWorkingDirectory']}/out/tmp
          mkdir -p \${TMPDIR}
          echo 0 > ${RCFile}
