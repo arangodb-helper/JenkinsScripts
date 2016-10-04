@@ -117,7 +117,7 @@ def runTests(where) {
   }
 }
 
-def runThisTest(where)
+def runThisTest(where, buildEnvironment)
 {
   node {
     sh 'pwd > workspace.loc'
@@ -130,22 +130,30 @@ def runThisTest(where)
         echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
         echo "${env}"
       }
-      docker.withRegistry(REGISTRY_URL, '') {
-        def myRunImage = docker.image("${DOCKER_CONTAINER}/run")
-        myRunImage.pull()
-        docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
-          if (VERBOSE) {
-            sh "cat /etc/issue"
-            sh "cat /mnt/workspace/issue"
-            sh "pwd"
+      if (buildEnvironment['docker']) {
+        docker.withRegistry(REGISTRY_URL, '') {
+          def myRunImage = docker.image("${buildEnvironment['name']}/run")
+          myRunImage.pull()
+          docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
+            if (VERBOSE) {
+              sh "cat /etc/issue"
+              sh "cat /mnt/workspace/issue"
+              sh "pwd"
 
-            echo "${env}"
+              echo "${env}"
+            }
+            copyExtractTarBall(where)
+            setupTestArea(where)
+            runTests(where)
+
           }
-          copyExtractTarBall(where)
-          setupTestArea(where)
-          runTests(where)
-
         }
+      }
+      else {
+        // TODO: non docker-implement!
+        copyExtractTarBall(where)
+        setupTestArea(where)
+        runTests(where)
       }
     }
   }
@@ -296,11 +304,11 @@ try {
       def testRunName = "${shortName}_${j}_${n}"
       paralellJobNames[n]=testRunName
       params[testRunName] = [:]
-      setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
+      setDirectories(params[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
       
       branches[testRunName] = {
         def where = params[testRunName]
-        runThisTest(where)
+        runThisTest(where, DOCKER_CONTAINER)
       }
       n += 1
       
