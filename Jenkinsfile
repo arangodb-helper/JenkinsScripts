@@ -95,6 +95,11 @@ def setupTestArea(where) {
   sh removeOldSymlinks
   sh createNewSymlinks
 }
+
+/jenkins/workspace/ArangoDB_Devel_Build/http_server_6_4
+/jenkins/workspace/ArangoDB_Devel_Build/http_server_4_2/
+
+
 def runTests(where) {
   if (VERBOSE) {
     print("${where['unitTests']}: runTests")
@@ -165,9 +170,11 @@ def runThisTest(where, buildEnvironment)
       }
       else {
         // TODO: non docker-implement!
-        copyExtractTarBall(where)
-        setupTestArea(where)
-        runTests(where)
+        // copyExtractTarBall(where)
+        // setupTestArea(where)
+        // runTests(where)
+	echo "SHOULDNT BE HERE!!!"
+	throw("unsupported branch")
       }
     }
   }
