@@ -236,7 +236,7 @@ try {
     for (int j = 2; j < o; j ++ ) {
       def cmdLineArgs = unitTestSet.getAt(j)
       echo " ${shortName} ${cmdLineArgs} -  ${j}"
-      testRunName = "${shortName}_${j}_${n}"
+      def testRunName = "${shortName}_${j}_${n}"
       paralellJobNames[n]=testRunName
       params[testRunName] = [:]
       setDirectories(params[testRunName], LOCAL_TAR_DIR, OS, env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
