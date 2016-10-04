@@ -20,6 +20,7 @@ BUILT_FILE = ""
 DIST_FILE = ""
 fatalError = false
 VERBOSE = true
+ENTERPRISE_URL=""// TODO from param
 
 def CONTAINERS=[
   [ 'docker': true,  'name': 'centosix',            'packageFormat': 'RPM', 'OS': "Linux" ],
@@ -239,6 +240,7 @@ node {
 
 stage("building ArangoDB")
 try {
+  if 
   setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
 } catch (err) {
   stage('Send Notification for build' )
