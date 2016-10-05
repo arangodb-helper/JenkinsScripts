@@ -107,7 +107,7 @@ def runTests(where) {
          export TMPDIR=${where['testWorkingDirectory']}/out/tmp
          mkdir -p \${TMPDIR}
          echo 0 > ${RCFile}
-         ls -l *
+         ls -l
          bash -x ${where['testWorkingDirectory']}/scripts/unittest ${where['unitTests']} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
