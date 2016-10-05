@@ -143,6 +143,7 @@ def runThisTest(which, buildEnvironment)
     if (VERBOSE) {
       sh "pwd"
     }
+    print("hello, I'm still: ${where['testRunName']} ?")
     dir("${where['testRunName']}") {
       if (VERBOSE) {
         echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
