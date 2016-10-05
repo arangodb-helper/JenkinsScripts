@@ -150,6 +150,10 @@ def runThisTest(which, buildEnvironment)
         echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
         echo "${env}"
       }
+      def buildHost=sh(returnStdout: true, script: "cat /mnt/workspace/issue").trim()
+      print("buildhost: ${buildHost}")
+      buildHost = buildHost[-40..-1]
+      print("buildhost3: ${buildHost}")
       if (buildEnvironment['docker']) {
         docker.withRegistry(REGISTRY_URL, '') {
           def myRunImage = docker.image("${buildEnvironment['name']}/run")
@@ -162,10 +166,6 @@ def runThisTest(which, buildEnvironment)
 
               echo "${env} "
             }
-            def buildHost=sh(returnStdout: true, script: "cat /mnt/workspace/issue").trim()
-            print("buildhost: ${buildHost}")
-            buildHost = buildHost[-40..-1]
-            print("buildhost3: ${buildHost}")
             copyExtractTarBall(where, buildHost)
             setupTestArea(where)
             runTests(where)
