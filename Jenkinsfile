@@ -325,8 +325,11 @@ try {
       def cmdLineArgs = unitTestSet.getAt(j)
       echo " ${shortName} ${cmdLineArgs} -  ${j}"
       testRunName = "${shortName}_${j}_${n}"
+      echo " 1: ${testRunName}"
       parallelJobNames[n]=testRunName
+      echo " 2: ${testRunName}"
       params[testRunName] = [:]
+      echo " 3: ${testRunName}"
       setDirectories(params[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
       print(" configured: ${params[testRunName]}")
       n += 1
