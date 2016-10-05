@@ -328,10 +328,11 @@ try {
       parallelJobNames[n]=testRunName
       params[testRunName] = [:]
       setDirectories(params[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
+      print(" configured: ${params[testRunName]}")
       n += 1
     }
   }
-
+  print("setting up paralel branches")
   for (int i = 0; i < parallelJobNames.size(); i++) {
     def thisTestRunName = parallelJobNames[i]
     branches[thisTestRunName] = {
