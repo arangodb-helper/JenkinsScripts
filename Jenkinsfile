@@ -157,7 +157,13 @@ def runThisTest(which, buildEnvironment)
           docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
             if (VERBOSE) {
               sh "cat /etc/issue"
-              def buildHost=sh(returnStdout: true, script:"cat /mnt/workspace/issue").trim()[-40..-1]
+              def buildHost=readFile("/mnt/workspace/issue")
+              print("buildhost: ${buildHost}")
+              buildHost = buildHost.trim()
+              print("buildhost2: ${buildHost}")
+              buildHost = buildHost[-40..-1]
+              print("buildhost3: ${buildHost}")
+              
               sh "pwd"
 
               echo "${env} ${buildHost}"
