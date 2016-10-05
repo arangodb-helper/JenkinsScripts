@@ -23,6 +23,14 @@ VERBOSE = true
 ENTERPRISE_URL=""// TODO from param
 params = [:]
 
+echo "1: "
+params['foo'] = 'bar'
+echo "2: "
+params['foo2'] = [:]
+echo "3:"
+foo="bla"
+params[foo] = [:]
+
 def CONTAINERS=[
   [ 'docker': true,  'name': 'centosix',            'packageFormat': 'RPM', 'OS': "Linux" ],
   [ 'docker': true,  'name': 'centoseven',          'packageFormat': 'RPM', 'OS': "Linux" ],
