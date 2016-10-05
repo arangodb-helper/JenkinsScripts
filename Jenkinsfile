@@ -160,12 +160,10 @@ def runThisTest(which, buildEnvironment)
               
               sh "pwd"
 
-              echo "${env} ${buildHost}"
+              echo "${env} "
             }
-            def buildHost=readFile("/mnt/workspace/issue")
+            def buildHost=sh(returnStdout: true, script: "cat /mnt/workspace/issue").trim()
             print("buildhost: ${buildHost}")
-            buildHost = buildHost.trim()
-            print("buildhost2: ${buildHost}")
             buildHost = buildHost[-40..-1]
             print("buildhost3: ${buildHost}")
             copyExtractTarBall(where, buildHost)
