@@ -330,7 +330,7 @@ try {
       testRunName = "${shortName}_${j}_${n}"
       parallelJobNames[n]=testRunName
       testParams[testRunName] = [:]
-      setDirectories(testParams[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
+      setDirectories(testParams[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, testRunName, unitTests, cmdLineArgs)
       n += 1
     }
   }
