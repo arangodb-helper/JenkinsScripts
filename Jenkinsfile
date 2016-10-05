@@ -51,7 +51,7 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
 }
 
 
-def copyExtractTarBall (where) {
+def copyExtractTarBall (where, String buildHost) {
   print("${where['unitTests']}: copyExtractTarBall\n")
   
   CMD = """
@@ -64,7 +64,7 @@ fi
 if test ! -d ${where['localExtractDir']}; then
         mkdir -p ${where['localExtractDir']}
 fi
-python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']} ${where['localWSDir']} ${where['localTarball']} ${where['testRunName']} 'rm -rf ${where['localExtractDir']}; mkdir ${where['localExtractDir']}; cd ${where['localExtractDir']}; tar -xzf ${where['localTarball']}'
+python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']} ${where['localWSDir']} ${where['localTarball']} '${where['testRunName']}${buildHost}' 'rm -rf ${where['localExtractDir']}; mkdir ${where['localExtractDir']}; cd ${where['localExtractDir']}; tar -xzf ${where['localTarball']}'
 """
 
   if (VERBOSE) {
@@ -157,12 +157,12 @@ def runThisTest(which, buildEnvironment)
           docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
             if (VERBOSE) {
               sh "cat /etc/issue"
-              sh "cat /mnt/workspace/issue"
+              def buildHost=sh(returnStdout: true, script:"cat /mnt/workspace/issue").trim()[-40..-1]
               sh "pwd"
 
-              echo "${env}"
+              echo "${env} ${buildHost}"
             }
-            copyExtractTarBall(where)
+            copyExtractTarBall(where, buildHost)
             setupTestArea(where)
             runTests(where)
 
