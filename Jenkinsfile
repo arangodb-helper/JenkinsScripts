@@ -64,7 +64,7 @@ fi
 if test ! -d ${where['localExtractDir']}; then
         mkdir -p ${where['localExtractDir']}
 fi
-python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']} ${where['localWSDir']} ${where['localTarball']} '${where['testRunName']}${buildHost}' 'rm -rf ${where['localExtractDir']}; mkdir ${where['localExtractDir']}; cd ${where['localExtractDir']}; tar -xzf ${where['localTarball']}'
+python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']} ${where['localWSDir']} ${where['localTarball']} '${where['testRunName']}_${buildHost}' 'rm -rf ${where['localExtractDir']}; mkdir ${where['localExtractDir']}; cd ${where['localExtractDir']}; tar -xzf ${where['localTarball']}'
 """
 
   if (VERBOSE) {
@@ -154,7 +154,7 @@ def runThisTest(which, buildEnvironment)
         docker.withRegistry(REGISTRY_URL, '') {
           def myRunImage = docker.image("${buildEnvironment['name']}/run")
           myRunImage.pull()
-          docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
+          docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw --volume /var/lib/systemd/coredump:/var/lib/systemd/coredump:rw') {
             def buildHost=sh(returnStdout: true, script: "cat /mnt/workspace/issue").trim()
             print("buildhost: ${buildHost}")
             buildHost = buildHost[-40..-1]
