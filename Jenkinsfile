@@ -10,7 +10,7 @@ RELEASE_OUT_DIR="/net/fileserver/"
 LOCAL_TAR_DIR="/mnt/workspace/tmp/"
 branches = [:]
 failures = ""
-paralellJobNames = []
+parallelJobNames = []
 ADMIN_ACCOUNT = "willi@arangodb.com"
 lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
 lastKnownGitRev = ""
@@ -320,16 +320,18 @@ try {
     for (int j = 2; j < o; j ++ ) {
       def cmdLineArgs = unitTestSet.getAt(j)
       echo " ${shortName} ${cmdLineArgs} -  ${j}"
-      def testRunName = "${shortName}_${j}_${n}"
-      paralellJobNames[n]=testRunName
+      testRunName = "${shortName}_${j}_${n}"
+      parallelJobNames[n]=testRunName
       params[testRunName] = [:]
       setDirectories(params[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
-      
-      branches[testRunName] = {
-        runThisTest(testRunName, DOCKER_CONTAINER)
-      }
       n += 1
-      
+    }
+  }
+
+  for (int i = 0; i < parallelJobNames.size(); i++) {
+    def thisTestRunName = parallelJobNames[i]
+    branches[thisTestRunName] = {
+      runThisTest(thisTestRunName, DOCKER_CONTAINER)
     }
   }
   echo branches.toString();
