@@ -21,15 +21,15 @@ DIST_FILE = ""
 fatalError = false
 VERBOSE = true
 ENTERPRISE_URL=""// TODO from param
-params = [:]
+testParams = [:]
 
 echo "1: "
-params['foo'] = 'bar'
+testParams['foo'] = 'bar'
 echo "2: "
-params['foo2'] = [:]
+testParams['foo2'] = [:]
 echo "3:"
 foo="bla"
-params[foo] = [:]
+testParams[foo] = [:]
 
 def CONTAINERS=[
   [ 'docker': true,  'name': 'centosix',            'packageFormat': 'RPM', 'OS': "Linux" ],
@@ -145,7 +145,7 @@ def runTests(where) {
 def runThisTest(which, buildEnvironment)
 {
   node {
-    def where = params[which]
+    def where = testParams[which]
     print("hello ${which}: ${where}")
     sh 'pwd > workspace.loc'
     def WORKSPACE = readFile('workspace.loc').trim()
@@ -336,10 +336,10 @@ try {
       echo " 1: ${testRunName}"
       parallelJobNames[n]=testRunName
       echo " 2: ${testRunName}"
-      params[testRunName] = [:]
+      testParams[testRunName] = [:]
       echo " 3: ${testRunName}"
-      setDirectories(params[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
-      print(" configured: ${params[testRunName]}")
+      setDirectories(testParams[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
+      print(" configured: ${testParams[testRunName]}")
       n += 1
     }
   }
