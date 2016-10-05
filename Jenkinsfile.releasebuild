@@ -5,8 +5,10 @@
 def servers
 
 stage('bootstrap') {
-  servers = load 'servers.groovy'
-  print(servers)
+  node {
+    servers = load 'servers.groovy'
+    print(servers)
+  }
 }
 
 def REGISTRY="192.168.0.1"
