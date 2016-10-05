@@ -78,10 +78,10 @@ def setupTestArea(where) {
     print("${where['unitTests']}: setupTestArea\n")
     print(where)
   }
-  createDirectory = "mkdir -p ${where['testWorkingDirectory']}/out/"
-  cleanOutFiles = "rm -rf ${where['testWorkingDirectory']}/out/*"
-  removeOldSymlinks = "cd ${where['testWorkingDirectory']}/; find -type l -exec rm -f {} \\;;"
-  createNewSymlinks = "ln -s ${where['localExtractDir']}/* ${where['testWorkingDirectory']}/"
+  def createDirectory = "mkdir -p ${where['testWorkingDirectory']}/out/"
+  def cleanOutFiles = "rm -rf ${where['testWorkingDirectory']}/out/*"
+  def removeOldSymlinks = "cd ${where['testWorkingDirectory']}/; find -type l -exec rm -f {} \\;;"
+  def createNewSymlinks = "ln -s ${where['localExtractDir']}/* ${where['testWorkingDirectory']}/"
   if (VERBOSE) {
     sh "cat /mnt/workspace/issue"
     print(cleanOutFiles)
@@ -116,7 +116,7 @@ def runTests(where) {
     echo "${where['unitTests']}: ${EXECUTE_TEST}"
   }
   sh EXECUTE_TEST
-  shellRC = sh(returnStdout: true, script: "cat ${RCFile}").trim()
+  def shellRC = sh(returnStdout: true, script: "cat ${RCFile}").trim()
   if (shellRC != "0") {
     echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
     failures = "${failures}\n\n test ${where['testRunName']} exited with ${shellRC}"
@@ -127,7 +127,7 @@ def runTests(where) {
     sh "ls -l ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml"
   }
   junit "out/UNITTEST_RESULT_*.xml"
-  failureOutput=readFile("${where['testWorkingDirectory']}/out/testfailures.txt")
+  def failureOutput = readFile("${where['testWorkingDirectory']}/out/testfailures.txt")
   if (failureOutput.size() > 5) {
     failures = "${failureOutput}"
   }
@@ -136,10 +136,10 @@ def runTests(where) {
 def runThisTest(which, buildEnvironment)
 {
   node {
-    where = params[which]
+    def where = params[which]
     print("hello ${which}: ${where}")
     sh 'pwd > workspace.loc'
-    WORKSPACE = readFile('workspace.loc').trim()
+    def WORKSPACE = readFile('workspace.loc').trim()
     if (VERBOSE) {
       sh "pwd"
     }
@@ -190,7 +190,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl) 
       OUT_DIR = "${RELEASE_OUT_DIR}/EP/${buildEnv['name']}"
       XEP="EP"
     }
-    BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --jemalloc --targetDir ${OUT_DIR} "
+    def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --jemalloc --targetDir ${OUT_DIR} "
     if (! buildUnittestTarball) {
       BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} "
     }
@@ -256,8 +256,6 @@ node {
   sh "pwd"
   sh "ls -l /jenkins/workspace"
   sh "cat /etc/issue /jenkins/workspace/issue"
-  def someString="1234567890"
-  echo someString.take(5)
     
   if (fileExists(lastKnownGoodGitFile)) {
     lastKnownGitRev=readFile(lastKnownGoodGitFile)
