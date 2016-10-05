@@ -35,7 +35,7 @@ def CONTAINERS=[
 DOCKER_CONTAINER = CONTAINERS[5] // ubuntu 16
 OS = DOCKER_CONTAINER['OS'] /// todo wech.
 
-def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile, String WD, String testRunName, String unitTests, String cmdLineArgs) {
+def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile, String testRunName, String unitTests, String cmdLineArgs) {
   localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
   where['localTarDir'] = localTarDir
   where['localTarball'] = localTarball
@@ -44,12 +44,14 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
   where['MD5SUM'] = MD5SUM
   where['distFile'] = distFile
         
-  where['testWorkingDirectory'] = "${WD}/${testRunName}"
   where['testRunName'] = testRunName
   where['unitTests'] = unitTests
   where['cmdLineArgs'] = cmdLineArgs
 }
 
+def setWorkspace(where, String WD) {
+  where['testWorkingDirectory'] = "${WD}/${where['testRunName']}"
+}
 
 def copyExtractTarBall (where, String buildHost) {
   print("${where['unitTests']}: copyExtractTarBall\n")
@@ -144,6 +146,7 @@ def runThisTest(which, buildEnvironment)
     if (VERBOSE) {
       sh "pwd"
     }
+    setWorkspace(where, WORKSPACE)
     print("hello, I'm still: ${where['testRunName']} ?")
     dir("${where['testRunName']}") {
       if (VERBOSE) {
