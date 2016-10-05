@@ -346,7 +346,7 @@ try {
   stage('Send Notification unittest' )
   mail (to: ADMIN_ACCOUNT,
         subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 
-        body: err.getMessage());
+        body: "error message: " + err.getMessage());
   currentBuild.result = 'FAILURE'
   throw(err)
 }
