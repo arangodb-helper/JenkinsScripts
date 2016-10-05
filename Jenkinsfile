@@ -150,15 +150,15 @@ def runThisTest(which, buildEnvironment)
         echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
         echo "${env}"
       }
-      def buildHost=sh(returnStdout: true, script: "cat /mnt/workspace/issue").trim()
-      print("buildhost: ${buildHost}")
-      buildHost = buildHost[-40..-1]
-      print("buildhost3: ${buildHost}")
       if (buildEnvironment['docker']) {
         docker.withRegistry(REGISTRY_URL, '') {
           def myRunImage = docker.image("${buildEnvironment['name']}/run")
           myRunImage.pull()
           docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
+            def buildHost=sh(returnStdout: true, script: "cat /mnt/workspace/issue").trim()
+            print("buildhost: ${buildHost}")
+            buildHost = buildHost[-40..-1]
+            print("buildhost3: ${buildHost}")
             if (VERBOSE) {
               sh "cat /etc/issue"
               
