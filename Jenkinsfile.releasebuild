@@ -3,8 +3,11 @@
 //
 // We need permisions for several string manipulation operations, like take()
 def servers
-servers = load 'servers.groovy'
-print(servers)
+
+stage('bootstrap') {
+  servers = load 'servers.groovy'
+  print(servers)
+}
 
 def REGISTRY="192.168.0.1"
 def REGISTRY_URL="https://${REGISTRY}/"
