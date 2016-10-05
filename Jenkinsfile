@@ -157,17 +157,17 @@ def runThisTest(which, buildEnvironment)
           docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw') {
             if (VERBOSE) {
               sh "cat /etc/issue"
-              def buildHost=readFile("/mnt/workspace/issue")
-              print("buildhost: ${buildHost}")
-              buildHost = buildHost.trim()
-              print("buildhost2: ${buildHost}")
-              buildHost = buildHost[-40..-1]
-              print("buildhost3: ${buildHost}")
               
               sh "pwd"
 
               echo "${env} ${buildHost}"
             }
+            def buildHost=readFile("/mnt/workspace/issue")
+            print("buildhost: ${buildHost}")
+            buildHost = buildHost.trim()
+            print("buildhost2: ${buildHost}")
+            buildHost = buildHost[-40..-1]
+            print("buildhost3: ${buildHost}")
             copyExtractTarBall(where, buildHost)
             setupTestArea(where)
             runTests(where)
