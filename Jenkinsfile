@@ -137,6 +137,7 @@ def runThisTest(which, buildEnvironment)
 {
   node {
     where = params[which]
+    print("hello ${which}: ${where}")
     sh 'pwd > workspace.loc'
     WORKSPACE = readFile('workspace.loc').trim()
     if (VERBOSE) {
