@@ -21,6 +21,7 @@ DIST_FILE = ""
 fatalError = false
 VERBOSE = true
 ENTERPRISE_URL=""// TODO from param
+params = [:]
 
 def CONTAINERS=[
   [ 'docker': true,  'name': 'centosix',            'packageFormat': 'RPM', 'OS': "Linux" ],
@@ -132,9 +133,10 @@ def runTests(where) {
   }
 }
 
-def runThisTest(where, buildEnvironment)
+def runThisTest(which, buildEnvironment)
 {
   node {
+    where = params[which]
     sh 'pwd > workspace.loc'
     WORKSPACE = readFile('workspace.loc').trim()
     if (VERBOSE) {
@@ -309,7 +311,6 @@ try {
   print("getting keyset\n")
   m = testCaseSets.size()
   int n = 0;
-  def params = [:]
   for (int i = 0; i < m; i++) {
     def unitTestSet = testCaseSets.getAt(i);
     o = unitTestSet.size()
@@ -324,8 +325,7 @@ try {
       setDirectories(params[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, WORKSPACE, testRunName, unitTests, cmdLineArgs)
       
       branches[testRunName] = {
-        def where = params[testRunName]
-        runThisTest(where, DOCKER_CONTAINER)
+        runThisTest(testRunName, DOCKER_CONTAINER)
       }
       n += 1
       
