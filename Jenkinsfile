@@ -135,6 +135,15 @@ def runTests(where) {
   def failureOutput = readFile("${where['testWorkingDirectory']}/out/testfailures.txt")
   if (failureOutput.size() > 5) {
     failures = "${failureOutput}"
+    currentBuild.result = 'FAILURE'
+  }
+  else {
+    def executiveSummary = readFile("${where['testWorkingDirectory']}/out/UNITTEST_RESULT_EXECUTIVE_SUMMARY.json").trim()
+    if (executiveSummary != "true") {
+      currentBuild.result = 'SUCCESS'
+    } else {
+      currentBuild.result = 'UNSTABLE'
+    }
   }
 }
 
