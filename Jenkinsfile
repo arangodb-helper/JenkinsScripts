@@ -54,7 +54,7 @@ def setWorkspace(where, String WD) {
 }
 
 def copyExtractTarBall (where, String buildHost) {
-  print("${where['unitTests']}: copyExtractTarBall\n")
+  print("${where['testRunName']}: copyExtractTarBall\n")
   
   CMD = """
 if test ! -d ${where['localTarDir']}; then
@@ -77,7 +77,7 @@ python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']}
 
 def setupTestArea(where) {
   if (VERBOSE) {
-    print("${where['unitTests']}: setupTestArea\n")
+    print("${where['testRunName']}: setupTestArea\n")
     print(where)
   }
   def createDirectory = "mkdir -p ${where['testWorkingDirectory']}/out/"
@@ -101,7 +101,7 @@ def setupTestArea(where) {
 
 def runTests(where) {
   if (VERBOSE) {
-    print("${where['unitTests']}: runTests")
+    print("${where['testRunName']}: runTests")
   }
   def RCFile = "${where['testWorkingDirectory']}/out/rc"
   def EXECUTE_TEST="""pwd;
@@ -116,7 +116,7 @@ def runTests(where) {
                 ${where['cmdLineArgs']} || \
          echo \$? > ${RCFile}"""
   if (VERBOSE) {
-    echo "${where['unitTests']}: ${EXECUTE_TEST}"
+    echo "${where['testRunName']}: ${EXECUTE_TEST}"
   }
   sh EXECUTE_TEST
   def shellRC = sh(returnStdout: true, script: "cat ${RCFile}").trim()
@@ -126,7 +126,7 @@ def runTests(where) {
     currentBuild.result = 'FAILURE'
   }
   if (true) { //VERBOSE) {
-    echo "${where['unitTests']}: recording results [ ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml ]:"
+    echo "${where['testRunName']}: recording results [ ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml ]:"
     sh "ls -l ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml"
   }
   junit "out/UNITTEST_RESULT_*.xml"
@@ -354,7 +354,7 @@ try {
   echo branches.toString();
   
   parallel branches
-  printf("The currentBuild.result is now after the parallel: ${currentBuild.result}")
+  print("The currentBuild.result is now after the parallel: ${currentBuild.result}")
 
 } catch (err) {
   stage('Send Notification unittest')
