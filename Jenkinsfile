@@ -19,7 +19,7 @@ WORKSPACE = ""
 BUILT_FILE = ""
 DIST_FILE = ""
 fatalError = false
-VERBOSE = true
+VERBOSE = false
 ENTERPRISE_URL=""// TODO from param
 testParams = [:]
 
