@@ -129,7 +129,9 @@ def runTests(where) {
     echo "${where['unitTests']}: recording results [ ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml ]:"
     sh "ls -l ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml"
   }
-  junit "out/UNITTEST_RESULT_*.xml"
+  // junit "out/UNITTEST_RESULT_*.xml"
+  step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
+
   def failureOutput = readFile("${where['testWorkingDirectory']}/out/testfailures.txt")
   if (failureOutput.size() > 5) {
     failures = "${failureOutput}"
@@ -140,18 +142,15 @@ def runThisTest(which, buildEnvironment)
 {
   node {
     def where = testParams[which]
-    print("hello ${which}: ${where}")
     sh 'pwd > workspace.loc'
     def WORKSPACE = readFile('workspace.loc').trim()
-    if (VERBOSE) {
-      sh "pwd"
-    }
     setWorkspace(where, WORKSPACE)
-    print("hello, I'm still: ${where['testRunName']} ?")
+    if (VERBOSE) {
+      print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
+    }
     dir("${where['testRunName']}") {
       if (VERBOSE) {
         echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
-        echo "${env}"
       }
       if (buildEnvironment['docker']) {
         docker.withRegistry(REGISTRY_URL, '') {
@@ -159,15 +158,11 @@ def runThisTest(which, buildEnvironment)
           myRunImage.pull()
           docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw --volume /var/lib/systemd/coredump:/var/lib/systemd/coredump:rw') {
             def buildHost=sh(returnStdout: true, script: "cat /mnt/workspace/issue").trim()
-            print("buildhost: ${buildHost}")
             buildHost = buildHost[-40..-1]
-            print("buildhost3: ${buildHost}")
             if (VERBOSE) {
               sh "cat /etc/issue"
-              
               sh "pwd"
-
-              echo "${env} "
+              echo "${env} ${buildHost}"
             }
             copyExtractTarBall(where, buildHost)
             setupTestArea(where)
@@ -189,16 +184,22 @@ def runThisTest(which, buildEnvironment)
 }
 
 
-def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl) {
+def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir) {
   try {
     def EP=""
     def XEP=""
     if (enterpriseUrl.size() > 10) {
       EP="--enterprise ${ENTERPRISE_URL}"
-      OUT_DIR = "${RELEASE_OUT_DIR}/EP/${buildEnv['name']}"
       XEP="EP"
     }
-    def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --jemalloc --targetDir ${OUT_DIR} "
+    if (!buildUnittestTarball) {
+      if (enterpriseUrl.size() > 10) {
+        outDir = "${RELEASE_OUT_DIR}/EP/${buildEnv['name']}"
+      } else {
+        outDir = "${RELEASE_OUT_DIR}/${buildEnv['name']}"
+      }
+    }
+      def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --jemalloc --targetDir ${outDir} "
     if (! buildUnittestTarball) {
       BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} "
     }
@@ -209,17 +210,21 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl) 
     sh BUILDSCRIPT
     
     if (buildUnittestTarball) {
-      BUILT_FILE = "${OUT_DIR}/arangodb-${OS}.tar.gz"
+      BUILT_FILE = "${outDir}/arangodb-${OS}.tar.gz"
       DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
       MD5SUM = readFile("${BUILT_FILE}.md5").trim()
-      echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
-
+      if (VERBOSE) {
+        echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
+      }
+      
       sh "python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE} ${env.JOB_NAME}"
     }
     else {
       // TODO: release?
     }
-    sh "ls -l ${RELEASE_OUT_DIR}"
+    if (VERBOSE) {
+      sh "ls -l ${RELEASE_OUT_DIR}"
+    }
   } catch (err) {
     stage('Send Notification for failed build' ) {
       gitCommitter = sh(returnStdout: true, script: 'git --no-pager show -s --format="%ae"')
@@ -235,20 +240,24 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl) 
 
 def setupEnvCompileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl) {
   node {
-    OUT_DIR = ""
+    def outDir = ""
     if (buildEnv['docker']) {
       docker.withRegistry(REGISTRY_URL, '') {
         def myBuildImage = docker.image("${buildEnv['name']}/build")
         myBuildImage.pull()
         docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
-          sh "mount"
-          sh "pwd"
-          sh "cat /etc/issue /mnt/workspace/issue"
-
+          if (VERBOSE) {
+            sh "mount"
+            sh "pwd"
+          }
+          if (VERBOSE) {
+            sh "cat /etc/issue /mnt/workspace/issue"
+          }
+          
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
-          OUT_DIR = "${WORKSPACE}/out"
-          compileSource(buildEnv, buildUnittestTarball, enterpriseUrl)
+          outDir = "${WORKSPACE}/out"
+          compileSource(buildEnv, buildUnittestTarball, enterpriseUrl, outDir)
         }
       }
     } else {
@@ -260,11 +269,12 @@ def setupEnvCompileSource(buildEnv, Boolean buildUnittestTarball, String enterpr
 
 stage("cloning source")
 node {
-  sh "mount"
-  sh "pwd"
-  sh "ls -l /jenkins/workspace"
-  sh "cat /etc/issue /jenkins/workspace/issue"
-    
+  if (VERBOSE) {
+    sh "mount"
+    sh "pwd"
+    sh "ls -l /jenkins/workspace"
+    sh "cat /etc/issue /jenkins/workspace/issue"
+  }
   if (fileExists(lastKnownGoodGitFile)) {
     lastKnownGitRev=readFile(lastKnownGoodGitFile)
   }
@@ -361,12 +371,17 @@ node {
       gitRange = "${lastKnownGitRev}.."
     }
     gitRange = "${gitRange}${currentGitRev}"
-    print(gitRange)
+    if (VERBOSE) {
+      print(gitRange)
+    }
     def gitcmd = 'git --no-pager show -s --format="%ae>" ${gitRange} |sort -u |sed -e :a -e \'$!N;s/\\n//;ta\' -e \'s;>;, ;g\' -e \'s;, $;;\''
-    print(gitcmd)
+    if (VERBOSE) {
+      print(gitcmd)
+    }
     gitCommitters = sh(returnStdout: true, script: gitcmd)
-    echo gitCommitters
-      
+    if (VERBOSE) {
+      echo gitCommitters
+    }
     def subject = ""
     if (fatalError) {
       subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed MISERABLY! "
