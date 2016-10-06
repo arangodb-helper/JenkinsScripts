@@ -131,7 +131,7 @@ def runTests(where) {
   }
   junit "out/UNITTEST_RESULT_*.xml"
   //step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
-  printf("The currentBuild.result is: ${currentBuild.result}")
+  print("The currentBuild.result is: ${currentBuild.result}")
   def failureOutput = readFile("${where['testWorkingDirectory']}/out/testfailures.txt")
   if (failureOutput.size() > 5) {
     failures = "${failureOutput}"
