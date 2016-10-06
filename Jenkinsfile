@@ -125,12 +125,12 @@ def runTests(where) {
     failures = "${failures}\n\n test ${where['testRunName']} exited with ${shellRC}"
     currentBuild.result = 'FAILURE'
   }
-  if (VERBOSE) {
+  if (true) { //VERBOSE) {
     echo "${where['unitTests']}: recording results [ ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml ]:"
     sh "ls -l ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml"
   }
-  // junit "out/UNITTEST_RESULT_*.xml"
-  step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
+  junit "out/UNITTEST_RESULT_*.xml"
+  //step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
 
   def failureOutput = readFile("${where['testWorkingDirectory']}/out/testfailures.txt")
   if (failureOutput.size() > 5) {
