@@ -355,7 +355,7 @@ try {
   
   parallel branches
 } catch (err) {
-  stage('Send Notification unittest' )
+  stage('Send Notification unittest')
   mail (to: ADMIN_ACCOUNT,
         subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 
         body: "error message: " + err.getMessage());
