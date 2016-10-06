@@ -131,7 +131,7 @@ def runTests(where) {
   }
   junit "out/UNITTEST_RESULT_*.xml"
   //step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
-
+  printf("The currentBuild.result is: ${currentBuild.result}")
   def failureOutput = readFile("${where['testWorkingDirectory']}/out/testfailures.txt")
   if (failureOutput.size() > 5) {
     failures = "${failureOutput}"
@@ -354,6 +354,8 @@ try {
   echo branches.toString();
   
   parallel branches
+  printf("The currentBuild.result is now after the parallel: ${currentBuild.result}")
+
 } catch (err) {
   stage('Send Notification unittest')
   mail (to: ADMIN_ACCOUNT,
