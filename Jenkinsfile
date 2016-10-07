@@ -56,7 +56,6 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
   where['testRunName'] = testRunName
   where['unitTests'] = unitTests
   where['cmdLineArgs'] = cmdLineArgs
-  where['enterpriseURL'] = enterpriseURL
   where['releaseOutDir'] = releaseOutDir
 }
 
