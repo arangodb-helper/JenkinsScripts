@@ -35,11 +35,11 @@ def CONTAINERS=[
 DOCKER_CONTAINER = CONTAINERS[5] // ubuntu 16
 OS = DOCKER_CONTAINER['OS'] /// todo wech.
 
-def getReleaseOutDir(String enterpriseUrl) {
+def getReleaseOutDir(String enterpriseUrl, String jobname) {
   if (enterpriseUrl.size() > 10) {
-    outDir = "${RELEASE_OUT_DIR}/EP/${env.JOB_NAME}"
+    outDir = "${RELEASE_OUT_DIR}/EP/jobname"
   } else {
-    outDir = "${RELEASE_OUT_DIR}/${env.JOB_NAME}"
+    outDir = "${RELEASE_OUT_DIR}/jobname"
   }
   return outDir
 }
@@ -220,7 +220,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       XEP="EP"
     }
     if (!buildUnittestTarball) {
-      outDir = getReleaseOutDir(enterpriseUrl)
+      outDir = getReleaseOutDir(enterpriseUrl, ${env.JOB_NAME})
     }
       def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --jemalloc --targetDir ${outDir} "
     if (! buildUnittestTarball) {
@@ -348,9 +348,11 @@ try {
     ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
     ["arangosh", 'arangosh', ""],
   ]
-  def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL)
-  sh "mkdir -p ${releaseOutDir}/results/ ; rm -f ${releaseOutDir}/results/*;"
   print("getting keyset\n")
+  def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, ${env.JOB_NAME})
+  node {
+    sh "mkdir -p ${releaseOutDir}/results/ ; rm -f ${releaseOutDir}/results/*;"
+  }
   m = testCaseSets.size()
   int n = 0;
   for (int i = 0; i < m; i++) {
