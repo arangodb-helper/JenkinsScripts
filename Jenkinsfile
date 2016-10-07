@@ -420,7 +420,8 @@ node {
     else {
       subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed"
     }
-      
+
+    print("sending messages to ${gitCommitters}")
     mail (to: gitCommitters,
           subject: subject,
           body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
