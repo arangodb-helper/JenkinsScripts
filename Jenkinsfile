@@ -428,7 +428,7 @@ node {
           body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
   }
   else {
-    writeFile(lastKnownGoodGitFile, currentGitRev);
+    sh "echo ${currentGitRev} > ${lastKnownGoodGitFile}";
   }
 }
 
