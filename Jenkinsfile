@@ -37,9 +37,9 @@ OS = DOCKER_CONTAINER['OS'] /// todo wech.
 
 def getReleaseOutDir(String enterpriseUrl, String jobname) {
   if (enterpriseUrl.size() > 10) {
-    outDir = "${RELEASE_OUT_DIR}/EP/jobname"
+    outDir = "${RELEASE_OUT_DIR}/EP/${jobname}"
   } else {
-    outDir = "${RELEASE_OUT_DIR}/jobname"
+    outDir = "${RELEASE_OUT_DIR}/${jobname}"
   }
   return outDir
 }
@@ -349,7 +349,7 @@ try {
     ["arangosh", 'arangosh', ""],
   ]
   print("getting keyset\n")
-  def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, ${env.JOB_NAME})
+  def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, env.JOB_NAME)
   node {
     sh "mkdir -p ${releaseOutDir}/results/ ; rm -f ${releaseOutDir}/results/*;"
   }
