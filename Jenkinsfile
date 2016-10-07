@@ -35,7 +35,16 @@ def CONTAINERS=[
 DOCKER_CONTAINER = CONTAINERS[5] // ubuntu 16
 OS = DOCKER_CONTAINER['OS'] /// todo wech.
 
-def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile, String testRunName, String unitTests, String cmdLineArgs) {
+def getReleaseOutDir(String enterpriseUrl) {
+  if (enterpriseUrl.size() > 10) {
+    outDir = "${RELEASE_OUT_DIR}/EP/${buildEnv['name']}"
+  } else {
+    outDir = "${RELEASE_OUT_DIR}/${buildEnv['name']}"
+  }
+  return outDir
+}
+
+def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile, String testRunName, String unitTests, String cmdLineArgs, String releaseOutDir) {
   localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
   where['localTarDir'] = localTarDir
   where['localTarball'] = localTarball
@@ -43,10 +52,12 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
   where['localExtractDir']=where['localWSDir'] + "/x/"
   where['MD5SUM'] = MD5SUM
   where['distFile'] = distFile
-        
+
   where['testRunName'] = testRunName
   where['unitTests'] = unitTests
   where['cmdLineArgs'] = cmdLineArgs
+  where['enterpriseURL'] = enterpriseURL
+  where['releaseOutDir'] = releaseOutDir
 }
 
 def setWorkspace(where, String WD) {
@@ -66,6 +77,9 @@ fi
 if test ! -d ${where['localExtractDir']}; then
         mkdir -p ${where['localExtractDir']}
 fi
+if test ! -d ${where['releaseOutDir']}; then
+        mkdir -p ${where['releaseOutDir']}
+fi
 python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']} ${where['localWSDir']} ${where['localTarball']} '${where['testRunName']}_${buildHost}' 'rm -rf ${where['localExtractDir']}; mkdir ${where['localExtractDir']}; cd ${where['localExtractDir']}; tar -xzf ${where['localTarball']}'
 """
 
@@ -80,7 +94,8 @@ def setupTestArea(where) {
     print("${where['testRunName']}: setupTestArea\n")
     print(where)
   }
-  def createDirectory = "mkdir -p ${where['testWorkingDirectory']}/out/"
+  
+  def createDirectory = "mkdir -p ${where['testWorkingDirectory']}/out/ "
   def cleanOutFiles = "rm -rf ${where['testWorkingDirectory']}/out/*"
   def removeOldSymlinks = "cd ${where['testWorkingDirectory']}/; find -type l -exec rm -f {} \\;;"
   def createNewSymlinks = "ln -s ${where['localExtractDir']}/* ${where['testWorkingDirectory']}/"
@@ -103,6 +118,7 @@ def runTests(where) {
   if (VERBOSE) {
     print("${where['testRunName']}: runTests")
   }
+
   def RCFile = "${where['testWorkingDirectory']}/out/rc"
   def EXECUTE_TEST="""pwd;
          cat /mnt/workspace/issue
@@ -125,15 +141,17 @@ def runTests(where) {
     failures = "${failures}\n\n test ${where['testRunName']} exited with ${shellRC}"
     currentBuild.result = 'FAILURE'
   }
-  if (true) { //VERBOSE) {
+  if (VERBOSE) {
     echo "${where['testRunName']}: recording results [ ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml ]:"
     sh "ls -l ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml"
   }
   junit "out/UNITTEST_RESULT_*.xml"
   //step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
   print("The currentBuild.result is: ${currentBuild.result}")
-  def failureOutput = readFile("${where['testWorkingDirectory']}/out/testfailures.txt")
+  def testFailuresFile = "${where['testWorkingDirectory']}/out/testfailures.txt"
+  def failureOutput = readFile(testFailuresFile)
   if (failureOutput.size() > 5) {
+    sh "cp testFailuresFile where['releaseOutDir']/results/where['testRunName'].txt"
     failures = "${failureOutput}"
     currentBuild.result = 'FAILURE'
   }
@@ -192,7 +210,6 @@ def runThisTest(which, buildEnvironment)
   }
 }
 
-
 def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir) {
   try {
     def EP=""
@@ -202,11 +219,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       XEP="EP"
     }
     if (!buildUnittestTarball) {
-      if (enterpriseUrl.size() > 10) {
-        outDir = "${RELEASE_OUT_DIR}/EP/${buildEnv['name']}"
-      } else {
-        outDir = "${RELEASE_OUT_DIR}/${buildEnv['name']}"
-      }
+      outDir = getReleaseOutDir(enterpriseUrl)
     }
       def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --jemalloc --targetDir ${outDir} "
     if (! buildUnittestTarball) {
@@ -334,7 +347,8 @@ try {
     ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
     ["arangosh", 'arangosh', ""],
   ]
-
+  def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL)
+  sh "mkdir -p ${releaseOutDir}/results/ ; rm -f ${releaseOutDir}/results/*;"
   print("getting keyset\n")
   m = testCaseSets.size()
   int n = 0;
@@ -349,7 +363,7 @@ try {
       testRunName = "${shortName}_${j}_${n}"
       parallelJobNames[n]=testRunName
       testParams[testRunName] = [:]
-      setDirectories(testParams[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, testRunName, unitTests, cmdLineArgs)
+      setDirectories(testParams[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, testRunName, unitTests, cmdLineArgs, releaseOutDir)
       n += 1
     }
   }
@@ -376,7 +390,11 @@ try {
 
 stage("generating test report")
 node {
+  def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL)
+  def failures = sh(returnStdout: true, script: "cat ${releaseOutDir}/results/*;")
+
   if (failures.size() > 5) {
+    
     def gitRange = ""
     if (lastKnownGitRev.size() > 1) {
       gitRange = "${lastKnownGitRev}.."
