@@ -158,7 +158,7 @@ def runTests(where) {
   else {
     def executiveSummary = readFile("${where['testWorkingDirectory']}/out/UNITTEST_RESULT_EXECUTIVE_SUMMARY.json").trim()
     echo "executiveSummary: ${executiveSummary}"
-    if (executiveSummary != "true") {
+    if (executiveSummary == "true") {
       currentBuild.result = 'SUCCESS'
     } else {
       currentBuild.result = 'UNSTABLE'
