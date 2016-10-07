@@ -35,7 +35,7 @@ def CONTAINERS=[
 DOCKER_CONTAINER = CONTAINERS[5] // ubuntu 16
 OS = DOCKER_CONTAINER['OS'] /// todo wech.
 
-def getReleaseOutDir(String enterpriseUrl,) {
+def getReleaseOutDir(String enterpriseUrl) {
   if (enterpriseUrl.size() > 10) {
     outDir = "${RELEASE_OUT_DIR}/EP/${env.JOB_NAME}"
   } else {
