@@ -151,6 +151,7 @@ def runTests(where) {
   def testFailuresFile = "${where['testWorkingDirectory']}/out/testfailures.txt"
   def failureOutput = readFile(testFailuresFile)
   if (failureOutput.size() > 5) {
+    echo "FAILING NOW!"
     sh "cp testFailuresFile where['releaseOutDir']/results/where['testRunName'].txt"
     failures = "${failureOutput}"
     currentBuild.result = 'FAILURE'
