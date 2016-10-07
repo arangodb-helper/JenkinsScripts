@@ -2,9 +2,6 @@
 // We need these modules:
 //
 // We need permisions for several string manipulation operations, like take()
-def servers
-@Library('servers') _
-print(servers)
 def REGISTRY="192.168.0.1"
 def REGISTRY_URL="https://${REGISTRY}/"
 // def DOCKER_CONTAINER="debianjessie"
