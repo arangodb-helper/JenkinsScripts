@@ -151,7 +151,7 @@ def runTests(where) {
   def failureOutput = readFile(testFailuresFile)
   if (failureOutput.size() > 5) {
     echo "FAILING NOW!"
-    sh "cp testFailuresFile where['releaseOutDir']/results/where['testRunName'].txt"
+    sh "cp testFailuresFile ${where['releaseOutDir']}/results/${where['testRunName']}.txt"
     failures = "${failureOutput}"
     currentBuild.result = 'FAILURE'
   }
@@ -393,7 +393,7 @@ try {
 stage("generating test report")
 node {
   def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL)
-  def failures = sh(returnStdout: true, script: "cat ${releaseOutDir}/results/*;")
+  def failures = failures +  sh(returnStdout: true, script: "cat ${releaseOutDir}/results/*;")
 
   if (failures.size() > 5) {
     
