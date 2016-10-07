@@ -392,7 +392,7 @@ try {
 
 stage("generating test report")
 node {
-  def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL)
+  def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, env.JOB_NAME)
   def failures = failures +  sh(returnStdout: true, script: "cat ${releaseOutDir}/results/*;")
 
   if (failures.size() > 5) {
