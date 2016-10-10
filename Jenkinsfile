@@ -315,21 +315,38 @@ def setupEnvCompileSource(buildEnv, Boolean buildUnittestTarball, String enterpr
 }
 
 stage("cloning source")
-node {
-  if (VERBOSE) {
-    sh "mount"
-    sh "pwd"
-    sh "ls -l /jenkins/workspace"
-    sh "cat /etc/issue /jenkins/workspace/issue"
+if (DOCKER_CONTAINER['docker']) {
+  node {
+    if (VERBOSE) {
+      sh "mount"
+      sh "pwd"
+      sh "ls -l /jenkins/workspace"
+      sh "cat /etc/issue /jenkins/workspace/issue"
+    }
+    if (fileExists(lastKnownGoodGitFile)) {
+      lastKnownGitRev=readFile(lastKnownGoodGitFile)
+    }
+    git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
+    currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+    print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
   }
-  if (fileExists(lastKnownGoodGitFile)) {
-    lastKnownGitRev=readFile(lastKnownGoodGitFile)
-  }
-  git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
-  currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-  print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
 }
-
+else {
+  node(DOCKER_CONTAINER['name']) {
+    if (VERBOSE) {
+      sh "mount"
+      sh "pwd"
+      sh "uname -a"
+    }
+    if (fileExists(lastKnownGoodGitFile)) {
+      lastKnownGitRev=readFile(lastKnownGoodGitFile)
+    }
+    git url: 'https://github.com/arangodb/arangodb.git', branch: 'devel'
+    currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+    print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
+  }
+}
+  
 stage("building ArangoDB")
 try {
   setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
