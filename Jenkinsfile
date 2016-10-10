@@ -280,28 +280,30 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 }
 
 def setupEnvCompileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl) {
+  def outDir = ""
   if (buildEnvironment['docker']) {
-  node {
-    def outDir = ""
-    docker.withRegistry(REGISTRY_URL, '') {
-      def myBuildImage = docker.image("${buildEnv['name']}/build")
-      myBuildImage.pull()
-      docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
-        if (VERBOSE) {
-          sh "mount"
-          sh "pwd"
-        }
-        if (VERBOSE) {
-          sh "cat /etc/issue /mnt/workspace/issue"
-        }
+    node {
+      docker.withRegistry(REGISTRY_URL, '') {
+        def myBuildImage = docker.image("${buildEnv['name']}/build")
+        myBuildImage.pull()
+        docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
+          if (VERBOSE) {
+            sh "mount"
+            sh "pwd"
+          }
+          if (VERBOSE) {
+            sh "cat /etc/issue /mnt/workspace/issue"
+          }
         
-        sh 'pwd > workspace.loc'
-        WORKSPACE = readFile('workspace.loc').trim()
-        outDir = "${WORKSPACE}/out"
-        compileSource(buildEnv, buildUnittestTarball, enterpriseUrl, outDir)
+          sh 'pwd > workspace.loc'
+          WORKSPACE = readFile('workspace.loc').trim()
+          outDir = "${WORKSPACE}/out"
+          compileSource(buildEnv, buildUnittestTarball, enterpriseUrl, outDir)
+        }
       }
     }
-  } else {
+  }
+  else {
     node(buildEnvironment['name']){
       echo "building on ${buildEnvironment['name']}"
       sh 'pwd > workspace.loc'
