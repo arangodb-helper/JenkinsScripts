@@ -5,7 +5,7 @@
 REGISTRY="192.168.0.1"
 REGISTRY_URL="https://${REGISTRY}/"
 
-DOCKER_CONTAINER="ubuntusixteenofour"
+DOCKER_CONTAINER=[:]
 RELEASE_OUT_DIR="/net/fileserver/"
 LOCAL_TAR_DIR="/mnt/workspace/tmp/"
 branches = [:]
@@ -22,7 +22,8 @@ fatalError = false
 VERBOSE = false
 ENTERPRISE_URL=""// TODO from param
 testParams = [:]
-
+//def preferBuilder="ubuntusixteenofour"
+def preferBuilder="windows"
 def CONTAINERS=[
   [ 'docker': true,  'name': 'centosix',            'packageFormat': 'RPM', 'OS': "Linux" ],
   [ 'docker': true,  'name': 'centoseven',          'packageFormat': 'RPM', 'OS': "Linux" ],
@@ -30,10 +31,16 @@ def CONTAINERS=[
   [ 'docker': true,  'name': 'debianjessie',        'packageFormat': 'DEB', 'OS': "Linux" ],
   [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB', 'OS': "Linux" ],
   [ 'docker': true,  'name': 'ubuntusixteenofour',  'packageFormat': 'DEB', 'OS': "Linux" ],
+  [ 'docker': false, 'name': 'windows',             'packageFormat': 'NSIS', 'OS': "Windows"],
 ]
 
-DOCKER_CONTAINER = CONTAINERS[5] // ubuntu 16
-OS = DOCKER_CONTAINER['OS'] /// todo wech.
+for (int c  = 0; c < CONTAINERS.size(); c++) {
+  if (CONTAINERS[c]['name'] == preferBuilder) {
+    DOCKER_CONTAINER = CONTAINERS[c]
+  }
+}
+
+OS = DOCKER_CONTAINER['OS']
 
 def getReleaseOutDir(String enterpriseUrl, String jobname) {
   if (enterpriseUrl.size() > 10) {
@@ -168,19 +175,19 @@ def runTests(where) {
 
 def runThisTest(which, buildEnvironment)
 {
-  node {
-    def where = testParams[which]
-    sh 'pwd > workspace.loc'
-    def WORKSPACE = readFile('workspace.loc').trim()
-    setWorkspace(where, WORKSPACE)
-    if (VERBOSE) {
-      print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
-    }
-    dir("${where['testRunName']}") {
+  def where = testParams[which]
+  if (buildEnvironment['docker']) {
+    node {
+      sh 'pwd > workspace.loc'
+      def WORKSPACE = readFile('workspace.loc').trim()
+      setWorkspace(where, WORKSPACE)
       if (VERBOSE) {
-        echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
+        print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
       }
-      if (buildEnvironment['docker']) {
+      dir("${where['testRunName']}") {
+        if (VERBOSE) {
+          echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
+        }
         docker.withRegistry(REGISTRY_URL, '') {
           def myRunImage = docker.image("${buildEnvironment['name']}/run")
           myRunImage.pull()
@@ -199,13 +206,24 @@ def runThisTest(which, buildEnvironment)
           }
         }
       }
-      else {
-        // TODO: non docker-implement!
-        // copyExtractTarBall(where)
-        // setupTestArea(where)
-        // runTests(where)
-	echo "SHOULDNT BE HERE!!!"
-	throw("unsupported branch")
+    }
+  }
+  else {
+    node(buildEnvironment['name']){
+      sh 'pwd > workspace.loc'
+      def WORKSPACE = readFile('workspace.loc').trim()
+      setWorkspace(where, WORKSPACE)
+      if (VERBOSE) {
+        print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
+      }
+      dir("${where['testRunName']}") {
+        if (VERBOSE) {
+          echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
+        }
+        def buildHost=buildEnvironment['name']
+        copyExtractTarBall(where, buildHost)
+        setupTestArea(where)
+        runTests(where)
       }
     }
   }
@@ -262,30 +280,34 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 }
 
 def setupEnvCompileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl) {
+  if (buildEnvironment['docker']) {
   node {
     def outDir = ""
-    if (buildEnv['docker']) {
-      docker.withRegistry(REGISTRY_URL, '') {
-        def myBuildImage = docker.image("${buildEnv['name']}/build")
-        myBuildImage.pull()
-        docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
-          if (VERBOSE) {
-            sh "mount"
-            sh "pwd"
-          }
-          if (VERBOSE) {
-            sh "cat /etc/issue /mnt/workspace/issue"
-          }
-          
-          sh 'pwd > workspace.loc'
-          WORKSPACE = readFile('workspace.loc').trim()
-          outDir = "${WORKSPACE}/out"
-          compileSource(buildEnv, buildUnittestTarball, enterpriseUrl, outDir)
+    docker.withRegistry(REGISTRY_URL, '') {
+      def myBuildImage = docker.image("${buildEnv['name']}/build")
+      myBuildImage.pull()
+      docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
+        if (VERBOSE) {
+          sh "mount"
+          sh "pwd"
         }
+        if (VERBOSE) {
+          sh "cat /etc/issue /mnt/workspace/issue"
+        }
+        
+        sh 'pwd > workspace.loc'
+        WORKSPACE = readFile('workspace.loc').trim()
+        outDir = "${WORKSPACE}/out"
+        compileSource(buildEnv, buildUnittestTarball, enterpriseUrl, outDir)
       }
-    } else {
-      echo "NON-Docker not yet supported!"
-      throw("Not yet implemented: non-docker build")
+    }
+  } else {
+    node(buildEnvironment['name']){
+      echo "building on ${buildEnvironment['name']}"
+      sh 'pwd > workspace.loc'
+      WORKSPACE = readFile('workspace.loc').trim()
+      outDir = "${WORKSPACE}/out"
+      compileSource(buildEnv, buildUnittestTarball, enterpriseUrl, outDir)
     }
   }
 }
