@@ -63,10 +63,8 @@ node {
   sh "docker push '${REGISTRY}/arangodbenterprise/arangodb:3.1'"
   sh """
         cd arangodb-mesos-docker
-        ./release.sh arangodb/arangodb-mesos mesosphere-V2 E-build7
-        docker tag arangodb/arangodb-mesos:E-build7 ${REGISTRY}/arangodb/arangodb-mesos:E-build7
-        docker push ${REGISTRY}/arangodb/arangodb-mesos:E-build7
-        docker push ${REGISTRY}/arangodb/arangodb-mesos:E-build7
-        git push --follow-tags
+        docker tag -f arangodbenterprise/arangodb:3.1 'arangodb/arangodb'
+        docker build -t arangodbenterprise/arangodb-mesos:3.1 .
+        
 """
 }
