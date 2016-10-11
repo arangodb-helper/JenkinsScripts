@@ -39,7 +39,7 @@ else {
   ARANGODB_RELEASE=BASE_RELEASE
 }
 
-ecgi "HOHO"
+echo "HOHO"
 echo ENTERPRISE
 
 stage("cloning source")
