@@ -32,6 +32,7 @@ def DIST_FILE = ""
 def fatalError = false
 def DOCKER_VENDOR = ""
 def BASE_RELEASE="3.1"
+def ENTERPRISE = ENTERPRISE == "true"
 if (ENTERPRISE) {
   ARANGODB_RELEASE="${BASE_RELEASE}-enterprise"
 }
