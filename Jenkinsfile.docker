@@ -40,9 +40,6 @@ else {
   ARANGODB_RELEASE=BASE_RELEASE
 }
 
-echo "HOHO"
-echo ENTERPRISE
-
 stage("cloning source")
 node {
   sh "mount"
