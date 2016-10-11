@@ -2,7 +2,7 @@
 // We need these modules:
 //
 // We need permisions for several string manipulation operations, like take()
-def REGISTRY="192.168.0.1"
+
 def REGISTRY_URL="https://${REGISTRY}/"
 // def DOCKER_CONTAINER="debianjessie"
 
@@ -30,7 +30,6 @@ def currentGitRev=""
 def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
-def ENTERPRISE = true
 def DOCKER_VENDOR = ""
 if (ENTERPRISE) {
   DOCKER_PRODUCT="arangodbenterprise"
@@ -40,7 +39,6 @@ else {
 }
 ARANGODB_RELEASE="3.1"
 
-echo "bla"
 stage("cloning source")
 node {
   sh "mount"
