@@ -14,7 +14,8 @@ def CONTAINERS=[
   [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB'],
   [ 'docker': true,  'name': 'ubuntusixteenofour', 'packageFormat': 'DEB'],
 ]
-
+// TODO: aus GITTAG bauen
+GITTAG_PKG="3.1.rc2"
 def OS="Linux"
 def RELEASE_OUT_DIR="/net/fileserver/"
 def LOCAL_TAR_DIR="/mnt/workspace/tmp/"
@@ -55,7 +56,7 @@ node {
 stage("building docker container")
 
 node {
-  sh "cp /net/fileserver/EP/debianjessie/arangodb3e-3.1.rc0-1_amd64.deb arangodb.deb"
+  sh "cp /net/fileserver/EP/debianjessie/arangodb3e-${GITTAG_PKG}-1_amd64.deb arangodb.deb"
   sh "docker build -t arangodbenterprise/arangodb:3.1 -f Dockerfile3.local ."
   sh "docker tag -f arangodbenterprise/arangodb:3.1 '${REGISTRY}/arangodbenterprise/arangodb:3.1'"
   sh "docker tag -f arangodbenterprise/arangodb:3.1 '${REGISTRY}/arangodb/arangodb:3.1'"
