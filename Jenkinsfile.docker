@@ -30,6 +30,14 @@ def currentGitRev=""
 def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
+def ENTERPRISE = true
+def DOCKER_VENDOR = ""
+if (ENTERPRISE) {
+  DOCKER_PRODUCT="arangodbenterprise"
+}
+else {
+  DOCKER_PRODUCT="arangodb"
+}
 
 echo "bla"
 stage("cloning source")
@@ -56,11 +64,16 @@ node {
 stage("building docker container")
 
 node {
-  sh "cp /net/fileserver/EP/debianjessie/arangodb3e-${GITTAG_PKG}-1_amd64.deb arangodb.deb"
-  sh "docker build -t arangodbenterprise/arangodb:3.1 -f Dockerfile3.local ."
-  sh "docker tag -f arangodbenterprise/arangodb:3.1 '${REGISTRY}/arangodbenterprise/arangodb:3.1'"
-  sh "docker tag -f arangodbenterprise/arangodb:3.1 '${REGISTRY}/arangodb/arangodb:3.1'"
-  sh "docker push '${REGISTRY}/arangodbenterprise/arangodb:3.1'"
+  if (ENTERPRISE) {
+    sh "cp /net/fileserver/EP/debianjessie/arangodb3e-${GITTAG_PKG}-1_amd64.deb arangodb.deb"
+  }
+  else {
+    sh "cp /net/fileserver/debianjessie/arangodb3-${GITTAG_PKG}-1_amd64.deb arangodb.deb"
+  }
+  sh "docker build -t arangodb/${DOCKER_PRODUCT}:3.1 -f Dockerfile3.local ."
+  sh "docker tag -f arangodb/${DOCKER_PRODUCT}:3.1 '${REGISTRY}/arangodb/${DOCKER_PRODUCT}:3.1'"
+  sh "docker tag -f arangodb/${DOCKER_PRODUCT}:3.1 '${REGISTRY}/arangodb/${DOCKER_PRODUCT}:3.1'"
+  sh "docker push '${REGISTRY}/arangodb/${DOCKER_PRODUCT}:3.1'"
   sh """
         cd arangodb-mesos-docker
         docker tag -f arangodbenterprise/arangodb:3.1 'arangodb/arangodb'
