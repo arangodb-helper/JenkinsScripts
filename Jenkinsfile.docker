@@ -31,13 +31,13 @@ def BUILT_FILE = ""
 def DIST_FILE = ""
 def fatalError = false
 def DOCKER_VENDOR = ""
+def BASE_RELEASE="3.1"
 if (ENTERPRISE) {
-  DOCKER_PRODUCT="arangodbenterprise"
+  ARANGODB_RELEASE="${BASE_RELEASE}-enterprise"
 }
 else {
-  DOCKER_PRODUCT="arangodb"
+  ARANGODB_RELEASE=BASE_RELEASE
 }
-ARANGODB_RELEASE="3.1"
 
 stage("cloning source")
 node {
@@ -54,7 +54,7 @@ node {
   echo "git url: 'https://github.com/arangodb/arangodb-docker', branch: official"
 
   git url: 'https://github.com/arangodb/arangodb-docker', branch: "official"
-  sh "if test -d arangodb-mesos-docker; then cd arangodb-mesos-docker; git pull --all; else git clone https://github.com/ArangoDB/arangodb-mesos-docker; fi"
+  sh "if test ! -d arangodb-mesos-docker; then git clone https://github.com/ArangoDB/arangodb-mesos-docker; fi;   cd arangodb-mesos-docker; git pull --all; git checkout ${BASE_RELEASE} "
   sh "find"
 }
 
@@ -69,15 +69,15 @@ node {
   else {
     sh "cp /net/fileserver/debianjessie/arangodb3-${GITTAG_PKG}-1_amd64.deb arangodb.deb"
   }
-  sh "docker build -t arangodb/${DOCKER_PRODUCT}:${ARANGODB_RELEASE} -f Dockerfile3.local ."
-  sh "docker tag -f arangodb/${DOCKER_PRODUCT}:${ARANGODB_RELEASE} '${REGISTRY}/arangodb/${DOCKER_PRODUCT}:${ARANGODB_RELEASE}'"
-  sh "docker tag -f arangodb/${DOCKER_PRODUCT}:${ARANGODB_RELEASE} '${REGISTRY}/arangodb/${DOCKER_PRODUCT}:${ARANGODB_RELEASE}'"
-  sh "docker push '${REGISTRY}/arangodb/${DOCKER_PRODUCT}:${ARANGODB_RELEASE}'"
+  sh "docker build -t arangodb/arangodb:${ARANGODB_RELEASE} -f Dockerfile3.local ."
+  sh "docker tag -f arangodb/arangodb:${ARANGODB_RELEASE} '${REGISTRY}/arangodb/arangodb:${ARANGODB_RELEASE}'"
+  sh "docker tag -f arangodb/arangodb:${ARANGODB_RELEASE} '${REGISTRY}/arangodb/arangodb:${ARANGODB_RELEASE}'"
+  sh "docker push '${REGISTRY}/arangodb/arangodb:${ARANGODB_RELEASE}'"
   sh """
         cd arangodb-mesos-docker
-        docker tag -f 'arangodb/${DOCKER_PRODUCT}:${ARANGODB_RELEASE}' 'arangodb/arangodb'
-        docker build -t 'arangodb/${DOCKER_PRODUCT}-mesos:${ARANGODB_RELEASE}' .
-        docker tag 'arangodb/${DOCKER_PRODUCT}-mesos:${ARANGODB_RELEASE}' '${REGISTRY}/arangodb/${DOCKER_PRODUCT}-mesos:${ARANGODB_RELEASE}'
-        docker push '${REGISTRY}/arangodb/${DOCKER_PRODUCT}-mesos:${ARANGODB_RELEASE}'
+        docker tag -f 'arangodb/arangodb:${ARANGODB_RELEASE}' 'arangodb/arangodb'
+        docker build -t 'arangodb/arangodb-mesos:${ARANGODB_RELEASE}' .
+        docker tag 'arangodb/arangodb-mesos:${ARANGODB_RELEASE}' '${REGISTRY}/arangodb/arangodb-mesos:${ARANGODB_RELEASE}'
+        docker push '${REGISTRY}/arangodb/arangodb-mesos:${ARANGODB_RELEASE}'
 """
 }
