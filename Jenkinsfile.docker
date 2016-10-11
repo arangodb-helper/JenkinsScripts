@@ -77,6 +77,7 @@ node {
         cd arangodb-mesos-docker
         docker tag -f 'arangodb/${DOCKER_PRODUCT}:${ARANGODB_RELEASE}' 'arangodb/arangodb'
         docker build -t 'arangodb/${DOCKER_PRODUCT}-mesos:${ARANGODB_RELEASE}' .
+        docker tag 'arangodb/${DOCKER_PRODUCT}-mesos:${ARANGODB_RELEASE}' '${REGISTRY}/arangodb/${DOCKER_PRODUCT}-mesos:${ARANGODB_RELEASE}'
         docker push '${REGISTRY}/arangodb/${DOCKER_PRODUCT}-mesos:${ARANGODB_RELEASE}'
 """
 }
