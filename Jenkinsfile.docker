@@ -46,7 +46,7 @@ node {
   echo "git url: 'https://github.com/arangodb/arangodb-docker', branch: official"
 
   git url: 'https://github.com/arangodb/arangodb-docker', branch: "official"
-  sh "git clone https://github.com/ArangoDB/arangodb-mesos-docker"
+  sh "if test -d arangodb-mesos-docker; then cd arangodb-mesos-docker; git pull --all; else git clone https://github.com/ArangoDB/arangodb-mesos-docker; fi"
   sh "find"
 }
 
