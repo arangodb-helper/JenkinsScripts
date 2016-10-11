@@ -39,6 +39,9 @@ else {
   ARANGODB_RELEASE=BASE_RELEASE
 }
 
+ecgi "HOHO"
+echo ENTERPRISE
+
 stage("cloning source")
 node {
   sh "mount"
