@@ -54,7 +54,7 @@ stage("cloning source")
 
 
 stage("building ArangoDB")
-try {
+//try {
   for (int c=0; c < CONTAINERS.size(); c++) {
     echo "building No. ${c}: "
     echo CONTAINERS[c]['name']
@@ -81,31 +81,31 @@ try {
           } else {
             OUT_DIR = "${RELEASE_OUT_DIR}/${DOCKER_CONTAINER}"
           }
-          try {
+          //try {
             sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 8 --buildDir build-${XEP}package-${DOCKER_CONTAINER} --package ${PACKAGE_FORMAT} ${EP} --jemalloc --targetDir ${OUT_DIR} "
-          } catch (err) {
-            stage('Send Notification for failed build' ) {
-
-              mail (to: 'release-bot@arangodb.com',
-                    subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
-                    body: err.getMessage());
-              currentBuild.result = 'FAILURE'
-              throw(err)
-            }
-          }
+          //} catch (err) {
+          //  stage('Send Notification for failed build' ) {
+          //
+          //    mail (to: 'release-bot@arangodb.com',
+          //          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
+          //          body: err.getMessage());
+          //    currentBuild.result = 'FAILURE'
+          //    throw(err)
+          //  }
+          //}
           sh "ls -l ${OUT_DIR}"
         }
       }
     }
   }
-} catch (err) {
-  stage('Send FAIL-Notification for build' )
-  mail (to: ADMIN_ACCOUNT, 
-        subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
-        body: err.getMessage());
-  currentBuild.result = 'FAILURE'
-  throw(err)
-}
+//} catch (err) {
+//  stage('Send FAIL-Notification for build' )
+//  mail (to: ADMIN_ACCOUNT, 
+//        subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
+//        body: err.getMessage());
+//  currentBuild.result = 'FAILURE'
+//  throw(err)
+//}
 
 stage("generating test report")
   node {
