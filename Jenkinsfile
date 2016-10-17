@@ -32,6 +32,7 @@ def CONTAINERS=[
   [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB', 'OS': "Linux" ],
   [ 'docker': true,  'name': 'ubuntusixteenofour',  'packageFormat': 'DEB', 'OS': "Linux" ],
   [ 'docker': false, 'name': 'windows',             'packageFormat': 'NSIS', 'OS': "Windows"],
+  [ 'docker': false, 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "MacOSX"],
 ]
 
 for (int c  = 0; c < CONTAINERS.size(); c++) {

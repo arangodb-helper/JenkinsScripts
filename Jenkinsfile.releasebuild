@@ -8,12 +8,13 @@ def REGISTRY_URL="https://${REGISTRY}/"
 
 def CONTAINERS=[
 // [ 'docker': true,  'name': 'centosix', 'packageFormat': 'RPM'],
- [ 'docker': true,  'name': 'centoseven', 'packageFormat': 'RPM'],
- [ 'docker': true,  'name': 'fedoratwentythree', 'packageFormat': 'RPM'],
+// [ 'docker': true,  'name': 'centoseven', 'packageFormat': 'RPM'],
+ // [ 'docker': true,  'name': 'fedoratwentythree', 'packageFormat': 'RPM'],
 // [ 'docker': true,  'name': 'opensusethirteen', 'packageFormat': 'RPM'],
 // [ 'docker': true,  'name': 'debianjessie', 'packageFormat': 'DEB'],
 // [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB'],
 // [ 'docker': true,  'name': 'ubuntusixteenofour', 'packageFormat': 'DEB'],
+  [ 'docker': false, 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "MacOSX"],
 ]
 
 def OS="Linux"
@@ -76,10 +77,10 @@ stage("building ArangoDB")
           XEP=""
           if (ENTERPRISE_URL.size() > 10) {
             EP="--enterprise ${ENTERPRISE_URL}"
-            OUT_DIR = "${RELEASE_OUT_DIR}/EP/${DOCKER_CONTAINER}"
+            OUT_DIR = "${RELEASE_OUT_DIR}/REL/EP/${DOCKER_CONTAINER}"
             XEP="EP"
           } else {
-            OUT_DIR = "${RELEASE_OUT_DIR}/${DOCKER_CONTAINER}"
+            OUT_DIR = "${RELEASE_OUT_DIR}/REL/CO/${DOCKER_CONTAINER}"
           }
           //try {
             sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 8 --buildDir build-${XEP}package-${DOCKER_CONTAINER} --package ${PACKAGE_FORMAT} ${EP} --jemalloc --targetDir ${OUT_DIR} "
