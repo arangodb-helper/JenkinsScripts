@@ -23,7 +23,7 @@ VERBOSE = false
 ENTERPRISE_URL=""// TODO from param
 testParams = [:]
 //def preferBuilder="ubuntusixteenofour"
-def preferBuilder="windows"
+def preferBuilder="macos"
 def CONTAINERS=[
   [ 'docker': true,  'name': 'centosix',            'packageFormat': 'RPM', 'OS': "Linux" ],
   [ 'docker': true,  'name': 'centoseven',          'packageFormat': 'RPM', 'OS': "Linux" ],
