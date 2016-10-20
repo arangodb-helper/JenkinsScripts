@@ -178,8 +178,11 @@ def runTests(where) {
 
 def runThisTest(which, buildEnvironment)
 {
+    print('runThisTest')
+    
   def where = testParams[which]
-  if (buildEnvironment['testType'] == 'docker') {
+    if (buildEnvironment['testType'] == 'docker') {
+	print("in")
     node {
       sh 'pwd > workspace.loc'
       def WORKSPACE = readFile('workspace.loc').trim()
@@ -211,7 +214,9 @@ def runThisTest(which, buildEnvironment)
       }
     }
   }
-  else {
+    else {
+	print("else")
+	print(buildEnvironment)
     node(buildEnvironment['name']){
       sh 'pwd > workspace.loc'
       def WORKSPACE = readFile('workspace.loc').trim()
