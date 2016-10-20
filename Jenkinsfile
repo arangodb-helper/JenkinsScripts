@@ -281,7 +281,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 }
 
 def setupEnvCompileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl) {
-  def outDir = ""
+    def outDir = ""
+    print("before")
   if (buildEnvironment['docker']) {
     node {
       docker.withRegistry(REGISTRY_URL, '') {
@@ -304,7 +305,8 @@ def setupEnvCompileSource(buildEnv, Boolean buildUnittestTarball, String enterpr
       }
     }
   }
-  else {
+    else {
+	print("else")
     node(buildEnvironment['name']){
       echo "building on ${buildEnvironment['name']}"
       sh 'pwd > workspace.loc'
