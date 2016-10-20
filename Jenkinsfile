@@ -69,11 +69,6 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
   where['releaseOutDir'] = releaseOutDir
 }
 
-def setWorkspace(where, String WD) {
-    print("setting workspace")
-    return ['testWorkingDirectory': "${WD}/${where['testRunName']}" ] + where
-}
-
 def copyExtractTarBall (where, String buildHost) {
   print("${where['testRunName']}: copyExtractTarBall\n")
   
@@ -99,16 +94,16 @@ python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']}
   sh CMD
 }
 
-def setupTestArea(where) {
+def setupTestArea(where, testWorkingDirectory) {
   if (VERBOSE) {
     print("${where['testRunName']}: setupTestArea\n")
     print(where)
   }
   
-  def createDirectory = "mkdir -p ${where['testWorkingDirectory']}/out/ "
-  def cleanOutFiles = "rm -rf ${where['testWorkingDirectory']}/out/*"
-  def removeOldSymlinks = "cd ${where['testWorkingDirectory']}/; find . -type l -exec rm -f {} \\;;"
-  def createNewSymlinks = "ln -s ${where['localExtractDir']}/* ${where['testWorkingDirectory']}/"
+  def createDirectory = "mkdir -p ${testWorkingDirectory}/out/ "
+  def cleanOutFiles = "rm -rf ${testWorkingDirectory}/out/*"
+  def removeOldSymlinks = "cd ${testWorkingDirectory}/; find . -type l -exec rm -f {} \\;;"
+  def createNewSymlinks = "ln -s ${where['localExtractDir']}/* ${testWorkingDirectory}/"
   if (VERBOSE) {
     sh "cat /mnt/workspace/issue"
     print(cleanOutFiles)
@@ -124,19 +119,19 @@ def setupTestArea(where) {
   sh createNewSymlinks
 }
 
-def runTests(where) {
+def runTests(where, testWorkingDirectory) {
   if (VERBOSE) {
     print("${where['testRunName']}: runTests")
   }
 
-  def RCFile = "${where['testWorkingDirectory']}/out/rc"
+  def RCFile = "${testWorkingDirectory}/out/rc"
   def EXECUTE_TEST="""pwd;
          cat /mnt/workspace/issue
-         export TMPDIR=${where['testWorkingDirectory']}/out/tmp
+         export TMPDIR=${testWorkingDirectory}/out/tmp
          mkdir -p \${TMPDIR}
          echo 0 > ${RCFile}
          ls -l
-         bash -x ${where['testWorkingDirectory']}/scripts/unittest ${where['unitTests']} \
+         bash -x ${testWorkingDirectory}/scripts/unittest ${where['unitTests']} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
                 ${where['cmdLineArgs']} || \
@@ -152,13 +147,13 @@ def runTests(where) {
     currentBuild.result = 'FAILURE'
   }
   if (VERBOSE) {
-    echo "${where['testRunName']}: recording results [ ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml ]:"
-    sh "ls -l ${where['testWorkingDirectory']}/out/UNITTEST_RESULT_*.xml"
+    echo "${where['testRunName']}: recording results [ ${testWorkingDirectory}/out/UNITTEST_RESULT_*.xml ]:"
+    sh "ls -l ${testWorkingDirectory}/out/UNITTEST_RESULT_*.xml"
   }
   junit "out/UNITTEST_RESULT_*.xml"
   //step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
   print("The currentBuild.result is: ${currentBuild.result}")
-  def testFailuresFile = "${where['testWorkingDirectory']}/out/testfailures.txt"
+  def testFailuresFile = "${testWorkingDirectory}/out/testfailures.txt"
   def failureOutput = readFile(testFailuresFile)
   if (failureOutput.size() > 5) {
     echo "FAILING NOW!"
@@ -167,7 +162,7 @@ def runTests(where) {
     currentBuild.result = 'FAILURE'
   }
   else {
-    def executiveSummary = readFile("${where['testWorkingDirectory']}/out/UNITTEST_RESULT_EXECUTIVE_SUMMARY.json").trim()
+    def executiveSummary = readFile("${testWorkingDirectory}/out/UNITTEST_RESULT_EXECUTIVE_SUMMARY.json").trim()
     echo "executiveSummary: ${executiveSummary}"
     if (executiveSummary == "true") {
       currentBuild.result = 'SUCCESS'
@@ -177,7 +172,7 @@ def runTests(where) {
   }
 }
 
-def runThisTest(which, buildEnvironment)
+def runThisTest(which, buildEnvironment, testWorkingDirectory)
 {
     print('runThisTest')
     
@@ -187,7 +182,7 @@ def runThisTest(which, buildEnvironment)
     node {
       sh 'pwd > workspace.loc'
       def WORKSPACE = readFile('workspace.loc').trim()
-      where = setWorkspace(where, WORKSPACE)
+	def testWorkingDirectory="${WD}/${where['testRunName']}"
       if (VERBOSE) {
         print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
       }
@@ -206,9 +201,9 @@ def runThisTest(which, buildEnvironment)
               sh "pwd"
               echo "${env} ${buildHost}"
             }
-            copyExtractTarBall(where, buildHost)
-            setupTestArea(where)
-            runTests(where)
+              copyExtractTarBall(where, buildHost, testWorkingDirectory)
+              setupTestArea(where, testWorkingDirectory)
+              runTests(where, testWorkingDirectory)
 
           }
         }
@@ -223,7 +218,7 @@ def runThisTest(which, buildEnvironment)
 	    sh 'pwd > workspace.loc'
 	    def WORKSPACE = readFile('workspace.loc').trim()
 	    print("setting workspace")
-	    myWhere = setWorkspace(where, WORKSPACE)
+	    def testWorkingDirectory="${WD}/${where['testRunName']}"
 	    print("done")
 	    if (VERBOSE) {
 		print("hello ${which}: ${mywhere['testRunName']} ${mywhere} RUNNING in ${WORKSPACE}")
@@ -234,9 +229,9 @@ def runThisTest(which, buildEnvironment)
 		    echo "Hi, I'm [${mywhere['testRunName']}] - ${mywhere['unitTests']}"
 		}
 		def buildHost=buildEnvironment['name']
-		copyExtractTarBall(mywhere, buildHost)
-		setupTestArea(mywhere)
-		runTests(mywhere)
+		copyExtractTarBall(mywhere, buildHost, testWorkingDirectory)
+		setupTestArea(mywhere, testWorkingDirectory)
+		runTests(mywhere, testWorkingDirectory)
 	    }
 	}
   }
