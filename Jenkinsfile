@@ -224,6 +224,7 @@ def runThisTest(which, buildEnvironment)
 	    def WORKSPACE = readFile('workspace.loc').trim()
 	    print("setting workspace")
 	    myWhere = setWorkspace(where, WORKSPACE)
+	    print("done")
 	    if (VERBOSE) {
 		print("hello ${which}: ${mywhere['testRunName']} ${mywhere} RUNNING in ${WORKSPACE}")
 	    }
