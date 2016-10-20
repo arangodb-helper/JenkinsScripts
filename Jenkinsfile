@@ -25,12 +25,12 @@ testParams = [:]
 //def preferBuilder="ubuntusixteenofour"
 def preferBuilder="macos"
 def CONTAINERS=[
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "" ],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "" ],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'opensusethirteen',    'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "" ],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessie',        'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "" ],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntufourteenofour', 'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "" ],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntusixteenofour',  'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "" ],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "--jemalloc" ],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "--jemalloc" ],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'opensusethirteen',    'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "--jemalloc" ],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessie',        'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "--jemalloc" ],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntufourteenofour', 'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "--jemalloc" ],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntusixteenofour',  'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "--jemalloc" ],
   [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS', 'OS': "Windows", 'buildArgs': "--msvc"],
   [ 'buildType': 'native', 'testType': 'native', 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "MacOSX", 'buildArgs': "--clang"],
 ]
@@ -241,7 +241,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (!buildUnittestTarball) {
       outDir = getReleaseOutDir(enterpriseUrl, ${env.JOB_NAME})
     }
-    def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --jemalloc --targetDir ${outDir} ${buildEnv['buildArgs']}"
+      print(buildEnv)
+    def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
     if (! buildUnittestTarball) {
       BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} "
     }
