@@ -106,7 +106,7 @@ def setupTestArea(where) {
   
   def createDirectory = "mkdir -p ${where['testWorkingDirectory']}/out/ "
   def cleanOutFiles = "rm -rf ${where['testWorkingDirectory']}/out/*"
-  def removeOldSymlinks = "cd ${where['testWorkingDirectory']}/; find -type l -exec rm -f {} \\;;"
+  def removeOldSymlinks = "cd ${where['testWorkingDirectory']}/; find . -type l -exec rm -f {} \\;;"
   def createNewSymlinks = "ln -s ${where['localExtractDir']}/* ${where['testWorkingDirectory']}/"
   if (VERBOSE) {
     sh "cat /mnt/workspace/issue"
