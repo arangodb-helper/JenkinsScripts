@@ -221,17 +221,17 @@ def runThisTest(which, buildEnvironment)
 	    testWorkingDirectory="${WORKSPACE}/${where['testRunName']}"
 	    print("done")
 	    if (VERBOSE) {
-		print("hello ${which}: ${mywhere['testRunName']} ${mywhere} RUNNING in ${WORKSPACE}")
+		print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
 	    }
-	    dir("${mywhere['testRunName']}") {
+	    dir("${where['testRunName']}") {
 		print("on directory")
 		if (VERBOSE) {
-		    echo "Hi, I'm [${mywhere['testRunName']}] - ${mywhere['unitTests']}"
+		    echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
 		}
 		def buildHost=buildEnvironment['name']
-		copyExtractTarBall(mywhere, buildHost, testWorkingDirectory)
-		setupTestArea(mywhere, testWorkingDirectory)
-		runTests(mywhere, testWorkingDirectory)
+		copyExtractTarBall(where, buildHost, testWorkingDirectory)
+		setupTestArea(where, testWorkingDirectory)
+		runTests(where, testWorkingDirectory)
 	    }
 	}
   }
