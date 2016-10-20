@@ -25,14 +25,14 @@ testParams = [:]
 //def preferBuilder="ubuntusixteenofour"
 def preferBuilder="macos"
 def CONTAINERS=[
-  [ 'docker': true,  'name': 'centosix',            'packageFormat': 'RPM', 'OS': "Linux" ],
-  [ 'docker': true,  'name': 'centoseven',          'packageFormat': 'RPM', 'OS': "Linux" ],
-  [ 'docker': true,  'name': 'opensusethirteen',    'packageFormat': 'RPM', 'OS': "Linux" ],
-  [ 'docker': true,  'name': 'debianjessie',        'packageFormat': 'DEB', 'OS': "Linux" ],
-  [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB', 'OS': "Linux" ],
-  [ 'docker': true,  'name': 'ubuntusixteenofour',  'packageFormat': 'DEB', 'OS': "Linux" ],
-  [ 'docker': false, 'name': 'windows',             'packageFormat': 'NSIS', 'OS': "Windows"],
-  [ 'docker': false, 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "MacOSX"],
+  [ 'docker': true,  'name': 'centosix',            'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "" ],
+  [ 'docker': true,  'name': 'centoseven',          'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "" ],
+  [ 'docker': true,  'name': 'opensusethirteen',    'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "" ],
+  [ 'docker': true,  'name': 'debianjessie',        'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "" ],
+  [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "" ],
+  [ 'docker': true,  'name': 'ubuntusixteenofour',  'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "" ],
+    [ 'docker': false, 'name': 'windows',             'packageFormat': 'NSIS', 'OS': "Windows", 'buildArgs': ""],
+    [ 'docker': false, 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "MacOSX", 'buildArgs': "--clang"],
 ]
 
 for (int c  = 0; c < CONTAINERS.size(); c++) {
@@ -241,7 +241,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (!buildUnittestTarball) {
       outDir = getReleaseOutDir(enterpriseUrl, ${env.JOB_NAME})
     }
-      def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --jemalloc --targetDir ${outDir} "
+    def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --jemalloc --targetDir ${outDir} ${buildEnv['buildArgs']}"
     if (! buildUnittestTarball) {
       BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} "
     }
