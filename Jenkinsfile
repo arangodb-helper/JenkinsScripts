@@ -70,6 +70,7 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
 }
 
 def setWorkspace(where, String WD) {
+    print("setting workspace")
     return ['testWorkingDirectory': "${WD}/${where['testRunName']}" ] + where
 }
 
