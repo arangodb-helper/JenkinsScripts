@@ -172,7 +172,7 @@ def runTests(where, testWorkingDirectory) {
   }
 }
 
-def runThisTest(which, buildEnvironment, testWorkingDirectory)
+def runThisTest(which, buildEnvironment)
 {
     print('runThisTest')
     def testWorkingDirectory;
