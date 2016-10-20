@@ -175,14 +175,14 @@ def runTests(where, testWorkingDirectory) {
 def runThisTest(which, buildEnvironment, testWorkingDirectory)
 {
     print('runThisTest')
-    
+    def testWorkingDirectory;
   def where = testParams[which]
     if (buildEnvironment['testType'] == 'docker') {
 	print("in")
     node {
       sh 'pwd > workspace.loc'
       def WORKSPACE = readFile('workspace.loc').trim()
-	def testWorkingDirectory="${WD}/${where['testRunName']}"
+      testWorkingDirectory="${WD}/${where['testRunName']}"
       if (VERBOSE) {
         print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
       }
@@ -218,7 +218,7 @@ def runThisTest(which, buildEnvironment, testWorkingDirectory)
 	    sh 'pwd > workspace.loc'
 	    def WORKSPACE = readFile('workspace.loc').trim()
 	    print("setting workspace")
-	    def testWorkingDirectory="${WD}/${where['testRunName']}"
+	    testWorkingDirectory="${WD}/${where['testRunName']}"
 	    print("done")
 	    if (VERBOSE) {
 		print("hello ${which}: ${mywhere['testRunName']} ${mywhere} RUNNING in ${WORKSPACE}")
