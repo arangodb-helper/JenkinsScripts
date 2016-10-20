@@ -286,7 +286,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
   if (buildEnvironment['docker']) {
     node {
       docker.withRegistry(REGISTRY_URL, '') {
-        def myBuildImage = docker.image("${buildEnv['name']}/build")
+        def myBuildImage = docker.image("${buildEnvironment['name']}/build")
         myBuildImage.pull()
         docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
           if (VERBOSE) {
@@ -300,7 +300,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
           outDir = "${WORKSPACE}/out"
-          compileSource(buildEnv, buildUnittestTarball, enterpriseUrl, outDir)
+          compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir)
         }
       }
     }
@@ -312,7 +312,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
       sh 'pwd > workspace.loc'
       WORKSPACE = readFile('workspace.loc').trim()
       outDir = "${WORKSPACE}/out"
-      compileSource(buildEnv, buildUnittestTarball, enterpriseUrl, outDir)
+      compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir)
     }
   }
 }
