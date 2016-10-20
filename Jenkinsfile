@@ -350,6 +350,7 @@ else {
   
 stage("building ArangoDB")
 try {
+    print(DOCKER_CONTAINER)
   setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
 } catch (err) {
   stage('Send Notification for build' )
