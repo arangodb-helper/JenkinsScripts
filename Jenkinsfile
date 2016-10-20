@@ -280,7 +280,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
   }
 }
 
-def setupEnvCompileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl) {
+def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl) {
     def outDir = ""
     print("before")
   if (buildEnvironment['docker']) {
