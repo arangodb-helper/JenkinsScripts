@@ -415,11 +415,11 @@ try {
 	    ['http_server', 'http_server', ""],
 	    ["shell_client", 'shell_client', ""],
 	    ["shell_server_aql", 'shell_server_aql', ""],
-	    ["dump_import", 'dump.importing', ""],
-	    ["shell_server", 'shell_server', ""],
-	    ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
-	    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
-	    ["arangosh", 'arangosh', ""],
+//	    ["dump_import", 'dump.importing', ""],
+//	    ["shell_server", 'shell_server', ""],
+//	    ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
+//	    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
+//	    ["arangosh", 'arangosh', ""],
 	]
     }
     print("getting keyset\n")
