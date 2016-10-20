@@ -182,7 +182,7 @@ def runThisTest(which, buildEnvironment)
     node {
       sh 'pwd > workspace.loc'
       def WORKSPACE = readFile('workspace.loc').trim()
-      testWorkingDirectory="${WD}/${where['testRunName']}"
+      testWorkingDirectory="${WORKSPACE}/${where['testRunName']}"
       if (VERBOSE) {
         print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
       }
@@ -218,7 +218,7 @@ def runThisTest(which, buildEnvironment)
 	    sh 'pwd > workspace.loc'
 	    def WORKSPACE = readFile('workspace.loc').trim()
 	    print("setting workspace")
-	    testWorkingDirectory="${WD}/${where['testRunName']}"
+	    testWorkingDirectory="${WORKSPACE}/${where['testRunName']}"
 	    print("done")
 	    if (VERBOSE) {
 		print("hello ${which}: ${mywhere['testRunName']} ${mywhere} RUNNING in ${WORKSPACE}")
