@@ -70,7 +70,7 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
 }
 
 def setWorkspace(where, String WD) {
-  where['testWorkingDirectory'] = "${WD}/${where['testRunName']}"
+    return ['testWorkingDirectory': "${WD}/${where['testRunName']}" ] + where
 }
 
 def copyExtractTarBall (where, String buildHost) {
@@ -186,7 +186,7 @@ def runThisTest(which, buildEnvironment)
     node {
       sh 'pwd > workspace.loc'
       def WORKSPACE = readFile('workspace.loc').trim()
-      setWorkspace(where, WORKSPACE)
+      where = setWorkspace(where, WORKSPACE)
       if (VERBOSE) {
         print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
       }
@@ -222,19 +222,19 @@ def runThisTest(which, buildEnvironment)
 	    sh 'pwd > workspace.loc'
 	    def WORKSPACE = readFile('workspace.loc').trim()
 	    print("setting workspace")
-	    setWorkspace(where, WORKSPACE)
+	    myWhere = setWorkspace(where, WORKSPACE)
 	    if (VERBOSE) {
-		print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
+		print("hello ${which}: ${mywhere['testRunName']} ${mywhere} RUNNING in ${WORKSPACE}")
 	    }
-	    dir("${where['testRunName']}") {
+	    dir("${mywhere['testRunName']}") {
 		print("on directory")
 		if (VERBOSE) {
-		    echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
+		    echo "Hi, I'm [${mywhere['testRunName']}] - ${mywhere['unitTests']}"
 		}
 		def buildHost=buildEnvironment['name']
-		copyExtractTarBall(where, buildHost)
-		setupTestArea(where)
-		runTests(where)
+		copyExtractTarBall(mywhere, buildHost)
+		setupTestArea(mywhere)
+		runTests(mywhere)
 	    }
 	}
   }
