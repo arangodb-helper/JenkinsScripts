@@ -25,14 +25,14 @@ testParams = [:]
 //def preferBuilder="ubuntusixteenofour"
 def preferBuilder="macos"
 def CONTAINERS=[
-  [ 'docker': true,  'name': 'centosix',            'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "" ],
-  [ 'docker': true,  'name': 'centoseven',          'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "" ],
-  [ 'docker': true,  'name': 'opensusethirteen',    'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "" ],
-  [ 'docker': true,  'name': 'debianjessie',        'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "" ],
-  [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "" ],
-  [ 'docker': true,  'name': 'ubuntusixteenofour',  'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "" ],
-    [ 'docker': false, 'name': 'windows',             'packageFormat': 'NSIS', 'OS': "Windows", 'buildArgs': ""],
-    [ 'docker': false, 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "MacOSX", 'buildArgs': "--clang"],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "" ],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "" ],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'opensusethirteen',    'packageFormat': 'RPM', 'OS': "Linux", 'buildArgs': "" ],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessie',        'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "" ],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntufourteenofour', 'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "" ],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntusixteenofour',  'packageFormat': 'DEB', 'OS': "Linux", 'buildArgs': "" ],
+  [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS', 'OS': "Windows", 'buildArgs': "--msvc"],
+  [ 'buildType': 'native', 'testType': 'native', 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "MacOSX", 'buildArgs': "--clang"],
 ]
 
 for (int c  = 0; c < CONTAINERS.size(); c++) {
@@ -177,7 +177,7 @@ def runTests(where) {
 def runThisTest(which, buildEnvironment)
 {
   def where = testParams[which]
-  if (buildEnvironment['docker']) {
+  if (buildEnvironment['testType'] == 'docker') {
     node {
       sh 'pwd > workspace.loc'
       def WORKSPACE = readFile('workspace.loc').trim()
@@ -283,7 +283,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl) {
     def outDir = ""
     print("before")
-  if (buildEnvironment['docker']) {
+  if (buildEnvironment['compileType'] == 'docker') {
     node {
       docker.withRegistry(REGISTRY_URL, '') {
         def myBuildImage = docker.image("${buildEnvironment['name']}/build")
@@ -318,7 +318,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
 }
 
 stage("cloning source")
-if (DOCKER_CONTAINER['docker']) {
+if (DOCKER_CONTAINER['buildType'] == 'docker') {
   node {
     if (VERBOSE) {
       sh "mount"
