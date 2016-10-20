@@ -398,9 +398,15 @@ try {
   ]
   print("getting keyset\n")
   def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, env.JOB_NAME)
-  node {
-    sh "mkdir -p ${releaseOutDir}/results/ ; rm -f ${releaseOutDir}/results/*;"
-  }
+    if (DOCKER_CONTAINER['buildType'] == 'docker') {
+	node {
+	    sh "mkdir -p ${releaseOutDir}/results/ ; rm -f ${releaseOutDir}/results/*;"
+	}
+    } else {
+	node(DOCKER_CONTAINER['name']) {
+	    sh "mkdir -p ${releaseOutDir}/results/ ; rm -f ${releaseOutDir}/results/*;"
+	}
+    }
   m = testCaseSets.size()
   int n = 0;
   for (int i = 0; i < m; i++) {
