@@ -25,14 +25,14 @@ testParams = [:]
 //def preferBuilder="ubuntusixteenofour"
 def preferBuilder="macos"
 def CONTAINERS=[
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc", 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc", 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'opensusethirteen',    'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc", 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessie',        'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc", 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntufourteenofour', 'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc", 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntusixteenofour',  'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc", 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
-  [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "Windows", 'buildArgs': "--msvc",     'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
-  [ 'buildType': 'native', 'testType': 'native', 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "Darwin",  'buildArgs': "--clang",    'LOCALFS': '/Users/jenkins/mnt/workspace/tmp/', 'FS': '/Users/jenkins/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'opensusethirteen',    'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessie',        'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntufourteenofour', 'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntusixteenofour',  'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "Windows", 'buildArgs': "--msvc",     'cluster': false, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'native', 'testType': 'native', 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "Darwin",  'buildArgs': "--clang",    'cluster': false, 'LOCALFS': '/Users/jenkins/mnt/workspace/tmp/', 'FS': '/Users/jenkins/net/fileserver/'],
 ]
 
 for (int c  = 0; c < CONTAINERS.size(); c++) {
@@ -373,35 +373,50 @@ try {
 
 stage("running unittest")
 try {
-  def testCaseSets = [ 
-    //  ["fail", 'fail', ""],
-    //    ["fail", 'fail', ""],
-    ['http_server', 'http_server', "",
-     "--cluster true --testBuckets 4/1 ",
-     "--cluster true --testBuckets 4/2 ",
-     "--cluster true --testBuckets 4/3 ",
-     "--cluster true --testBuckets 4/4 "],
-    ["shell_client", 'shell_client', "",
-     "--cluster true --testBuckets 4/1 ",
-     "--cluster true --testBuckets 4/2 ",
-     "--cluster true --testBuckets 4/3 ",
-     "--cluster true --testBuckets 4/4 "],
-    ["shell_server_aql", 'shell_server_aql', "",
-     "--cluster true --testBuckets 4/1 ",
-     "--cluster true --testBuckets 4/2 ",
-     "--cluster true --testBuckets 4/3 ",
-     "--cluster true --testBuckets 4/4 "],
-    ["dump_import", 'dump.importing', "", "--cluster true"],
-    ["shell_server", 'shell_server', "",
-     "--cluster true --testBuckets 4/1 ",
-     "--cluster true --testBuckets 4/2 ",
-     "--cluster true --testBuckets 4/3 ",
-     "--cluster true --testBuckets 4/4 "],
-    ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
-    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
-    ["arangosh", 'arangosh', ""],
-  ]
-  print("getting keyset\n")
+    if (DOCKER_CONTAINER['cluster']) {
+	def testCaseSets = [ 
+	    //  ["fail", 'fail', ""],
+	    //    ["fail", 'fail', ""],
+	    ['http_server', 'http_server', "",
+	     "--cluster true --testBuckets 4/1 ",
+	     "--cluster true --testBuckets 4/2 ",
+	     "--cluster true --testBuckets 4/3 ",
+	     "--cluster true --testBuckets 4/4 "],
+	    ["shell_client", 'shell_client', "",
+	     "--cluster true --testBuckets 4/1 ",
+	     "--cluster true --testBuckets 4/2 ",
+	     "--cluster true --testBuckets 4/3 ",
+	     "--cluster true --testBuckets 4/4 "],
+	    ["shell_server_aql", 'shell_server_aql', "",
+	     "--cluster true --testBuckets 4/1 ",
+	     "--cluster true --testBuckets 4/2 ",
+	     "--cluster true --testBuckets 4/3 ",
+	     "--cluster true --testBuckets 4/4 "],
+	    ["dump_import", 'dump.importing', "", "--cluster true"],
+	    ["shell_server", 'shell_server', "",
+	     "--cluster true --testBuckets 4/1 ",
+	     "--cluster true --testBuckets 4/2 ",
+	     "--cluster true --testBuckets 4/3 ",
+	     "--cluster true --testBuckets 4/4 "],
+	    ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
+	    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
+	    ["arangosh", 'arangosh', ""],
+	]
+    } else {
+	def testCaseSets = [ 
+	    //  ["fail", 'fail', ""],
+	    //    ["fail", 'fail', ""],
+	    ['http_server', 'http_server', ""],
+	    ["shell_client", 'shell_client', ""],
+	    ["shell_server_aql", 'shell_server_aql', ""],
+	    ["dump_import", 'dump.importing', ""],
+	    ["shell_server", 'shell_server', ""],
+	    ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
+	    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
+	    ["arangosh", 'arangosh', ""],
+	]
+    }
+    print("getting keyset\n")
   def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, env.JOB_NAME)
     if (DOCKER_CONTAINER['buildType'] == 'docker') {
 	node {
