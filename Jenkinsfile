@@ -25,19 +25,21 @@ testParams = [:]
 //def preferBuilder="ubuntusixteenofour"
 def preferBuilder="macos"
 def CONTAINERS=[
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc" ],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc" ],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'opensusethirteen',    'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc" ],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessie',        'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc" ],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntufourteenofour', 'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc" ],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntusixteenofour',  'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc" ],
-  [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "Windows", 'buildArgs': "--msvc"],
-  [ 'buildType': 'native', 'testType': 'native', 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "Darwin",  'buildArgs': "--clang"],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc", 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc", 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'opensusethirteen',    'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc", 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessie',        'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc", 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntufourteenofour', 'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc", 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntusixteenofour',  'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc", 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "Windows", 'buildArgs': "--msvc",     'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'native', 'testType': 'native', 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "Darwin",  'buildArgs': "--clang",    'LOCALFS': '/Users/jenkins/mnt/workspace/tmp/', 'FS': '/Users/jenkins/net/fileserver/'],
 ]
 
 for (int c  = 0; c < CONTAINERS.size(); c++) {
   if (CONTAINERS[c]['name'] == preferBuilder) {
-    DOCKER_CONTAINER = CONTAINERS[c]
+      DOCKER_CONTAINER = CONTAINERS[c]
+      RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
+      LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
   }
 }
 
@@ -192,7 +194,7 @@ def runThisTest(which, buildEnvironment)
         docker.withRegistry(REGISTRY_URL, '') {
           def myRunImage = docker.image("${buildEnvironment['name']}/run")
           myRunImage.pull()
-          docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw --volume /var/lib/systemd/coredump:/var/lib/systemd/coredump:rw') {
+          docker.image(myRunImage.imageName()).inside('--volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw --volume /jenkins:/mnt/:rw --volume /var/lib/systemd/coredump:/var/lib/systemd/coredump:rw') {
             def buildHost=sh(returnStdout: true, script: "cat /mnt/workspace/issue").trim()
             buildHost = buildHost[-40..-1]
             if (VERBOSE) {
@@ -289,7 +291,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
       docker.withRegistry(REGISTRY_URL, '') {
         def myBuildImage = docker.image("${buildEnvironment['name']}/build")
         myBuildImage.pull()
-        docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
+        docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw --volume /jenkins:/mnt/:rw ') {
           if (VERBOSE) {
             sh "mount"
             sh "pwd"
