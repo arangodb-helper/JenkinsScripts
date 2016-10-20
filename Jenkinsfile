@@ -217,23 +217,26 @@ def runThisTest(which, buildEnvironment)
     else {
 	print("else")
 	print(buildEnvironment)
-    node(buildEnvironment['name']){
-      sh 'pwd > workspace.loc'
-      def WORKSPACE = readFile('workspace.loc').trim()
-      setWorkspace(where, WORKSPACE)
-      if (VERBOSE) {
-        print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
-      }
-      dir("${where['testRunName']}") {
-        if (VERBOSE) {
-          echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
-        }
-        def buildHost=buildEnvironment['name']
-        copyExtractTarBall(where, buildHost)
-        setupTestArea(where)
-        runTests(where)
-      }
-    }
+	node(buildEnvironment['name']){
+	    print("on node")
+	    sh 'pwd > workspace.loc'
+	    def WORKSPACE = readFile('workspace.loc').trim()
+	    print("setting workspace")
+	    setWorkspace(where, WORKSPACE)
+	    if (VERBOSE) {
+		print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
+	    }
+	    dir("${where['testRunName']}") {
+		print("on directory")
+		if (VERBOSE) {
+		    echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
+		}
+		def buildHost=buildEnvironment['name']
+		copyExtractTarBall(where, buildHost)
+		setupTestArea(where)
+		runTests(where)
+	    }
+	}
   }
 }
 
