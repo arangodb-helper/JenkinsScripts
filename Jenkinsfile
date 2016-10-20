@@ -376,8 +376,9 @@ try {
 
 stage("running unittest")
 try {
+    def testCaseSets = [:]
     if (DOCKER_CONTAINER['cluster']) {
-	def testCaseSets = [ 
+	testCaseSets = [ 
 	    //  ["fail", 'fail', ""],
 	    //    ["fail", 'fail', ""],
 	    ['http_server', 'http_server', "",
@@ -406,7 +407,7 @@ try {
 	    ["arangosh", 'arangosh', ""],
 	]
     } else {
-	def testCaseSets = [ 
+	testCaseSets = [ 
 	    //  ["fail", 'fail', ""],
 	    //    ["fail", 'fail', ""],
 	    ['http_server', 'http_server', ""],
