@@ -69,7 +69,7 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
   where['releaseOutDir'] = releaseOutDir
 }
 
-def copyExtractTarBall (where, String buildHost) {
+def copyExtractTarBall (where, String buildHost, String testWorkingDirectory) {
   print("${where['testRunName']}: copyExtractTarBall\n")
   
   CMD = """
