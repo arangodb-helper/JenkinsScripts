@@ -120,14 +120,13 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
           if (VERBOSE) {
             sh "mount"
             sh "pwd"
-          }
-          if (VERBOSE) {
             sh "cat /etc/issue /mnt/workspace/issue"
           }
         
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
           outDir = "${WORKSPACE}/out"
+          echo "checking out: "
           compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir)
         }
       }
@@ -143,17 +142,6 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
     }
   }
 }
-
-
-for (int c  = 0; c < CONTAINERS.size(); c++) {
-  if (CONTAINERS[c]['name'] == preferBuilder) {
-    DOCKER_CONTAINER = CONTAINERS[c]
-    RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
-    LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
-  }
-}
-
-OS = DOCKER_CONTAINER['OS']
 
 
 stage("cloning source")
