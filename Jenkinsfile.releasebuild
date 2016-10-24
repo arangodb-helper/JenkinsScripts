@@ -28,15 +28,26 @@ def CONTAINERS=[
   [ 'buildType': 'native', 'testType': 'native', 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "Darwin",  'buildArgs': "--clang",    'cluster': false, 'LOCALFS': '/Users/jenkins/mnt/workspace/tmp/', 'FS': '/Users/jenkins/net/fileserver/'],
 ]
 
-for (int c  = 0; c < CONTAINERS.size(); c++) {
-  if (CONTAINERS[c]['name'] == preferBuilder) {
-    DOCKER_CONTAINER = CONTAINERS[c]
-    RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
-    LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
+if (preferBuilder.size() > 0) {
+  for (int c  = 0; c < CONTAINERS.size(); c++) {
+    if (CONTAINERS[c]['name'] == preferBuilder) {
+      DOCKER_CONTAINER = CONTAINERS[c]
+      RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
+      LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
+    }
+  }
+} else {
+  for (int c  = 0; c < CONTAINERS.size(); c++) {
+    if (CONTAINERS[c]['buildType'] == 'docker') {
+      DOCKER_CONTAINER = CONTAINERS[c]
+      RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
+      LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
+    }
   }
 }
 
 OS = DOCKER_CONTAINER['OS']
+
 
 def getReleaseOutDir(String enterpriseUrl, String jobname) {
   if (enterpriseUrl.size() > 10) {
@@ -133,6 +144,18 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
   }
 }
 
+
+for (int c  = 0; c < CONTAINERS.size(); c++) {
+  if (CONTAINERS[c]['name'] == preferBuilder) {
+    DOCKER_CONTAINER = CONTAINERS[c]
+    RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
+    LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
+  }
+}
+
+OS = DOCKER_CONTAINER['OS']
+
+
 stage("cloning source")
 if (DOCKER_CONTAINER['buildType'] == 'docker') {
   node {
@@ -167,8 +190,22 @@ else {
   
 stage("building ArangoDB")
 try {
-  print(DOCKER_CONTAINER)
-  setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
+  if (preferBuilder.size() > 0) {
+    print(DOCKER_CONTAINER)
+    setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
+  }
+  else {
+    for (int c  = 0; c < CONTAINERS.size(); c++) {
+      if (CONTAINERS[c]['buildType'] == 'docker') {
+        DOCKER_CONTAINER = CONTAINERS[c]
+        RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
+        LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
+        OS = DOCKER_CONTAINER['OS']
+        print(DOCKER_CONTAINER)
+        setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
+      }
+    }
+  }
 } catch (err) {
   stage('Send Notification for build' )
   mail (to: ADMIN_ACCOUNT, 
