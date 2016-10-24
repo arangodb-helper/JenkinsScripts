@@ -70,6 +70,8 @@ stage("building ArangoDB")
         docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
           sh "mount"
           sh "pwd"
+          sh "whoami"
+          sh "cat /etc/passwd"
           sh "cat /etc/issue /mnt/workspace/issue"
 
           sh 'pwd > workspace.loc'
