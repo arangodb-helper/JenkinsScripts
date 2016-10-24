@@ -136,6 +136,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
     }
   }
   else {
+    print("building native")
     node(buildEnvironment['name']){
       print "else:"
       echo "building on ${buildEnvironment['name']}"
