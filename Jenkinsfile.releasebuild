@@ -59,7 +59,7 @@ def getReleaseOutDir(String enterpriseUrl, String jobname) {
   return outDir
 }
 
-def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir) {
+def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir, String envName) {
   try {
     def EP=""
     def XEP=""
@@ -68,7 +68,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       XEP="EP"
     }
     if (!buildUnittestTarball) {
-      outDir = getReleaseOutDir(enterpriseUrl, "${env.JOB_NAME}")
+      outDir = getReleaseOutDir(enterpriseUrl, envName)
     }
     print(buildEnv)
     def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
@@ -134,7 +134,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
           echo "${WORKSPACE}/out"
           outDir = "${WORKSPACE}/out"
           echo "checking out: "
-          compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir)
+          compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir, buildEnvironment['name'])
         }
       }
     }
@@ -147,7 +147,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
       sh 'pwd > workspace.loc'
       WORKSPACE = readFile('workspace.loc').trim()
       outDir = "${WORKSPACE}/out"
-      compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir)
+      compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir, buildEnvironment['name'])
     }
   }
 }
