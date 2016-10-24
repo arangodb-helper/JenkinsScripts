@@ -124,7 +124,8 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
           if (VERBOSE) {
             sh "mount"
             sh "pwd"
-            sh "cat /etc/issue /mnt/workspace/issue"
+            sh "cat /etc/issue /mnt/workspace/issue /etc/passwd"
+            
           }
         
           sh 'pwd > workspace.loc'
