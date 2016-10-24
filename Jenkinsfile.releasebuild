@@ -11,10 +11,10 @@ def CONTAINERS=[
 // [ 'docker': true,  'name': 'centoseven', 'packageFormat': 'RPM'],
  // [ 'docker': true,  'name': 'fedoratwentythree', 'packageFormat': 'RPM'],
 // [ 'docker': true,  'name': 'opensusethirteen', 'packageFormat': 'RPM'],
-// [ 'docker': true,  'name': 'debianjessie', 'packageFormat': 'DEB'],
+ [ 'docker': true,  'name': 'debianjessie', 'packageFormat': 'DEB'],
 // [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB'],
 // [ 'docker': true,  'name': 'ubuntusixteenofour', 'packageFormat': 'DEB'],
-  [ 'docker': false, 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "MacOSX"],
+//  [ 'docker': false, 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "MacOSX"],
 ]
 
 def OS="Linux"
