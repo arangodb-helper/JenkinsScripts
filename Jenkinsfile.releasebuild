@@ -1,6 +1,4 @@
 #!groovy
-
-#!groovy
 // We need these modules:
 //
 // We need permisions for several string manipulation operations, like take()
