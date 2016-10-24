@@ -119,7 +119,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
         def myBuildImage = docker.image("${buildEnvironment['name']}/build")
         myBuildImage.pull()
         echo "hello before docker"
-        docker.image(myBuildImage.imageName()).inside("--volume /net/fileserver:${RELEASE_OUT_DIR}:rw --volume /jenkins:/mnt/:rw ") {
+        docker.image(myBuildImage.imageName()).inside("--volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw --volume /jenkins:/mnt/:rw ") {
           echo "hello from docker"
           if (VERBOSE) {
             sh "mount"
