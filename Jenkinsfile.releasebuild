@@ -188,7 +188,7 @@ stage("building ArangoDB")
 try {
   if (preferBuilder.size() > 0) {
     print(DOCKER_CONTAINER)
-    setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
+    setupEnvCompileSource(DOCKER_CONTAINER, false, ENTERPRISE_URL)
   }
   else {
     for (int c  = 0; c < CONTAINERS.size(); c++) {
@@ -198,7 +198,7 @@ try {
         LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
         OS = DOCKER_CONTAINER['OS']
         print(DOCKER_CONTAINER)
-        setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
+        setupEnvCompileSource(DOCKER_CONTAINER, false, ENTERPRISE_URL)
       }
     }
   }
