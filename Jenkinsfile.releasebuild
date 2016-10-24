@@ -125,6 +125,8 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
         
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
+          echo "hi"
+          echo "${WORKSPACE}/out"
           outDir = "${WORKSPACE}/out"
           echo "checking out: "
           compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir)
