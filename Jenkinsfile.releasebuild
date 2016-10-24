@@ -9,12 +9,12 @@ def REGISTRY_URL="https://${REGISTRY}/"
 def CONTAINERS=[
 // [ 'docker': true,  'name': 'centosix', 'packageFormat': 'RPM'],
 // [ 'docker': true,  'name': 'centoseven', 'packageFormat': 'RPM'],
- // [ 'docker': true,  'name': 'fedoratwentythree', 'packageFormat': 'RPM'],
+// [ 'docker': true,  'name': 'fedoratwentythree', 'packageFormat': 'RPM'],
 // [ 'docker': true,  'name': 'opensusethirteen', 'packageFormat': 'RPM'],
- [ 'docker': true,  'name': 'debianjessie', 'packageFormat': 'DEB'],
+// [ 'docker': true,  'name': 'debianjessie', 'packageFormat': 'DEB'],
 // [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB'],
 // [ 'docker': true,  'name': 'ubuntusixteenofour', 'packageFormat': 'DEB'],
-//  [ 'docker': false, 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "MacOSX"],
+ [ 'docker': false, 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "MacOSX"],
 ]
 
 def OS="Linux"
@@ -35,12 +35,8 @@ def fatalError = false
 echo "bla"
 stage("cloning source")
   node {
-    sh "whoami"
-    sh "cat /etc/passwd"
     sh "mount"
     sh "pwd"
-    sh "ls -l /jenkins/workspace"
-    sh "cat /etc/issue /jenkins/workspace/issue"
     def someString="1234567890"
     echo someString.take(5)
     
@@ -56,7 +52,7 @@ stage("cloning source")
 
 
 stage("building ArangoDB")
-//try {
+try {
   for (int c=0; c < CONTAINERS.size(); c++) {
     echo "building No. ${c}: "
     echo CONTAINERS[c]['name']
@@ -70,9 +66,8 @@ stage("building ArangoDB")
         docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
           sh "mount"
           sh "pwd"
-          sh "whoami"
-          sh "cat /etc/passwd"
-          sh "cat /etc/issue /mnt/workspace/issue"
+          
+          // sh "cat /etc/issue /mnt/workspace/issue"
 
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
@@ -85,31 +80,31 @@ stage("building ArangoDB")
           } else {
             OUT_DIR = "${RELEASE_OUT_DIR}/REL/CO/${DOCKER_CONTAINER}"
           }
-          //try {
+          try {
             sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 8 --buildDir build-${XEP}package-${DOCKER_CONTAINER} --package ${PACKAGE_FORMAT} ${EP} --jemalloc --targetDir ${OUT_DIR} "
-          //} catch (err) {
-          //  stage('Send Notification for failed build' ) {
-          //
-          //    mail (to: 'release-bot@arangodb.com',
-          //          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
-          //          body: err.getMessage());
-          //    currentBuild.result = 'FAILURE'
-          //    throw(err)
-          //  }
-          //}
+          } catch (err) {
+            stage('Send Notification for failed build' ) {
+          
+              mail (to: 'release-bot@arangodb.com',
+                    subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
+                    body: err.getMessage());
+              currentBuild.result = 'FAILURE'
+              throw(err)
+            }
+          }
           sh "ls -l ${OUT_DIR}"
         }
       }
     }
   }
-//} catch (err) {
-//  stage('Send FAIL-Notification for build' )
-//  mail (to: ADMIN_ACCOUNT, 
-//        subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
-//        body: err.getMessage());
-//  currentBuild.result = 'FAILURE'
-//  throw(err)
-//}
+} catch (err) {
+  stage('Send FAIL-Notification for build' )
+  mail (to: ADMIN_ACCOUNT, 
+        subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
+        body: err.getMessage());
+  currentBuild.result = 'FAILURE'
+  throw(err)
+}
 
 stage("generating test report")
   node {
