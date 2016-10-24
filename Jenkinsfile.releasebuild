@@ -1,104 +1,186 @@
 #!groovy
+
+#!groovy
 // We need these modules:
 //
 // We need permisions for several string manipulation operations, like take()
-def REGISTRY="192.168.0.1"
-def REGISTRY_URL="https://${REGISTRY}/"
-// def DOCKER_CONTAINER="debianjessie"
+REGISTRY="192.168.0.1"
+REGISTRY_URL="https://${REGISTRY}/"
 
+DOCKER_CONTAINER=[:]
+RELEASE_OUT_DIR="/net/fileserver/"
+LOCAL_TAR_DIR="/mnt/workspace/tmp/"
+branches = [:]
+failures = ""
+ADMIN_ACCOUNT = "release-bot@arangodb.com"
+lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
+lastKnownGitRev = ""
+currentGitRev = ""
+WORKSPACE = ""
+BUILT_FILE = ""
+DIST_FILE = ""
+fatalError = false
+VERBOSE = true
+ENTERPRISE_URL=""// TODO from param
+testParams = [:]
+//def preferBuilder="ubuntusixteenofour"
+def preferBuilder="macos"
 def CONTAINERS=[
-// [ 'docker': true,  'name': 'centosix', 'packageFormat': 'RPM'],
-// [ 'docker': true,  'name': 'centoseven', 'packageFormat': 'RPM'],
-// [ 'docker': true,  'name': 'fedoratwentythree', 'packageFormat': 'RPM'],
-// [ 'docker': true,  'name': 'opensusethirteen', 'packageFormat': 'RPM'],
-// [ 'docker': true,  'name': 'debianjessie', 'packageFormat': 'DEB'],
-// [ 'docker': true,  'name': 'ubuntufourteenofour', 'packageFormat': 'DEB'],
-// [ 'docker': true,  'name': 'ubuntusixteenofour', 'packageFormat': 'DEB'],
- [ 'docker': false, 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "MacOSX"],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'opensusethirteen',    'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--jemalloc", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessie',        'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntufourteenofour', 'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntusixteenofour',  'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--jemalloc", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "Windows", 'buildArgs': "--msvc",     'cluster': false, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/net/fileserver/'],
+  [ 'buildType': 'native', 'testType': 'native', 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "Darwin",  'buildArgs': "--clang",    'cluster': false, 'LOCALFS': '/Users/jenkins/mnt/workspace/tmp/', 'FS': '/Users/jenkins/net/fileserver/'],
 ]
 
-def OS="Linux"
-def RELEASE_OUT_DIR="/net/fileserver/"
-def LOCAL_TAR_DIR="/mnt/workspace/tmp/"
-def branches = [:]
-def failures = ""
-def paralellJobNames = []
-def ADMIN_ACCOUNT = "release-bot@arangodb.com"
-def lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
-def lastKnownGitRev=""
-def currentGitRev=""
-
-def BUILT_FILE = ""
-def DIST_FILE = ""
-def fatalError = false
-
-echo "bla"
-stage("cloning source")
-  node {
-    sh "mount"
-    sh "pwd"
-    def someString="1234567890"
-    echo someString.take(5)
-    
-    if (fileExists(lastKnownGoodGitFile)) {
-      lastKnownGitRev=readFile(lastKnownGoodGitFile)
-    }
-    echo "git url: 'https://github.com/arangodb/arangodb.git', tag: ${GITTAG}"
-
-    git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
-    sh "git checkout ${GITTAG}"
+for (int c  = 0; c < CONTAINERS.size(); c++) {
+  if (CONTAINERS[c]['name'] == preferBuilder) {
+    DOCKER_CONTAINER = CONTAINERS[c]
+    RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
+    LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
   }
+}
 
+OS = DOCKER_CONTAINER['OS']
 
+def getReleaseOutDir(String enterpriseUrl, String jobname) {
+  if (enterpriseUrl.size() > 10) {
+    outDir = "${RELEASE_OUT_DIR}/EP/${jobname}"
+  } else {
+    outDir = "${RELEASE_OUT_DIR}/${jobname}"
+  }
+  return outDir
+}
 
-stage("building ArangoDB")
-try {
-  for (int c=0; c < CONTAINERS.size(); c++) {
-    echo "building No. ${c}: "
-    echo CONTAINERS[c]['name']
+def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir) {
+  try {
+    def EP=""
+    def XEP=""
+    if (enterpriseUrl.size() > 10) {
+      EP="--enterprise ${ENTERPRISE_URL}"
+      XEP="EP"
+    }
+    if (!buildUnittestTarball) {
+      outDir = getReleaseOutDir(enterpriseUrl, ${env.JOB_NAME})
+    }
+    print(buildEnv)
+    def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
+    if (! buildUnittestTarball) {
+      BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} "
+    }
+    if (VERBOSE) {
+      print(BUILDSCRIPT)
+    }
+    
+    sh BUILDSCRIPT
+    
+    if (buildUnittestTarball) {
+      BUILT_FILE = "${outDir}/arangodb-${OS}.tar.gz"
+      DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
+      MD5SUM = readFile("${BUILT_FILE}.md5").trim()
+      if (VERBOSE) {
+        echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
+      }
+      
+      sh "python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE} ${env.JOB_NAME}"
+    }
+    else {
+      // TODO: release?
+    }
+    if (VERBOSE) {
+      sh "ls -l ${RELEASE_OUT_DIR}"
+    }
+  } catch (err) {
+    stage('Send Notification for failed build' ) {
+      gitCommitter = sh(returnStdout: true, script: 'git --no-pager show -s --format="%ae"')
+
+      mail (to: gitCommitter,
+            subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
+            body: err.getMessage());
+      currentBuild.result = 'FAILURE'
+      throw(err)
+    }
+  }
+}
+
+def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl) {
+  def outDir = ""
+  print("before")
+  if (buildEnvironment['compileType'] == 'docker') {
     node {
-      DOCKER_CONTAINER=CONTAINERS[c]['name']
-      PACKAGE_FORMAT=CONTAINERS[c]['packageFormat']
-      OUT_DIR = ""
       docker.withRegistry(REGISTRY_URL, '') {
-        def myBuildImage=docker.image("${DOCKER_CONTAINER}/build")
+        def myBuildImage = docker.image("${buildEnvironment['name']}/build")
         myBuildImage.pull()
-        docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:/net/fileserver:rw --volume /jenkins:/mnt/:rw ') {
-          sh "mount"
-          sh "pwd"
-          
-          // sh "cat /etc/issue /mnt/workspace/issue"
-
+        docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw --volume /jenkins:/mnt/:rw ') {
+          if (VERBOSE) {
+            sh "mount"
+            sh "pwd"
+          }
+          if (VERBOSE) {
+            sh "cat /etc/issue /mnt/workspace/issue"
+          }
+        
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
-          EP=""
-          XEP=""
-          if (ENTERPRISE_URL.size() > 10) {
-            EP="--enterprise ${ENTERPRISE_URL}"
-            OUT_DIR = "${RELEASE_OUT_DIR}/REL/EP/${DOCKER_CONTAINER}"
-            XEP="EP"
-          } else {
-            OUT_DIR = "${RELEASE_OUT_DIR}/REL/CO/${DOCKER_CONTAINER}"
-          }
-          try {
-            sh "./Installation/Jenkins/build.sh standard  --rpath --parallel 8 --buildDir build-${XEP}package-${DOCKER_CONTAINER} --package ${PACKAGE_FORMAT} ${EP} --jemalloc --targetDir ${OUT_DIR} "
-          } catch (err) {
-            stage('Send Notification for failed build' ) {
-          
-              mail (to: 'release-bot@arangodb.com',
-                    subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
-                    body: err.getMessage());
-              currentBuild.result = 'FAILURE'
-              throw(err)
-            }
-          }
-          sh "ls -l ${OUT_DIR}"
+          outDir = "${WORKSPACE}/out"
+          compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir)
         }
       }
     }
   }
+  else {
+    print("else")
+    node(buildEnvironment['name']){
+      echo "building on ${buildEnvironment['name']}"
+      sh 'pwd > workspace.loc'
+      WORKSPACE = readFile('workspace.loc').trim()
+      outDir = "${WORKSPACE}/out"
+      compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir)
+    }
+  }
+}
+
+stage("cloning source")
+if (DOCKER_CONTAINER['buildType'] == 'docker') {
+  node {
+    if (VERBOSE) {
+      sh "pwd"
+      sh "cat /etc/issue /jenkins/workspace/issue"
+    }
+    if (fileExists(lastKnownGoodGitFile)) {
+      lastKnownGitRev=readFile(lastKnownGoodGitFile)
+    }
+    git url: 'https://github.com/arangodb/arangodb.git', tag: ${GITTAG}
+    currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+    sh "git checkout ${GITTAG}"
+    print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
+  }
+}
+else {
+  node(DOCKER_CONTAINER['name']) {
+    if (VERBOSE) {
+      sh "pwd"
+      sh "uname -a"
+    }
+    if (fileExists(lastKnownGoodGitFile)) {
+      lastKnownGitRev=readFile(lastKnownGoodGitFile)
+    }
+    git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
+    currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+    sh "git checkout ${GITTAG}"
+    print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
+  }
+}
+  
+stage("building ArangoDB")
+try {
+  print(DOCKER_CONTAINER)
+  setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
 } catch (err) {
-  stage('Send FAIL-Notification for build' )
+  stage('Send Notification for build' )
   mail (to: ADMIN_ACCOUNT, 
         subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
         body: err.getMessage());
@@ -106,7 +188,9 @@ try {
   throw(err)
 }
 
-stage("generating test report")
+
+
+stage("generating release build report")
   node {
       
     def subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) is finished"
