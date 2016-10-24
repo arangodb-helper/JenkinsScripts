@@ -112,8 +112,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
 def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl) {
   def outDir = ""
-  if (buildEnvironment['compileType'] == 'docker') {
-    node {
+  print(buildEnvironment)
+  if (buildEnvironment['buildType'] == 'docker') {
+    node('docker') {
       docker.withRegistry(REGISTRY_URL, '') {
         def myBuildImage = docker.image("${buildEnvironment['name']}/build")
         myBuildImage.pull()
