@@ -136,6 +136,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
   }
   else {
     node(buildEnvironment['name']){
+      print "else:"
       echo "building on ${buildEnvironment['name']}"
       sh 'pwd > workspace.loc'
       WORKSPACE = readFile('workspace.loc').trim()
