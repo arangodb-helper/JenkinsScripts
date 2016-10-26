@@ -61,6 +61,7 @@ def getReleaseOutDir(String enterpriseUrl, String jobname) {
 
 def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir, String envName) {
   try {
+    sh "cmake --version"
     def EP=""
     def XEP=""
     if (enterpriseUrl.size() > 10) {
