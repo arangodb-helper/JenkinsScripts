@@ -67,7 +67,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       outDir = getReleaseOutDir(enterpriseUrl, envName)
     }
     print(buildEnv)
-    def BUILDSCRIPT = "cd Documentation/books; make build-dist-books OUTPUT_DIR=${outDir}"
+    def BUILDSCRIPT = "cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir}"
     sh BUILDSCRIPT
     
     if (VERBOSE) {
