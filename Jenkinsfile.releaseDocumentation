@@ -143,7 +143,7 @@ if (DOCKER_CONTAINER['buildType'] == 'docker') {
     currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     if (FORCE_GITBRANCH != "") {
       sh "git checkout ${FORCE_GITBRANCH}"
-      sh 'echo "${GITTAG}" > VERSION'
+      sh 'echo "${GITTAG}" | sed "s;^v;;" > VERSION'
     } else {
       sh "git checkout ${GITTAG}"
     }
@@ -163,7 +163,7 @@ else {
     currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     if (FORCE_GITBRANCH != "") {
       sh "git checkout ${FORCE_GITBRANCH}"
-      sh 'echo "${GITTAG}" > VERSION'
+      sh 'echo "${GITTAG}" | sed "s;^v;;" > VERSION'
     } else {
       sh "git checkout ${GITTAG}"
     }
