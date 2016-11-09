@@ -142,7 +142,7 @@ if (DOCKER_CONTAINER['buildType'] == 'docker') {
     git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
     currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     if (FORCE_GITBRANCH != "") {
-      sh "git checkout ${FORCE_GITBRANCH}"
+      sh "git checkout ${FORCE_GITBRANCH}; git pull --all"
       sh 'echo "${GITTAG}" | sed "s;^v;;" > VERSION'
     } else {
       sh "git checkout ${GITTAG}"
@@ -162,7 +162,7 @@ else {
     git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
     currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     if (FORCE_GITBRANCH != "") {
-      sh "git checkout ${FORCE_GITBRANCH}"
+      sh "git checkout ${FORCE_GITBRANCH}; git pull --all"
       sh 'echo "${GITTAG}" | sed "s;^v;;" > VERSION'
     } else {
       sh "git checkout ${GITTAG}"
