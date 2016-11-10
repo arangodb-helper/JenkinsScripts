@@ -4,32 +4,35 @@
 //                    string(name: 'preferBuilder', value: params['preferBuilder']),
 //                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
 //     )
-parallel([
-  {
-    // Build Enterprise:
-    build( job: 'ArangoDB_Release',
-           parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                        string(name: 'GITTAG', value: params['GITTAG']),
-                        string(name: 'preferBuilder', value: params['preferBuilder']),
-                        booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
-         )
-  }, {
-    // Build Community:
-    build( job: 'ArangoDB_Release',
-           parameters: [string(name: 'ENTERPRISE_URL', value: ''),
-                        string(name: 'GITTAG', value: params['GITTAG']),
-                        string(name: 'preferBuilder', value: params['preferBuilder']),
-                        booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
-         )
-  }, {
-    // Build Enterprise:
-    build( job: 'ArangoDB_Release_Documentation',
-           parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                        string(name: 'GITTAG', value: params['GITTAG']),
-                        string(name: 'preferBuilder', value: 'debianjessieDocu'),
-                        string(name: 'FORCE_GITBRANCH', value:''),
-                        booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
-         )
-  }
-])
+parallel({
+           "enterprise": {
+             // Build Enterprise:
+             build( job: 'ArangoDB_Release',
+                    parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                                 string(name: 'GITTAG', value: params['GITTAG']),
+                                 string(name: 'preferBuilder', value: params['preferBuilder']),
+                                 booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                  )
+           },
+           "community": {
+             // Build Community:
+             build( job: 'ArangoDB_Release',
+                    parameters: [string(name: 'ENTERPRISE_URL', value: ''),
+                                 string(name: 'GITTAG', value: params['GITTAG']),
+                                 string(name: 'preferBuilder', value: params['preferBuilder']),
+                                 booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                  )
+           },
+           "documentation": {
+             // Build Documentation:             
+             build( job: 'ArangoDB_Release_Documentation',
+                    parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                                 string(name: 'GITTAG', value: params['GITTAG']),
+                                 string(name: 'preferBuilder', value: 'debianjessieDocu'),
+                                 string(name: 'FORCE_GITBRANCH', value:''),
+                                 booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                  )
+           }
+         }
+  )
 
