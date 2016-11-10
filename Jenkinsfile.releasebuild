@@ -128,6 +128,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
         def myBuildImage = docker.image("${buildEnvironment['name']}/build")
         myBuildImage.pull()
         echo "hello before docker ${RELEASE_OUT_DIR}"
+        echo '''hello before docker ${RELEASE_OUT_DIR}'''
         docker.image(myBuildImage.imageName()).withRun('''\
  -u 1000:1000 \
 --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw \
