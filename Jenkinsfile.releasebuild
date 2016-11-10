@@ -129,12 +129,16 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
         myBuildImage.pull()
         echo "hello before docker ${RELEASE_OUT_DIR}"
         echo """hello before docker ${RELEASE_OUT_DIR}"""
-        docker.image(myBuildImage.imageName()).withRun("""\
- -u 1000:1000 \
---volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw \
---volume /jenkins:/mnt/:rw \
---volume /var/lib/jenkins/workspace/ArangoDB_Release:/var/lib/jenkins/workspace/ArangoDB_Release:rw \
-""") { c->
+        docker.image(myBuildImage.imageName()).inside("""\
+ --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw\
+ --volume /jenkins:/mnt/:rw \
+""") {
+//           docker.image(myBuildImage.imageName()).withRun("""\
+//  -u 1000:1000 \
+// --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw \
+// --volume /jenkins:/mnt/:rw \
+// --volume /var/lib/jenkins/workspace/ArangoDB_Release:/var/lib/jenkins/workspace/ArangoDB_Release:rw \
+// """) { c->
           echo "hello from docker"
           if (VERBOSE) {
             sh "mount"
