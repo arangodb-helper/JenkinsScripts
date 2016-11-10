@@ -1,30 +1,30 @@
 parallel({
   // Build Enterprise:
-           build(job: 'ArangoDB_Release',
+           build job: 'ArangoDB_Release',
                  wait: true,
                  parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                               string(name: 'GITTAG', value: params['GITTAG']),
                               string(name: 'preferBuilder', value: params['preferBuilder']),
                               booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
-                )
+                
          }, {
   // Build Community:
-           build(job: 'ArangoDB_Release',
+           build job: 'ArangoDB_Release',
                  wait: true,
                  parameters: [string(name: 'ENTERPRISE_URL', value: ''),
                               string(name: 'GITTAG', value: params['GITTAG']),
                               string(name: 'preferBuilder', value: params['preferBuilder']),
                               booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
-                )
+                
          }, {
   // Build Enterprise:
-           build(job: 'ArangoDB_Release_Documentation',
+           build job: 'ArangoDB_Release_Documentation',
                  wait: true,
                  parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                               string(name: 'GITTAG', value: params['GITTAG']),
                               string(name: 'preferBuilder', value: 'debianjessieDocu'),
                               string(name: '   FORCE_GITBRANCH', value:''),
                               booleanParam(name: 'CLEA N_BUILDENV', value: params['CLEAN_BUILDENV'])]
-                )
+                
          }
   )
