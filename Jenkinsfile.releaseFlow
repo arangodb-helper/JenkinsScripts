@@ -4,7 +4,7 @@
 //                    string(name: 'preferBuilder', value: params['preferBuilder']),
 //                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
 //     )
-parallel({
+parallel([
            "enterprise": {
              // Build Enterprise:
              build( job: 'ArangoDB_Release',
@@ -33,6 +33,6 @@ parallel({
                                  booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                   )
            }
-         }
+         ]
   )
 
