@@ -1,0 +1,6 @@
+// Build Enterprise:
+build("ArangoDB_Release", 
+	  ENTERPRISE_URL:params['ENTERPRISE_URL'], 
+      GITTAG:params['GITTAG'], 
+      preferBuilder:params['preferBuilder'], 
+      CLEAN_BUILDENV:params['CLEAN_BUILDENV'])
