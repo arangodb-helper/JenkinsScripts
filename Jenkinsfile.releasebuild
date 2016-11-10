@@ -133,7 +133,6 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
 --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw \
 --volume /jenkins:/mnt/:rw \
 --volume /var/lib/jenkins/workspace/ArangoDB_Release:/var/lib/jenkins/workspace/ArangoDB_Release:rw \
---volume /var/lib/jenkins/workspace/ArangoDB_Release@tmp:/var/lib/jenkins/workspace/ArangoDB_Release@tmp:rw \
 ''') { c->
           echo "hello from docker"
           if (VERBOSE) {
