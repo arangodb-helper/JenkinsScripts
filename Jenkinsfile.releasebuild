@@ -123,11 +123,18 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
   print(buildEnvironment)
   if (buildEnvironment['buildType'] == 'docker') {
     node('docker') {
+      sh "set"
       docker.withRegistry(REGISTRY_URL, '') {
         def myBuildImage = docker.image("${buildEnvironment['name']}/build")
         myBuildImage.pull()
         echo "hello before docker"
-        docker.image(myBuildImage.imageName()).withRun("--volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw --volume /jenkins:/mnt/:rw ") { c->
+        docker.image(myBuildImage.imageName()).withRun('''\
+ -u 1000:1000 \
+--volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw \
+--volume /jenkins:/mnt/:rw 
+--volume /var/lib/jenkins/workspace/ArangoDB_Release:/var/lib/jenkins/workspace/ArangoDB_Release:rw \
+--volume /var/lib/jenkins/workspace/ArangoDB_Release@tmp:/var/lib/jenkins/workspace/ArangoDB_Release@tmp:rw \
+''') { c->
           echo "hello from docker"
           if (VERBOSE) {
             sh "mount"
