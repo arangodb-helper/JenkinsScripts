@@ -5,7 +5,7 @@
 //                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
 //     )
 parallel([
-           "enterprise": {
+           "linuxPackages": {
              // Build Enterprise:
              build( job: 'ArangoDB_Release',
                     parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
@@ -13,13 +13,45 @@ parallel([
                                  string(name: 'preferBuilder', value: params['preferBuilder']),
                                  booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                   )
-           },
-           "community": {
              // Build Community:
              build( job: 'ArangoDB_Release',
                     parameters: [string(name: 'ENTERPRISE_URL', value: ''),
                                  string(name: 'GITTAG', value: params['GITTAG']),
                                  string(name: 'preferBuilder', value: params['preferBuilder']),
+                                 booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                  )
+           },
+           "macintosh": {
+             // this mac will run massive parallel, so we run this sequential:
+             // Build Enterprise:
+             build( job: 'ArangoDB_Release',
+                    parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                                 string(name: 'GITTAG', value: 'macos'),
+                                 string(name: 'preferBuilder', value: params['preferBuilder']),
+                                 booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                  )
+             // Build Community:
+             build( job: 'ArangoDB_Release',
+                    parameters: [string(name: 'ENTERPRISE_URL', value: ''),
+                                 string(name: 'GITTAG', value: params['GITTAG']),
+                                 string(name: 'preferBuilder', value: 'macos'),
+                                 booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                  )
+           },
+           "Windows": {
+             // Windows doesn't like if we compile multiple times at once...
+             // Build Community:
+             build( job: 'WindowsRelease',
+                    parameters: [string(name: 'ENTERPRISE_URL', value: ''),
+                                 string(name: 'GITTAG', value: params['GITTAG']),
+                                 string(name: 'preferBuilder', value: 'windows'),
+                                 booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                  )
+             // Build Enterprise:
+             build( job: 'WindowsRelease',
+                    parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                                 string(name: 'GITTAG', value: 'macos'),
+                                 string(name: 'preferBuilder', value: 'windows'),
                                  booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                   )
            },
