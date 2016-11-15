@@ -26,8 +26,8 @@ parallel([
              // Build Enterprise:
              build( job: 'ArangoDB_Release',
                     parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                                 string(name: 'GITTAG', value: 'macos'),
-                                 string(name: 'preferBuilder', value: params['preferBuilder']),
+                                 string(name: 'GITTAG', value: params['GITTAG']),
+                                 string(name: 'preferBuilder', value: 'macos'),
                                  booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                   )
              // Build Community:
