@@ -23,6 +23,9 @@ parallel([
            },
            "macintosh": {
              echo "building MacOS X Enterprise Release"
+             node("macos") {
+               sh "rm -rf /Users/jenkins/net/fileserver/*"
+             }
              build( job: 'ArangoDB_Release',
                     parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                                  string(name: 'GITTAG', value: params['GITTAG']),
@@ -36,21 +39,30 @@ parallel([
                                  string(name: 'preferBuilder', value: 'macos'),
                                  booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                   )
+             node("macos") {
+               sh "scp -r /Users/jenkins/net/fileserver/* $params['JENKINSMASTER']:/mnt/data/"
+             }
            },
            "Windows": {
              // Windows doesn't like if we compile multiple times at once...
              echo "building Windows Enterprise Release"
              build( job: 'WindowsRelease',
                     parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                                 string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
                                  string(name: 'GITTAG', value: params['GITTAG']),
                                  string(name: 'preferBuilder', value: 'windows'),
+                                 booleanParam(name: 'FLUSH_OUTPUT', value: true),
+                                 booleanParam(name: 'UPLOAD_RESULTS', value: false),
                                  booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                   )
              echo "building Windows Community Release"
              build( job: 'WindowsRelease',
                     parameters: [string(name: 'ENTERPRISE_URL', value: ''),
+                                 string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
                                  string(name: 'GITTAG', value: params['GITTAG']),
                                  string(name: 'preferBuilder', value: 'windows'),
+                                 booleanParam(name: 'FLUSH_OUTPUT', value: false),
+                                 booleanParam(name: 'UPLOAD_RESULTS', value: true),
                                  booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                   )
            },
