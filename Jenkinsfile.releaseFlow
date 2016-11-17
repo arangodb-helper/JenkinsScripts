@@ -53,7 +53,7 @@ stage("building packages") {
                echo "building Windows Enterprise Release"
                build( job: 'WindowsRelease',
                       parameters: [
-                        string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                        string(name: 'ENTERPRISE_URL_PARAM', value: "--enterprise ${params['ENTERPRISE_URL']}"),
                         string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
                         string(name: 'GITTAG', value: "v${params['GITTAG']}"),
                         string(name: 'preferBuilder', value: 'windows'),
