@@ -1,15 +1,8 @@
-
-//build( job: 'ArangoDB_Release',
-//       parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-//                    string(name: 'GITTAG', value: params['GITTAG']),
-//                    string(name: 'preferBuilder', value: params['preferBuilder']),
-//                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
-//     )
 stage("building packages") {
   parallel([
              "sourceTarballs": {
                node("master") {
-                 sh "export GITTAG=params['GITTAG']; ${ARANGO_SCRIPT_DIR}/source/build.sh"
+                 sh "export GITTAG=${params['GITTAG']}; ${ARANGO_SCRIPT_DIR}/source/build.sh"
 
                }
              },
