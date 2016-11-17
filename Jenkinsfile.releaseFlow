@@ -10,14 +10,14 @@ stage("building packages") {
                echo "building Linux Enterprise Release"
                build( job: 'ArangoDB_Release',
                       parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                                   string(name: 'GITTAG', value: params['GITTAG']),
+                                   string(name: 'GITTAG', value: "v${params['GITTAG']"),
                                    string(name: 'preferBuilder', value: params['preferBuilder']),
                                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                     )
                echo "building Linux Community Release"
                build( job: 'ArangoDB_Release',
                       parameters: [string(name: 'ENTERPRISE_URL', value: ''),
-                                   string(name: 'GITTAG', value: params['GITTAG']),
+                                   string(name: 'GITTAG', value: "v${params['GITTAG']"),
                                    string(name: 'preferBuilder', value: params['preferBuilder']),
                                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                     )
@@ -29,14 +29,14 @@ stage("building packages") {
                }
                build( job: 'ArangoDB_Release',
                       parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                                   string(name: 'GITTAG', value: params['GITTAG']),
+                                   string(name: 'GITTAG', value: "v${params['GITTAG']"),
                                    string(name: 'preferBuilder', value: 'macos'),
                                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                     )
                echo "building MacOS X Community Release"
                build( job: 'ArangoDB_Release',
                       parameters: [string(name: 'ENTERPRISE_URL', value: ''),
-                                   string(name: 'GITTAG', value: params['GITTAG']),
+                                   string(name: 'GITTAG', value: "v${params['GITTAG']"),
                                    string(name: 'preferBuilder', value: 'macos'),
                                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                     )
@@ -50,7 +50,7 @@ stage("building packages") {
                build( job: 'WindowsRelease',
                       parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                                    string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
-                                   string(name: 'GITTAG', value: params['GITTAG']),
+                                   string(name: 'GITTAG', value: "v${params['GITTAG']"),
                                    string(name: 'preferBuilder', value: 'windows'),
                                    booleanParam(name: 'FLUSH_OUTPUT', value: true),
                                    booleanParam(name: 'UPLOAD_RESULTS', value: false),
@@ -60,7 +60,7 @@ stage("building packages") {
                build( job: 'WindowsRelease',
                       parameters: [string(name: 'ENTERPRISE_URL', value: ''),
                                    string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
-                                   string(name: 'GITTAG', value: params['GITTAG']),
+                                   string(name: 'GITTAG', value: "v${params['GITTAG']"),
                                    string(name: 'preferBuilder', value: 'windows'),
                                    booleanParam(name: 'FLUSH_OUTPUT', value: false),
                                    booleanParam(name: 'UPLOAD_RESULTS', value: true),
@@ -70,7 +70,7 @@ stage("building packages") {
              "documentation": {
                build( job: 'ArangoDB_Release_Documentation',
                       parameters: [string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                                   string(name: 'GITTAG', value: params['GITTAG']),
+                                   string(name: 'GITTAG', value: "v${params['GITTAG']"),
                                    string(name: 'preferBuilder', value: 'debianjessieDocu'),
                                    string(name: 'FORCE_GITBRANCH', value:''),
                                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
@@ -84,12 +84,13 @@ stage("building packages") {
 node('master') {
 
   build( job: '440_UPDATE_Official_Docker',
-         parameters: [string(name: 'GITTAG', value: params['GITTAG']),
-                      booleanParam(name: 'NEW_MAJOR_RELEASE', value: params['NEW_MAJOR_RELEASE']),
-                      booleanParam(name: 'CREATE_NEW_VERSION', value: true),
-                      booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: true),
-                      booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
-                      booleanParam(name: 'UPDATE_MESOS_IMAGE', value: true)]
+         parameters: [
+           string(name: 'GITTAG', value: "v${params['GITTAG']"),
+           booleanParam(name: 'NEW_MAJOR_RELEASE', value: params['NEW_MAJOR_RELEASE']),
+           booleanParam(name: 'CREATE_NEW_VERSION', value: true),
+           booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: true),
+           booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
+           booleanParam(name: 'UPDATE_MESOS_IMAGE', value: true)]
        )
 
   sh "export GITTAG=${GITTAG}; ${ARANGO_SCRIPT_DIR}/macosx/update_homebrew.sh"
