@@ -45,7 +45,7 @@ stage("building packages") {
                         booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                     )
                node("macos") {
-                 sh "scp -r /Users/jenkins/net/fileserver/* $params['JENKINSMASTER']:${env.INTERMEDIATE_DIR}"
+                 sh "scp -r /Users/jenkins/net/fileserver/* ${env.JENKINSMASTER}:${env.INTERMEDIATE_DIR}"
                }
              },
              "Windows": {
