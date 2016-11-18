@@ -42,7 +42,7 @@ if (preferBuilder.size() > 0) {
     }
   }
   if (!found) {
-    throw new Excoption("didn't find the builder '${preferBuilder}' you specified!")
+    throw new Exception("didn't find the builder '${preferBuilder}' you specified!")
   }
 } else {
   for (int c  = 0; c < CONTAINERS.size(); c++) {
