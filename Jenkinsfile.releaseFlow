@@ -134,8 +134,8 @@ ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
   }
   stage("Generating HTML output") {
     sh """
-${ARANGO_SCRIPT_DIR}/html/create_index.sh enterprise repositories ${env.INTERMEDIATE_EP_DIR}
-${ARANGO_SCRIPT_DIR}/html/create_index.sh community ${env.ENTERPRISE_SECRET} ${env.INTERMEDIATE_CO_DIR}
+${ARANGO_SCRIPT_DIR}/html/create_index.sh enterprise ${env.ENTERPRISE_SECRET} ${env.INTERMEDIATE_EP_DIR}
+${ARANGO_SCRIPT_DIR}/html/create_index.sh community repositories ${env.INTERMEDIATE_CO_DIR}
 """
   }
   
