@@ -31,13 +31,18 @@ def CONTAINERS=[
 ]
 
 if (preferBuilder.size() > 0) {
+  found=false
   for (int c  = 0; c < CONTAINERS.size(); c++) {
     if (CONTAINERS[c]['name'] == preferBuilder) {
       print("prefering: ${CONTAINERS[c]}")
+      found=true
       DOCKER_CONTAINER = CONTAINERS[c]
       RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
       LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
     }
+  }
+  if (!found) {
+    throw new Excoption("didn't find the builder '${preferBuilder}' you specified!")
   }
 } else {
   for (int c  = 0; c < CONTAINERS.size(); c++) {
