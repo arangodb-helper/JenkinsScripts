@@ -1,5 +1,5 @@
 stage("building packages") {
-  if (SKIP_BUILD == "true") {
+  if (params['SKIP_BUILD'] == "true") {
     parallel([
                "sourceTarballs": {
                  node("master") {
