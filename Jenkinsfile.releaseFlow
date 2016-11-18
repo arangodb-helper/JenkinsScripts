@@ -1,5 +1,5 @@
 stage("building packages") {
-  if (SKIP_BUILD != "true") {
+  if (SKIP_BUILD == "true") {
     parallel([
                "sourceTarballs": {
                  node("master") {
@@ -94,7 +94,7 @@ node('master') {
 
   build( job: '440_UPDATE_Official_Docker',
          parameters: [
-           string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+           string(name: 'GITTAG', value: params['GITTAG']),
            booleanParam(name: 'NEW_MAJOR_RELEASE', value: params['NEW_MAJOR_RELEASE']),
            booleanParam(name: 'CREATE_NEW_VERSION', value: true),
            booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: true),
