@@ -1,90 +1,92 @@
 stage("building packages") {
-  parallel([
-             "sourceTarballs": {
-               node("master") {
-                 sh "export GITTAG=${params['GITTAG']}; ${ARANGO_SCRIPT_DIR}/source/build.sh"
+  if (SKIP_BUILD != "true") {
+    parallel([
+               "sourceTarballs": {
+                 node("master") {
+                   sh "export GITTAG=${params['GITTAG']}; ${ARANGO_SCRIPT_DIR}/source/build.sh"
 
+                 }
+               },
+               "linuxPackages": {
+                 echo "building Linux Enterprise Release"
+                 build( job: 'ArangoDB_Release',
+                        parameters: [
+                          string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                          string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                          string(name: 'preferBuilder', value: params['preferBuilder']),
+                          booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                      )
+                 echo "building Linux Community Release"
+                 build( job: 'ArangoDB_Release',
+                        parameters: [
+                          string(name: 'ENTERPRISE_URL', value: ''),
+                          string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                          string(name: 'preferBuilder', value: params['preferBuilder']),
+                          booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                      )
+               },
+               "macintosh": {
+                 echo "building MacOS X Enterprise Release"
+                 node("macos") {
+                   sh "rm -rf /Users/jenkins/net/fileserver/*"
+                 }
+                 build( job: 'ArangoDB_Release',
+                        parameters: [
+                          string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                          string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                          string(name: 'preferBuilder', value: 'macos'),
+                          booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                      )
+                 echo "building MacOS X Community Release"
+                 build( job: 'ArangoDB_Release',
+                        parameters: [
+                          string(name: 'ENTERPRISE_URL', value: ''),
+                          string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                          string(name: 'preferBuilder', value: 'macos'),
+                          booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                      )
+                 node("macos") {
+                   sh "scp -r /Users/jenkins/net/fileserver/* ${env.JENKINSMASTER}:${env.INTERMEDIATE_DIR}"
+                 }
+               },
+               "Windows": {
+                 // Windows doesn't like if we compile multiple times at once...
+                 echo "building Windows Enterprise Release"
+                 build( job: 'WindowsRelease',
+                        parameters: [
+                          string(name: 'ENTERPRISE_URL_PARAM', value: "--enterprise ${params['ENTERPRISE_URL']}"),
+                          string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
+                          string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                          string(name: 'preferBuilder', value: 'windows'),
+                          booleanParam(name: 'FLUSH_OUTPUT', value: true),
+                          booleanParam(name: 'UPLOAD_RESULTS', value: false),
+                          booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                      )
+                 echo "building Windows Community Release"
+                 build( job: 'WindowsRelease',
+                        parameters: [
+                          string(name: 'ENTERPRISE_URL', value: ''),
+                          string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
+                          string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                          string(name: 'preferBuilder', value: 'windows'),
+                          booleanParam(name: 'FLUSH_OUTPUT', value: false),
+                          booleanParam(name: 'UPLOAD_RESULTS', value: true),
+                          booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                      )
+               },
+               "documentation": {
+                 build( job: 'ArangoDB_Release_Documentation',
+                        parameters: [
+                          string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                          string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                          string(name: 'preferBuilder', value: 'debianjessieDocu'),
+                          string(name: 'FORCE_GITBRANCH', value:''),
+                          booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                      )
                }
-             },
-             "linuxPackages": {
-               echo "building Linux Enterprise Release"
-               build( job: 'ArangoDB_Release',
-                      parameters: [
-                        string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                        string(name: 'GITTAG', value: "v${params['GITTAG']}"),
-                        string(name: 'preferBuilder', value: params['preferBuilder']),
-                        booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
-                    )
-               echo "building Linux Community Release"
-               build( job: 'ArangoDB_Release',
-                      parameters: [
-                        string(name: 'ENTERPRISE_URL', value: ''),
-                        string(name: 'GITTAG', value: "v${params['GITTAG']}"),
-                        string(name: 'preferBuilder', value: params['preferBuilder']),
-                        booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
-                    )
-             },
-             "macintosh": {
-               echo "building MacOS X Enterprise Release"
-               node("macos") {
-                 sh "rm -rf /Users/jenkins/net/fileserver/*"
-               }
-               build( job: 'ArangoDB_Release',
-                      parameters: [
-                        string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                        string(name: 'GITTAG', value: "v${params['GITTAG']}"),
-                        string(name: 'preferBuilder', value: 'macos'),
-                        booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
-                    )
-               echo "building MacOS X Community Release"
-               build( job: 'ArangoDB_Release',
-                      parameters: [
-                        string(name: 'ENTERPRISE_URL', value: ''),
-                        string(name: 'GITTAG', value: "v${params['GITTAG']}"),
-                        string(name: 'preferBuilder', value: 'macos'),
-                        booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
-                    )
-               node("macos") {
-                 sh "scp -r /Users/jenkins/net/fileserver/* ${env.JENKINSMASTER}:${env.INTERMEDIATE_DIR}"
-               }
-             },
-             "Windows": {
-               // Windows doesn't like if we compile multiple times at once...
-               echo "building Windows Enterprise Release"
-               build( job: 'WindowsRelease',
-                      parameters: [
-                        string(name: 'ENTERPRISE_URL_PARAM', value: "--enterprise ${params['ENTERPRISE_URL']}"),
-                        string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
-                        string(name: 'GITTAG', value: "v${params['GITTAG']}"),
-                        string(name: 'preferBuilder', value: 'windows'),
-                        booleanParam(name: 'FLUSH_OUTPUT', value: true),
-                        booleanParam(name: 'UPLOAD_RESULTS', value: false),
-                        booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
-                    )
-               echo "building Windows Community Release"
-               build( job: 'WindowsRelease',
-                      parameters: [
-                        string(name: 'ENTERPRISE_URL', value: ''),
-                        string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
-                        string(name: 'GITTAG', value: "v${params['GITTAG']}"),
-                        string(name: 'preferBuilder', value: 'windows'),
-                        booleanParam(name: 'FLUSH_OUTPUT', value: false),
-                        booleanParam(name: 'UPLOAD_RESULTS', value: true),
-                        booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
-                    )
-             },
-             "documentation": {
-               build( job: 'ArangoDB_Release_Documentation',
-                      parameters: [
-                        string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                        string(name: 'GITTAG', value: "v${params['GITTAG']}"),
-                        string(name: 'preferBuilder', value: 'debianjessieDocu'),
-                        string(name: 'FORCE_GITBRANCH', value:''),
-                        booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
-                    )
-             }
-           ]
-          )
+             ]
+            )
+  }
 }
 
 
