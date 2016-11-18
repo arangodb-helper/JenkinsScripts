@@ -91,20 +91,8 @@ stage("building packages") {
 
 
 node('master') {
-
-  build( job: '440_UPDATE_Official_Docker',
-         parameters: [
-           string(name: 'GITTAG', value: params['GITTAG']),
-           booleanParam(name: 'NEW_MAJOR_RELEASE', value: params['NEW_MAJOR_RELEASE']),
-           booleanParam(name: 'CREATE_NEW_VERSION', value: true),
-           booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: true),
-           booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
-           booleanParam(name: 'UPDATE_MESOS_IMAGE', value: true)]
-       )
-
-  sh "export GITTAG=${GITTAG}; ${ARANGO_SCRIPT_DIR}/macosx/update_homebrew.sh"
-
-  sh """
+  stage("create repositories") {
+    sh """
 ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
         ${env.INTERMEDIATE_DIR} \
         ${env.INTERMEDIATE_EP_DIR} \
@@ -113,11 +101,25 @@ ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
         ${env.ENTERPRISE_SECRET}/arangodb31
         repositories/arangodb31
 """
+  }
+  stage("updating other repos") {
+    build( job: '440_UPDATE_Official_Docker',
+           parameters: [
+             string(name: 'GITTAG', value: params['GITTAG']),
+             booleanParam(name: 'NEW_MAJOR_RELEASE', value: params['NEW_MAJOR_RELEASE']),
+             booleanParam(name: 'CREATE_NEW_VERSION', value: true),
+             booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: true),
+             booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
+             booleanParam(name: 'UPDATE_MESOS_IMAGE', value: true)]
+         )
 
-  sh """
+    sh "export GITTAG=${GITTAG}; ${ARANGO_SCRIPT_DIR}/macosx/update_homebrew.sh"
+  }
+  stage("Generating HTML output") {
+    sh """
 ${ARANGO_SCRIPT_DIR}/html/create_index.sh community repositories ${env.INTERMEDIATE_EP_DIR}
 ${ARANGO_SCRIPT_DIR}/html/create_index.sh enterprise ${env.ENTERPRISE_SECRET} ${env.INTERMEDIATE_CO_DIR}
 """
-
+  }
   
 }
