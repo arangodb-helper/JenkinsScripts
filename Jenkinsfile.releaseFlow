@@ -124,7 +124,7 @@ ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
         ${env.INTERMEDIATE_EP_DIR} \
         ${env.INTERMEDIATE_CO_DIR} \
         ${GITTAG} \
-        ${env.ENTERPRISE_SECRET}/arangodb31
+        ${env.ENTERPRISE_SECRET}/arangodb31 \
         repositories/arangodb31
 """
   }
