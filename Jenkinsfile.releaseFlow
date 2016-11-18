@@ -130,7 +130,7 @@ ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
 """
     }
     
-    sh "export GITTAG=${GITTAG}; ${ARANGO_SCRIPT_DIR}/macosx/update_homebrew.sh"
+    // sh "export GITTAG=${GITTAG}; ${ARANGO_SCRIPT_DIR}/macosx/update_homebrew.sh"
   }
   stage("Generating HTML output") {
     sh """
