@@ -29,8 +29,8 @@ stage("building packages") {
 
                  EP_PARAMS=[ params['ENTERPRISE_URL'], '']
                  UNSTABLE_BUILDERS = ['ubuntutwelveofour']
-                 for (EP_PARAM : EP_PARAMS ) {
-                   for (BUILDER : UNSTABLE_BUILDERS) {
+                 for (EP_PARAM in EP_PARAMS ) {
+                   for (BUILDER in UNSTABLE_BUILDERS) {
                      done=false
                      count=0
                      while (!done && count < 10) {
