@@ -118,7 +118,8 @@ stage("building packages") {
 
 node('master') {
   stage("create repositories") {
-    sh """
+    if (SKIP_REPOBUILD == 'false') {
+      sh """
 ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
         ${env.INTERMEDIATE_DIR} \
         ${env.INTERMEDIATE_EP_DIR} \
@@ -127,6 +128,7 @@ ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
         ${env.ENTERPRISE_SECRET}/arangodb31 \
         repositories/arangodb31
 """
+    }
   }
   stage("updating other repos") {
     build( job: '440_UPDATE_Official_Docker',
