@@ -136,10 +136,18 @@ ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
     sh """
 ${ARANGO_SCRIPT_DIR}/html/create_index.sh enterprise ${env.ENTERPRISE_SECRET} ${env.INTERMEDIATE_EP_DIR}
 ${ARANGO_SCRIPT_DIR}/html/create_index.sh community repositories ${env.INTERMEDIATE_CO_DIR}
+${ARANGO_SCRIPT_DIR}/publish/builddoc2stage.sh
 """
   }
   
 }
+
+node('master') {
+  stage("publish packages") {
+    sh "${ARANGO_SCRIPT_DIR}/publish/stage2public.sh"
+  }
+}
+
 
 node('master') {
   stage("updating other repos") {
