@@ -24,6 +24,32 @@ stage("building packages") {
                           string(name: 'preferBuilder', value: params['preferBuilder']),
                           booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                       )
+                 echo "building Unstable builds with several attempts"
+
+
+                 EP_PARAMS=[ params['ENTERPRISE_URL'], '']
+                 UNSTABLE_BUILDERS = ['ubuntutwelveofour']
+                 for (EP_PARAM : EP_PARAMS ) {
+                   for (BUILDER : UNSTABLE_BUILDERS) {
+                     done=false
+                     count=0
+                     while (!done && count < 10) {
+                       rc = build( job: 'ArangoDB_Release',
+                                   propagate: false,
+                                   parameters: [
+                                     string(name: 'ENTERPRISE_URL', value: EP_PARAM),
+                                     string(name: 'GITTAG', value: "v3.1.1"),
+                                     string(name: 'preferBuilder', value: BUILDER),
+                                     booleanParam(name: 'CLEAN_BUILDENV', value: false),
+                                     booleanParam(name: 'propagate', value:false)]
+
+                                 )
+                       echo "Completed Run ${count} from ${BUILDER} with rc.result!"
+                       done = rc.result == "SUCCESS"
+                       count = count + 1
+                     }
+                   }
+                 }
                },
                "macintosh": {
                  echo "building MacOS X Enterprise Release"
