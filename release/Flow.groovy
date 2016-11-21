@@ -136,8 +136,8 @@ stage("building packages") {
 
 
 stage("create repositories") {
-  node('master') {
-    if (SKIP_REPOBUILD == 'false') {
+  if (SKIP_REPOBUILD == 'false') {
+    node('master') {
       sh """
 ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
         ${env.INTERMEDIATE_DIR} \
@@ -148,20 +148,28 @@ ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
         repositories/arangodb31
 """
     }
-    
   }
+}    
+
+stage("Build Travis CI") {
+  build(
+    job: 'RELEASE__BuildTravisCI',
+        parameters: [
+          string(name: 'GITTAG', value: params['GITTAG']),
+          string(name: 'DEBFILE', value: "${env.INTERMEDIATE_CO_DIR}/xUbuntu_12.04/amd64/arangodb3-${GITTAG}-*_amd64.deb"),
+          booleanParam(name: 'DEBUG', value: false),
+        ]
+  )
 }
 
 stage("Generating HTML output") {
-  node('master') {
-      build(
-        job: 'RELEASE__CreateDownloadSnippets',
-            parameters: [
-              string(name: 'GITTAG', value: params['GITTAG'])
-              booleanParam(name: 'DEBUG', value: false),
-            ]
-      )
-  }
+  build(
+    job: 'RELEASE__CreateDownloadSnippets',
+        parameters: [
+          string(name: 'GITTAG', value: params['GITTAG']),
+          booleanParam(name: 'DEBUG', value: false),
+        ]
+  )
 }
 
 stage("publish packages") {
@@ -174,12 +182,12 @@ stage("publish packages") {
 
 stage("updating other repos") {
   node('macos') {
-      build( job: 'RELEASE__BuildHomebrew',
-             parameters: [
-               string(name: 'GITTAG', value: params['GITTAG'])
-               booleanParam(name: 'DEBUG', value: false),
-               ]
-           )
+    build( job: 'RELEASE__BuildHomebrew',
+           parameters: [
+             string(name: 'GITTAG', value: params['GITTAG']),
+             booleanParam(name: 'DEBUG', value: false),
+           ]
+         )
   }
   node('master') {
     if (SKIP_DOCKER_PUBLISH == 'false') {
