@@ -154,11 +154,13 @@ ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
 
 stage("Generating HTML output") {
   node('master') {
-    sh """
-${ARANGO_SCRIPT_DIR}/html/create_index.sh enterprise ${env.ENTERPRISE_SECRET} ${env.INTERMEDIATE_EP_DIR}
-${ARANGO_SCRIPT_DIR}/html/create_index.sh community repositories ${env.INTERMEDIATE_CO_DIR}
-${ARANGO_SCRIPT_DIR}/publish/builddoc2stage.sh
-"""
+      build(
+        job: 'RELEASE__CreateDownloadSnippets',
+            parameters: [
+              string(name: 'GITTAG', value: params['GITTAG'])
+              booleanParam(name: 'DEBUG', value: false),
+            ]
+      )
   }
 }
 
@@ -171,9 +173,14 @@ stage("publish packages") {
 }
 
 stage("updating other repos") {
-
-  // sh "export GITTAG=${GITTAG}; ${ARANGO_SCRIPT_DIR}/macosx/update_homebrew.sh"
-
+  node('macos') {
+      build( job: 'RELEASE__BuildHomebrew',
+             parameters: [
+               string(name: 'GITTAG', value: params['GITTAG'])
+               booleanParam(name: 'DEBUG', value: false),
+               ]
+           )
+  }
   node('master') {
     if (SKIP_DOCKER_PUBLISH == 'false') {
       build( job: 'RELEASE__UpdateDockerResources',
