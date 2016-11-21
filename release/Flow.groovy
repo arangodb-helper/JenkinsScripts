@@ -89,7 +89,7 @@ stage("building packages") {
                           booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
                       )
                  echo "building Windows Community Release"
-                 build( job: 'WindowsRelease',
+                 build( job: 'RELEASE__BuildWindows',
                         parameters: [
                           string(name: 'ENTERPRISE_URL', value: ''),
                           string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
@@ -101,7 +101,7 @@ stage("building packages") {
                       )
                },
                "documentation": {
-                 build( job: 'ArangoDB_Release_Documentation',
+                 build( job: 'RELEASE__BuildWindows',
                         parameters: [
                           string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                           string(name: 'GITTAG', value: "v${params['GITTAG']}"),
@@ -154,7 +154,7 @@ node('master') {
 node('master') {
   stage("updating other repos") {
     if (SKIP_DOCKER_PUBLISH == 'false') {
-      build( job: '440_UPDATE_Official_Docker',
+      build( job: 'RELEASE__UpdateDockerResources',
            parameters: [
              string(name: 'GITTAG', value: params['GITTAG']),
              booleanParam(name: 'NEW_MAJOR_RELEASE', value: params['NEW_MAJOR_RELEASE']),
