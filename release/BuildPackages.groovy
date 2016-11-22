@@ -80,7 +80,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     }
     print(buildEnv)
     def buildDir = "build-${XEP}package-${buildEnv['name']}"
-    def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 10 --buildDir ${buildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
+    def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 16 --buildDir ${buildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
     if (! buildUnittestTarball) {
       BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} "
     }
