@@ -189,7 +189,15 @@ stage("updating other repos") {
            ]
          )
   }
+  
   node('master') {
+    build( job: 'RELEASE__BuildAMI',
+           parameters: [
+             string(name: 'GITTAG', value: params['GITTAG']),
+             booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
+             booleanParam(name: 'DEBUG', value: false)
+           ]
+         )
     if (SKIP_DOCKER_PUBLISH == 'false') {
       build( job: 'RELEASE__UpdateDockerResources',
              parameters: [
