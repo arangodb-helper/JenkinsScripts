@@ -13,22 +13,24 @@ stage("building packages") {
         "linuxPackages": {
           ///----------------------------------------------------------------------
           echo "building Linux Enterprise Release"
-          build( job: 'ArangoDB_Release',
+          build( job: 'RELEASE__BuildPackages',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                    string(name: 'GITTAG', value: "v${params['GITTAG']}"),
                    string(name: 'preferBuilder', value: params['preferBuilder']),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                 ]
                )
 
           ///----------------------------------------------------------------------
           echo "building Linux Community Release"
-          build( job: 'ArangoDB_Release',
+          build( job: 'RELEASE__BuildPackages',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: ''),
                    string(name: 'GITTAG', value: "v${params['GITTAG']}"),
                    string(name: 'preferBuilder', value: params['preferBuilder']),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                 ]
                )
                  
           ///----------------------------------------------------------------------
@@ -40,15 +42,15 @@ stage("building packages") {
               done=false
               count=0
               while (!done && count < 10) {
-                rc = build( job: 'ArangoDB_Release',
+                rc = build( job: 'RELEASE__BuildPackages',
                             propagate: false,
                             parameters: [
                               string(name: 'ENTERPRISE_URL', value: EP_PARAM),
                               string(name: 'GITTAG', value: "v3.1.1"),
                               string(name: 'preferBuilder', value: BUILDER),
                               booleanParam(name: 'CLEAN_BUILDENV', value: false),
-                              booleanParam(name: 'propagate', value:false)]
-
+                              booleanParam(name: 'propagate', value:false)
+                            ]
                           )
                 echo "Completed Run ${count} from ${BUILDER} with rc.result!"
                 done = rc.result == "SUCCESS"
@@ -65,22 +67,24 @@ stage("building packages") {
             sh "rm -rf /Users/jenkins/net/fileserver/*"
           }
           ///----------------------------------------------------------------------
-          build( job: 'ArangoDB_Release',
+          build( job: 'RELEASE__BuildPackages',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                    string(name: 'GITTAG', value: "v${params['GITTAG']}"),
                    string(name: 'preferBuilder', value: 'macos'),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                 ]
                )
 
           ///----------------------------------------------------------------------
           echo "building MacOS X Community Release"
-          build( job: 'ArangoDB_Release',
+          build( job: 'RELEASE__BuildPackages',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: ''),
                    string(name: 'GITTAG', value: "v${params['GITTAG']}"),
                    string(name: 'preferBuilder', value: 'macos'),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                 ]
                )
 
           ///----------------------------------------------------------------------
@@ -94,39 +98,42 @@ stage("building packages") {
           // Windows doesn't like if we compile multiple times at once...
           ///----------------------------------------------------------------------
           echo "building Windows Enterprise Release"
-          build( job: 'WindowsRelease',
+          build( job: 'RELEASE__BuildWindows',
                  parameters: [
-                   string(name: 'ENTERPRISE_URL_PARAM', value: "--enterprise ${params['ENTERPRISE_URL']}"),
-                   string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
                    string(name: 'GITTAG', value: "v${params['GITTAG']}"),
                    string(name: 'preferBuilder', value: 'windows'),
+                   string(name: 'ENTERPRISE_URL_PARAM', value: "--enterprise ${params['ENTERPRISE_URL']}"),
+                   string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
                    booleanParam(name: 'FLUSH_OUTPUT', value: true),
                    booleanParam(name: 'UPLOAD_RESULTS', value: false),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                 ]
                )
                  
           ///----------------------------------------------------------------------
           echo "building Windows Community Release"
           build( job: 'RELEASE__BuildWindows',
                  parameters: [
-                   string(name: 'ENTERPRISE_URL', value: ''),
-                   string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
                    string(name: 'GITTAG', value: "v${params['GITTAG']}"),
                    string(name: 'preferBuilder', value: 'windows'),
+                   string(name: 'ENTERPRISE_URL_PARAM', value: ''),
+                   string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
                    booleanParam(name: 'FLUSH_OUTPUT', value: false),
                    booleanParam(name: 'UPLOAD_RESULTS', value: true),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                 ]
                )
         },
         ////////////////////////////////////////////////////////////////////////////////
         "documentation": {
-          build( job: 'RELEASE__BuildWindows',
+          build( job: 'RELEASE__BuildDocumentation',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                    string(name: 'GITTAG', value: "v${params['GITTAG']}"),
                    string(name: 'preferBuilder', value: 'debianjessieDocu'),
                    string(name: 'FORCE_GITBRANCH', value:''),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])]
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                 ]
                )
         }
       ]
@@ -157,7 +164,8 @@ stage("Build Travis CI") {
         parameters: [
           string(name: 'GITTAG', value: params['GITTAG']),
           string(name: 'DEBFILE', value: "${env.INTERMEDIATE_CO_DIR}/xUbuntu_12.04/amd64/arangodb3-${GITTAG}-*_amd64.deb"),
-          booleanParam(name: 'DEBUG', value: false),
+          booleanParam(name: 'UPDATE_LINK', value: true),
+          booleanParam(name: 'DEBUG', value: false)
         ]
   )
 }
@@ -166,8 +174,7 @@ stage("Generating HTML output") {
   build(
     job: 'RELEASE__CreateDownloadSnippets',
         parameters: [
-          string(name: 'GITTAG', value: params['GITTAG']),
-          booleanParam(name: 'DEBUG', value: false),
+          string(name: 'GITTAG', value: params['GITTAG'])
         ]
   )
 }
@@ -198,16 +205,25 @@ stage("updating other repos") {
              booleanParam(name: 'DEBUG', value: false)
            ]
          )
+    build( job: 'RELEASE__UpdateGithubMaster',
+           parameters: [
+             string(name: 'GITTAG', value: params['GITTAG'])
+           ]
+         )
     if (SKIP_DOCKER_PUBLISH == 'false') {
       build( job: 'RELEASE__UpdateDockerResources',
              parameters: [
                string(name: 'GITTAG', value: params['GITTAG']),
                booleanParam(name: 'NEW_MAJOR_RELEASE', value: params['NEW_MAJOR_RELEASE']),
-               booleanParam(name: 'CREATE_NEW_VERSION', value: true),
-               booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: true),
+               booleanParam(name: 'UPDATE_MESOS_IMAGE', value: true),
                booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
-               booleanParam(name: 'UPDATE_MESOS_IMAGE', value: true)]
+               booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: true),
+               booleanParam(name: 'CREATE_NEW_VERSION', value: true),
+               booleanParam(name: 'DEBUG', value: false)
+             ]
            )
     }
+
+    
   }
 }
