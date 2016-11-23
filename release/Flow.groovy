@@ -189,28 +189,39 @@ stage("publish packages") {
 
 stage("updating other repos") {
   node('macos') {
-    build( job: 'RELEASE__BuildHomebrew',
-           parameters: [
-             string(name: 'GITTAG', value: params['GITTAG']),
-             booleanParam(name: 'DEBUG', value: false),
-           ]
-         )
+    if (IS_RELEASE == 'true') {
+      build( job: 'RELEASE__BuildHomebrew',
+             parameters: [
+               string(name: 'GITTAG', value: params['GITTAG']),
+               booleanParam(name: 'DEBUG', value: false),
+             ]
+           )
+    }
   }
   
   node('master') {
-    build( job: 'RELEASE__BuildAMI',
-           parameters: [
-             string(name: 'GITTAG', value: params['GITTAG']),
-             booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
-             booleanParam(name: 'DEBUG', value: false)
-           ]
-         )
-    build( job: 'RELEASE__UpdateGithubMaster',
+    if (IS_RELEASE == 'true') {
+      build( job: 'RELEASE__BuildAMI',
+             parameters: [
+               string(name: 'GITTAG', value: params['GITTAG']),
+               booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
+               booleanParam(name: 'DEBUG', value: false)
+             ]
+           )
+      build( job: 'RELEASE__UpdateGithubMaster',
+             parameters: [
+               string(name: 'GITTAG', value: params['GITTAG'])
+             ]
+           )
+    }
+    
+    build( job: 'RELEASE__UpdateGithubUnstable',
            parameters: [
              string(name: 'GITTAG', value: params['GITTAG'])
            ]
          )
-    if (SKIP_DOCKER_PUBLISH == 'false') {
+
+    if (SKIP_DOCKER_PUBLISH == 'false' && IS_RELEASE == 'true') {
       build( job: 'RELEASE__UpdateDockerResources',
              parameters: [
                string(name: 'GITTAG', value: params['GITTAG']),
