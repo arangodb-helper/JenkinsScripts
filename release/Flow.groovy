@@ -37,8 +37,10 @@ stage("building packages") {
           echo "building Unstable builds with several attempts"
           EP_PARAMS=[ params['ENTERPRISE_URL'], '']
           UNSTABLE_BUILDERS = ['ubuntutwelveofour', 'centosix']
+          finalSuccess = true
           for (EP_PARAM in EP_PARAMS ) {
             for (BUILDER in UNSTABLE_BUILDERS) {
+              def rc
               done=false
               count=0
               while (!done && count < 10) {
@@ -52,11 +54,16 @@ stage("building packages") {
                               booleanParam(name: 'propagate', value:false)
                             ]
                           )
-                echo "Completed Run ${count} from ${BUILDER} with rc.result!"
+                echo "Completed Run ${count} from ${BUILDER} with ${rc.result}!"
                 done = rc.result == "SUCCESS"
                 count = count + 1
               }
+              finalSuccess = finalSuccess && (rc.result == "SUCCESS")
             }
+          }
+          if (!finalSuccess) {
+            echo "some builds failed even after 10 retries!"
+            currentBuild.result = 'FAILURE'
           }
         },
         ////////////////////////////////////////////////////////////////////////////////
