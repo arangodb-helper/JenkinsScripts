@@ -179,6 +179,8 @@ stage("Generating HTML output") {
   )
 }
 
+input("message": "Everything we did so far was private. Proceed to the publish step now?")
+
 stage("publish packages") {
   node('master') {
     sh "${ARANGO_SCRIPT_DIR}/publish/stage2public.sh"
@@ -186,6 +188,7 @@ stage("publish packages") {
     
   }
 }
+
 
 stage("updating other repos") {
   node('macos') {
