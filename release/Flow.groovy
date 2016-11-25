@@ -11,27 +11,6 @@ stage("building packages") {
         },
         ////////////////////////////////////////////////////////////////////////////////
         "linuxPackages": {
-          ///----------------------------------------------------------------------
-          echo "building Linux Enterprise Release"
-          build( job: 'RELEASE__BuildPackages',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
-                   string(name: 'preferBuilder', value: params['preferBuilder']),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-
-          ///----------------------------------------------------------------------
-          echo "building Linux Community Release"
-          build( job: 'RELEASE__BuildPackages',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: ''),
-                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
-                   string(name: 'preferBuilder', value: params['preferBuilder']),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
                  
           ///----------------------------------------------------------------------
           echo "building Unstable builds with several attempts"
@@ -54,7 +33,7 @@ stage("building packages") {
                               booleanParam(name: 'propagate', value:false)
                             ]
                           )
-                echo "Completed Run ${count} from ${BUILDER} with ${rc.result}!"
+                echo "Completed Run ${count} from ${BUILDER} (${EP_PARAM}) with ${rc.result}!"
                 done = rc.result == "SUCCESS"
                 count = count + 1
               }
@@ -64,7 +43,31 @@ stage("building packages") {
           if (!finalSuccess) {
             echo "some builds failed even after 10 retries!"
             currentBuild.result = 'FAILURE'
+            throw new Exception()
           }
+          
+          ///----------------------------------------------------------------------
+          echo "building Linux Enterprise Release"
+          build( job: 'RELEASE__BuildPackages',
+                 parameters: [
+                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                   string(name: 'preferBuilder', value: params['preferBuilder']),
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                 ]
+               )
+
+          ///----------------------------------------------------------------------
+          echo "building Linux Community Release"
+          build( job: 'RELEASE__BuildPackages',
+                 parameters: [
+                   string(name: 'ENTERPRISE_URL', value: ''),
+                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                   string(name: 'preferBuilder', value: params['preferBuilder']),
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                 ]
+               )
+
         },
         ////////////////////////////////////////////////////////////////////////////////
         "macintosh": {
