@@ -91,7 +91,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
       sh "rm -rf ${buildDir}"
     }
-    
+    if (CONTAINERS[c]['reliable'] != true) {
+      BUILDSCRIPT="nohup ${BUILDSCRIPT}& tail -f nohup.out; wait"
+    }
     sh BUILDSCRIPT
     
     if (buildUnittestTarball) {
