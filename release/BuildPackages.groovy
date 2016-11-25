@@ -108,9 +108,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           }
           catch (x){}
           stillRunning=(processStat != "")
-          sleep 1
+          sleep 5
         }
-        sh "tail nohup.out"
+        sh "tail -n 100 nohup.out"
       }
     }
     else {
