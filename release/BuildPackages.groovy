@@ -97,13 +97,12 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         sh BUILDSCRIPT
       }
       catch (err) {
-        input("message": "blarg")
         RUNNING_PID=readFile("pid").trim()
         def stillRunning=true
         while (stillRunning) {
           def processStat=""
           try{
-            scripT="cat /proc/${RUNNING_PID}/stat"
+            scripT="cat /proc/${RUNNING_PID}/stat 2>/dev/null"
             echo "script: ${scripT}"
             processStat = sh(returnStdout: true, script: scripT)
           }
