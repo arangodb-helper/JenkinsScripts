@@ -66,7 +66,7 @@ def getReleaseOutDir(String enterpriseUrl, String jobname) {
   return outDir
 }
 
-def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir, String envName) {
+def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir, String envName, Bool Reliable) {
   try {
     sh "cmake --version"
     def EP=""
@@ -88,7 +88,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
       sh "rm -rf ${buildDir}"
     }
-    if (CONTAINERS[c]['reliable'] != true) {
+    if (!Reliable) {
       BUILDSCRIPT="nohup ${BUILDSCRIPT} & echo \$! > /tmp/pid; tail -f nohup.out; wait"
       try {
         if (VERBOSE) {
@@ -139,7 +139,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
   }
 }
 
-def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl) {
+def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl, Bool Reliable) {
   def outDir = ""
   print(buildEnvironment)
   if (buildEnvironment['buildType'] == 'docker') {
@@ -174,7 +174,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
           echo "${WORKSPACE}/out"
           outDir = "${WORKSPACE}/out"
           echo "checking out: "
-          compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir, buildEnvironment['name'])
+          compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir, buildEnvironment['name'], Reliable)
         }
       }
     }
@@ -187,7 +187,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
       sh 'pwd > workspace.loc'
       WORKSPACE = readFile('workspace.loc').trim()
       outDir = "${WORKSPACE}/out"
-      compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir, buildEnvironment['name'])
+      compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir, buildEnvironment['name'], Reliable)
     }
   }
 }
@@ -230,7 +230,7 @@ stage("building ArangoDB") {
   try {
     if (preferBuilder.size() > 0) {
       print(DOCKER_CONTAINER)
-      setupEnvCompileSource(DOCKER_CONTAINER, false, ENTERPRISE_URL)
+      setupEnvCompileSource(DOCKER_CONTAINER, false, ENTERPRISE_URL, CONTAINERS[c]['reliable'])
     }
     else {
       for (int c  = 0; c < CONTAINERS.size(); c++) {
@@ -240,7 +240,7 @@ stage("building ArangoDB") {
           LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
           OS = DOCKER_CONTAINER['OS']
           print(DOCKER_CONTAINER)
-          setupEnvCompileSource(DOCKER_CONTAINER, false, ENTERPRISE_URL)
+          setupEnvCompileSource(DOCKER_CONTAINER, false, ENTERPRISE_URL, CONTAINERS[c]['reliable'])
         }
       }
     }
