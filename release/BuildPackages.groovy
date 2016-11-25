@@ -89,7 +89,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       sh "rm -rf ${buildDir}"
     }
     if (!Reliable) {
-      BUILDSCRIPT="nohup ${BUILDSCRIPT} & echo \$! > pid; tail -f nohup.out; wait"
+      BUILDSCRIPT="nohup ${BUILDSCRIPT} 2>&1 > nohup.out & echo \$! > pid; tail -f nohup.out; wait"
       try {
         if (VERBOSE) {
           print(BUILDSCRIPT)
@@ -111,6 +111,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           stillRunning=(processStat != "")
           sleep 1
         }
+        sh "tail nohup.out"
       }
     }
     else {
