@@ -66,7 +66,7 @@ def getReleaseOutDir(String enterpriseUrl, String jobname) {
   return outDir
 }
 
-def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir, String envName, Bool Reliable) {
+def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir, String envName, Boolean Reliable) {
   try {
     sh "cmake --version"
     def EP=""
@@ -139,7 +139,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
   }
 }
 
-def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl, Bool Reliable) {
+def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl, Boolean Reliable) {
   def outDir = ""
   print(buildEnvironment)
   if (buildEnvironment['buildType'] == 'docker') {
