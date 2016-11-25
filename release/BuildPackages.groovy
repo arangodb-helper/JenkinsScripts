@@ -97,6 +97,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         sh BUILDSCRIPT
       }
       catch (err) {
+        input("message": "blarg")
         RUNNING_PID=readFile("/tmp/pid")
         while (fileExists("/proc/${RUNNING_PID}/mem")) {
           sleep 1
