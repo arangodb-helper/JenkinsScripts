@@ -104,7 +104,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           try{
             scripT="cat /proc/${RUNNING_PID}/stat 2>/dev/null"
             echo "script: ${scripT}"
-            processStat = sh(returnStdout: true, script: scripT)
+            processStat = sh(returnStdout: true, script: scripT).trim()
           }
           catch (x){}
           stillRunning=(processStat != "")
