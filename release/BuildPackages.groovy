@@ -99,7 +99,15 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       catch (err) {
         input("message": "blarg")
         RUNNING_PID=readFile("pid")
-        while (fileExists("/proc/${RUNNING_PID}/mem")) {
+        def stillRunning=true
+        while (stillRunning) {
+          sh "cat /proc/${RUNNING_PID}/stat"
+          def processStat=""
+          try{
+            processStat = sh(returnStdout: true, script: "cat /proc/${RUNNING_PID}/stat")
+          }
+          catch (){}
+          stillRunning=(processStat != "")
           sleep 1
         }
       }
