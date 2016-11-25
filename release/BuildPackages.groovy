@@ -106,7 +106,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           try{
             processStat = sh(returnStdout: true, script: "cat /proc/${RUNNING_PID}/stat")
           }
-          catch (){}
+          catch (x){}
           stillRunning=(processStat != "")
           sleep 1
         }
