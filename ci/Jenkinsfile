@@ -282,7 +282,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
       mail (to: gitCommitter,
             subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
-            body: err.getMessage());
+            body: "${err.getMessage()} - ${err}");
       currentBuild.result = 'FAILURE'
       throw(err)
     }
