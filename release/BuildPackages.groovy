@@ -92,10 +92,21 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       sh "rm -rf ${buildDir}"
     }
     if (CONTAINERS[c]['reliable'] != true) {
-      BUILDSCRIPT="nohup ${BUILDSCRIPT}& tail -f nohup.out; wait"
+      BUILDSCRIPT="nohup ${BUILDSCRIPT}& echo $! > /tmp/pid; tail -f nohup.out; wait"
+      try {
+        sh BUILDSCRIPT
+      }
+      catch (err) {
+        RUNNING_PID=readFile("/tmp/pid")
+        while (fileExists("/proc/${RUNNING_PID}/mem")) {
+          sleep 1
+        }
+      }
     }
-    sh BUILDSCRIPT
-    
+    else {
+      // we expect this docker to run stable, so we don't fuck aroundwith nohup
+      sh BUILDSCRIPT
+    }
     if (buildUnittestTarball) {
       BUILT_FILE = "${outDir}/arangodb-${OS}.tar.gz"
       DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
