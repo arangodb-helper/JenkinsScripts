@@ -89,7 +89,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       sh "rm -rf ${buildDir}"
     }
     if (!Reliable) {
-      BUILDSCRIPT="nohup ${BUILDSCRIPT} & echo \$! > /tmp/pid; tail -f nohup.out; wait"
+      BUILDSCRIPT="nohup ${BUILDSCRIPT} & echo \$! > pid; tail -f nohup.out; wait"
       try {
         if (VERBOSE) {
           print(BUILDSCRIPT)
@@ -98,7 +98,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       }
       catch (err) {
         input("message": "blarg")
-        RUNNING_PID=readFile("/tmp/pid")
+        RUNNING_PID=readFile("pid")
         while (fileExists("/proc/${RUNNING_PID}/mem")) {
           sleep 1
         }
