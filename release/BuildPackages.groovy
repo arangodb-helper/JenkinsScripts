@@ -98,7 +98,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       }
       catch (err) {
         input("message": "blarg")
-        RUNNING_PID=readFile("pid")
+        RUNNING_PID=readFile("pid").trim()
         def stillRunning=true
         while (stillRunning) {
           def processStat=""
