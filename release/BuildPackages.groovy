@@ -103,7 +103,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         while (stillRunning) {
           def processStat=""
           try{
-            processStat = sh(returnStdout: true, script: "cat /proc/${RUNNING_PID}/stat")
+            scripT="cat /proc/${RUNNING_PID}/stat"
+            echo "script: ${scripT}"
+            processStat = sh(returnStdout: true, script: scripT)
           }
           catch (x){}
           stillRunning=(processStat != "")
