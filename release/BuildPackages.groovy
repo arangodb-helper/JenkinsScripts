@@ -84,9 +84,6 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (! buildUnittestTarball) {
       BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} "
     }
-    if (VERBOSE) {
-      print(BUILDSCRIPT)
-    }
     if (CLEAN_BUILDENV == "true") {
 
       sh "rm -rf ${buildDir}"
@@ -94,6 +91,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (CONTAINERS[c]['reliable'] != true) {
       BUILDSCRIPT="nohup ${BUILDSCRIPT}& echo $! > /tmp/pid; tail -f nohup.out; wait"
       try {
+        if (VERBOSE) {
+          print(BUILDSCRIPT)
+        }
         sh BUILDSCRIPT
       }
       catch (err) {
@@ -105,6 +105,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     }
     else {
       // we expect this docker to run stable, so we don't fuck aroundwith nohup
+      if (VERBOSE) {
+        print(BUILDSCRIPT)
+      }
       sh BUILDSCRIPT
     }
     if (buildUnittestTarball) {
