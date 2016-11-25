@@ -101,7 +101,6 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         RUNNING_PID=readFile("pid")
         def stillRunning=true
         while (stillRunning) {
-          sh "cat /proc/${RUNNING_PID}/stat"
           def processStat=""
           try{
             processStat = sh(returnStdout: true, script: "cat /proc/${RUNNING_PID}/stat")
