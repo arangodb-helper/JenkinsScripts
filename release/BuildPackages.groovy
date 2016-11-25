@@ -154,12 +154,12 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
  --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw\
  --volume /jenkins:/mnt/:rw \
 """) {
-//           docker.image(myBuildImage.imageName()).withRun("""\
-//  -u 1000:1000 \
-// --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw \
-// --volume /jenkins:/mnt/:rw \
-// --volume /var/lib/jenkins/workspace/ArangoDB_Release:/var/lib/jenkins/workspace/ArangoDB_Release:rw \
-// """) { c->
+          //           docker.image(myBuildImage.imageName()).withRun("""\
+          //  -u 1000:1000 \
+          // --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw \
+          // --volume /jenkins:/mnt/:rw \
+          // --volume /var/lib/jenkins/workspace/ArangoDB_Release:/var/lib/jenkins/workspace/ArangoDB_Release:rw \
+          // """) { c->
           echo "hello from docker"
           if (VERBOSE) {
             sh "mount"
@@ -245,12 +245,13 @@ stage("building ArangoDB") {
       }
     }
   } catch (err) {
-    stage('Send Notification for build' )
-    mail (to: ADMIN_ACCOUNT, 
-          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
-          body: err.getMessage());
-    currentBuild.result = 'FAILURE'
-    throw(err)
+    stage('Send Notification for build' ) {
+      mail (to: ADMIN_ACCOUNT, 
+            subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
+            body: err.getMessage());
+      currentBuild.result = 'FAILURE'
+      throw(err)
+    }
   }
 }
 
