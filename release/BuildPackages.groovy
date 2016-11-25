@@ -234,7 +234,7 @@ stage("building ArangoDB") {
     }
     else {
       for (int c  = 0; c < CONTAINERS.size(); c++) {
-        if (CONTAINERS[c]['buildType'] == 'docker' && CONTAINERS[c]['reliable'] == true) {
+        if (CONTAINERS[c]['buildType'] == 'docker' && CONTAINER['reliable'] == true) {
           DOCKER_CONTAINER = CONTAINERS[c]
           RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
           LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
