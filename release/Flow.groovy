@@ -41,9 +41,8 @@ stage("building packages") {
             }
           }
           if (!finalSuccess) {
-            echo "some builds failed even after 10 retries!"
             currentBuild.result = 'FAILURE'
-            throw new Exception()
+            error "some builds failed even after 10 retries!"
           }
           
           ///----------------------------------------------------------------------
