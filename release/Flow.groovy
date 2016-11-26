@@ -168,15 +168,17 @@ ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
 }    
 
 stage("Build Travis CI") {
-  build(
-    job: 'RELEASE__BuildTravisCI',
-        parameters: [
-          string(name: 'GITTAG', value: params['GITTAG']),
-          string(name: 'DEBFILE', value: "${env.INTERMEDIATE_CO_DIR}/xUbuntu_12.04/amd64/arangodb3-${GITTAG}-*_amd64.deb"),
-          booleanParam(name: 'UPDATE_LINK', value: true),
-          booleanParam(name: 'DEBUG', value: false)
-        ]
-  )
+  node('master') {
+    build(
+      job: 'RELEASE__BuildTravisCI',
+          parameters: [
+            string(name: 'GITTAG', value: params['GITTAG']),
+            string(name: 'DEBFILE', value: "${env.INTERMEDIATE_CO_DIR}/xUbuntu_12.04/amd64/arangodb3-${GITTAG}-*_amd64.deb"),
+            booleanParam(name: 'UPDATE_LINK', value: true),
+            booleanParam(name: 'DEBUG', value: false)
+          ]
+    )
+  }
 }
 
 stage("Generating HTML output") {
