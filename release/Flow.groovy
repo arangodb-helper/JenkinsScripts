@@ -1,6 +1,6 @@
 stage("building packages") {
-  echo "skip build is: ${params['SKIP_BUILD']}"
-  if (params['SKIP_BUILD'] == "false") {
+  echo "skip build is: ${SKIP_BUILD}"
+  if (SKIP_BUILD == "false") {
     echo "Now starting to build:"
     parallel(
       [
