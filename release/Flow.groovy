@@ -155,17 +155,13 @@ stage("building packages") {
 
 stage("create repositories") {
   if (SKIP_REPOBUILD == 'false') {
-    node('master') {
-      sh """
-${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
-        ${env.INTERMEDIATE_DIR} \
-        ${env.INTERMEDIATE_EP_DIR} \
-        ${env.INTERMEDIATE_CO_DIR} \
-        ${GITTAG} \
-        ${env.ENTERPRISE_SECRET}/arangodb31 \
-        repositories/arangodb31
-"""
-    }
+    build(
+      job: 'RELEASE__BuildRepositories',
+          parameters: [
+            string(name: 'GITTAG', value: params['GITTAG']),
+            booleanParam(name: 'DEBUG', value: false)
+          ]
+    )
   }
 }    
 
