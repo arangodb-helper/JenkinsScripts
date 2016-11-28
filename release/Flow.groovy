@@ -15,37 +15,37 @@ stage("building packages") {
         "linuxPackages": {
                  
           ///----------------------------------------------------------------------
-          echo "building Unstable builds with several attempts"
-          EP_PARAMS=[ params['ENTERPRISE_URL'], '']
-          UNSTABLE_BUILDERS = ['ubuntutwelveofour', 'centosix', 'fedoratwentyfive']
-          finalSuccess = true
-          for (EP_PARAM in EP_PARAMS ) {
-            for (BUILDER in UNSTABLE_BUILDERS) {
-              def rc
-              done=false
-              count=0
-              while (!done && count < 10) {
-                rc = build( job: 'RELEASE__BuildPackages',
-                            propagate: false,
-                            parameters: [
-                              string(name: 'ENTERPRISE_URL', value: EP_PARAM),
-                              string(name: 'GITTAG', value: "v3.1.1"),
-                              string(name: 'preferBuilder', value: BUILDER),
-                              booleanParam(name: 'CLEAN_BUILDENV', value: false),
-                              booleanParam(name: 'propagate', value:false)
-                            ]
-                          )
-                echo "Completed Run ${count} from ${BUILDER} (${EP_PARAM}) with ${rc.result}!"
-                done = rc.result == "SUCCESS"
-                count = count + 1
-              }
-              finalSuccess = finalSuccess && (rc.result == "SUCCESS")
-            }
-          }
-          if (!finalSuccess) {
-            currentBuild.result = 'FAILURE'
-            error "some builds failed even after 10 retries!"
-          }
+          // echo "building Unstable builds with several attempts"
+          // EP_PARAMS=[ params['ENTERPRISE_URL'], '']
+          // UNSTABLE_BUILDERS = ['ubuntutwelveofour', 'centosix', 'fedoratwentyfive']
+          // finalSuccess = true
+          // for (EP_PARAM in EP_PARAMS ) {
+          //   for (BUILDER in UNSTABLE_BUILDERS) {
+          //     def rc
+          //     done=false
+          //     count=0
+          //     while (!done && count < 10) {
+          //       rc = build( job: 'RELEASE__BuildPackages',
+          //                   propagate: false,
+          //                   parameters: [
+          //                     string(name: 'ENTERPRISE_URL', value: EP_PARAM),
+          //                     string(name: 'GITTAG', value: "v3.1.1"),
+          //                     string(name: 'preferBuilder', value: BUILDER),
+          //                     booleanParam(name: 'CLEAN_BUILDENV', value: false),
+          //                     booleanParam(name: 'propagate', value:false)
+          //                   ]
+          //                 )
+          //       echo "Completed Run ${count} from ${BUILDER} (${EP_PARAM}) with ${rc.result}!"
+          //       done = rc.result == "SUCCESS"
+          //       count = count + 1
+          //     }
+          //     finalSuccess = finalSuccess && (rc.result == "SUCCESS")
+          //   }
+          // }
+          // if (!finalSuccess) {
+          //   currentBuild.result = 'FAILURE'
+          //   error "some builds failed even after 10 retries!"
+          // }
           
           ///----------------------------------------------------------------------
           echo "building Linux Enterprise Release"
