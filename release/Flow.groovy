@@ -15,7 +15,7 @@ stage("building packages") {
           ///----------------------------------------------------------------------
           echo "building Unstable builds with several attempts"
           EP_PARAMS=[ params['ENTERPRISE_URL'], '']
-          UNSTABLE_BUILDERS = ['ubuntutwelveofour', 'centosix']
+          UNSTABLE_BUILDERS = ['ubuntutwelveofour', 'centosix', 'fedoratwentyfive']
           finalSuccess = true
           for (EP_PARAM in EP_PARAMS ) {
             for (BUILDER in UNSTABLE_BUILDERS) {
