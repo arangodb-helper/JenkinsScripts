@@ -194,7 +194,7 @@ stage("publish packages") {
   node('master') {
     sh "${ARANGO_SCRIPT_DIR}/publish/stage2public.sh"
     sh "${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
-    
+    sh "echo '${params['GITTAG']}' > ${env.PUBLIC_CO_DIR}VERSION"
   }
 }
 
