@@ -186,6 +186,14 @@ stage("Generating HTML output") {
           string(name: 'GITTAG', value: params['GITTAG'])
         ]
   )
+  build(
+    job: 'RELEASE__TestPackages',
+        parameters: [
+          string(name: 'preferBuilder', value: ''),
+          booleanParam(name: 'DEBUG', value: false),
+          booleanParam(name: 'testLiveDownloads', value: false)
+        ]
+  )
 }
 
 input("message": "Everything we did so far was private. Proceed to the publish step now?")
