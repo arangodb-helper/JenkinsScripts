@@ -2,7 +2,7 @@
 
 stage("addCustomer") {
   node('master') {
-    echo "${env.BUILD_USER} ${env.BUILD_USER_FIRST_NAME}"
+    echo "${env.BUILD_USER} ${env.BUILD_USER_FIRST_NAME} ${env.BUILD_USER_ID} "
     sh "${ARANGO_SCRIPT_DIR}/enterprise/AddCustomer.sh '${CUSTOMER_NAME}' '${env.BUILD_USER_ID}'"
   }
 }
