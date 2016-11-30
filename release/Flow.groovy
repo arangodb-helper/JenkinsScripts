@@ -240,6 +240,12 @@ stage("updating other repos") {
              string(name: 'GITTAG', value: params['GITTAG'])
            ]
          )
+    
+    build( job: 'RELEASE__PublishSnap',
+           parameters: [
+             string(name: 'GITTAG', value: params['GITTAG'])
+           ]
+         )
 
     if (SKIP_DOCKER_PUBLISH == 'false' && IS_RELEASE == 'true') {
       build( job: 'RELEASE__UpdateDockerResources',
