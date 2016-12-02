@@ -179,7 +179,7 @@ stage("Build Travis CI") {
   }
 }
 
-stage("Generating HTML output") {
+stage("Generating HTML snippets & test it with the packages") {
   build(
     job: 'RELEASE__CreateDownloadSnippets',
         parameters: [
@@ -208,59 +208,79 @@ stage("publish packages") {
 
 
 stage("updating other repos") {
-  node('macos') {
-    if (IS_RELEASE == 'true') {
-      build( job: 'RELEASE__BuildHomebrew',
-             parameters: [
-               string(name: 'GITTAG', value: params['GITTAG']),
-               booleanParam(name: 'DEBUG', value: false),
-             ]
-           )
-    }
-  }
-  
-  node('master') {
-    if (IS_RELEASE == 'true') {
-      build( job: 'RELEASE__BuildAMI',
-             parameters: [
-               string(name: 'GITTAG', value: params['GITTAG']),
-               booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
-               booleanParam(name: 'DEBUG', value: false)
-             ]
-           )
-      build( job: 'RELEASE__UpdateGithubMaster',
-             parameters: [
-               string(name: 'GITTAG', value: params['GITTAG'])
-             ]
-           )
-    }
-    
-    build( job: 'RELEASE__UpdateGithubUnstable',
-           parameters: [
-             string(name: 'GITTAG', value: params['GITTAG'])
-           ]
-         )
-    
-    build( job: 'RELEASE__PublishSnap',
-           parameters: [
-             string(name: 'GITTAG', value: params['GITTAG'])
-           ]
-         )
-
-    if (SKIP_DOCKER_PUBLISH == 'false' && IS_RELEASE == 'true') {
-      build( job: 'RELEASE__UpdateDockerResources',
-             parameters: [
-               string(name: 'GITTAG', value: params['GITTAG']),
-               booleanParam(name: 'NEW_MAJOR_RELEASE', value: params['NEW_MAJOR_RELEASE']),
-               booleanParam(name: 'UPDATE_MESOS_IMAGE', value: true),
-               booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
-               booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: true),
-               booleanParam(name: 'CREATE_NEW_VERSION', value: true),
-               booleanParam(name: 'DEBUG', value: false)
-             ]
-           )
-    }
-
-    
-  }
+  parallel(
+    [
+      ////////////////////////////////////////////////////////////////////////////////
+      "homeBrew": {
+        node('macos') {
+          if (IS_RELEASE == 'true') {
+            build( job: 'RELEASE__BuildHomebrew',
+                   parameters: [
+                     string(name: 'GITTAG', value: params['GITTAG']),
+                     booleanParam(name: 'DEBUG', value: false),
+                   ]
+                 )
+          }
+        }
+      },
+      "AMI": {
+        node('master') {
+          if (IS_RELEASE == 'true') {
+            build( job: 'RELEASE__BuildAMI',
+                   parameters: [
+                     string(name: 'GITTAG', value: params['GITTAG']),
+                     booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
+                     booleanParam(name: 'DEBUG', value: false)
+                   ]
+                 )
+          }
+        }
+      },
+      "SNAPPY": {
+        node('master') {
+          build( job: 'RELEASE__PublishSnap',
+                 parameters: [
+                   string(name: 'GITTAG', value: params['GITTAG'])
+                 ]
+               )
+        }
+      },
+      "Docker": {
+        if (SKIP_DOCKER_PUBLISH == 'false' && IS_RELEASE == 'true') {
+          node('master') {
+            build( job: 'RELEASE__UpdateDockerResources',
+                   parameters: [
+                     string(name: 'GITTAG', value: params['GITTAG']),
+                     booleanParam(name: 'NEW_MAJOR_RELEASE', value: params['NEW_MAJOR_RELEASE']),
+                     booleanParam(name: 'UPDATE_MESOS_IMAGE', value: true),
+                     booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
+                     booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: true),
+                     booleanParam(name: 'CREATE_NEW_VERSION', value: true),
+                     booleanParam(name: 'DEBUG', value: false)
+                   ]
+                 )
+          }
+        }
+      },
+      "Update Github Master": {
+        if (IS_RELEASE == 'true') {
+          node("master") {
+            build( job: 'RELEASE__UpdateGithubMaster',
+                   parameters: [
+                     string(name: 'GITTAG', value: params['GITTAG'])
+                   ]
+                 )
+          }
+        }
+      },
+      "Update Github Unstable": {
+        node("master") {
+          build( job: 'RELEASE__UpdateGithubUnstable',
+                 parameters: [
+                   string(name: 'GITTAG', value: params['GITTAG'])
+                 ]
+               )
+        }
+      }
+    ])
 }
