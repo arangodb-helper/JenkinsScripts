@@ -85,8 +85,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} "
     }
     if (CLEAN_BUILDENV == "true") {
-
-      sh "rm -rf ${buildDir}"
+      BUILDSCRIPT="rm -rf ${buildDir}; ${BUILDSCRIPT}"
     }
     if (!Reliable) {
       BUILDSCRIPT="nohup ${BUILDSCRIPT} > nohup.out 2>&1 & PID=\$!; echo \$PID > pid; tail -f nohup.out & wait \$PID; kill %2"
