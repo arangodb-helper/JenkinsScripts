@@ -103,6 +103,26 @@ stage("building packages") {
           node("macos") {
             sh "scp -r /Users/jenkins/net/fileserver/* ${env.JENKINSMASTER}:${env.INTERMEDIATE_DIR}"
           }
+          ///----------------------------------------------------------------------
+          echo "running MacOS X Release unittests"
+          build( job: 'RELEASE__BuildTest',
+                 parameters: [
+                   string(name: 'ENTERPRISE_URL', value: ''),
+                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                   string(name: 'preferBuilder', value: 'macos'),
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                 ]
+               )
+          
+          build( job: 'RELEASE__BuildTest',
+                 parameters: [
+                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                   string(name: 'preferBuilder', value: 'macos'),
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                 ]
+               )
+          
         },
         ////////////////////////////////////////////////////////////////////////////////
         "Windows": {
