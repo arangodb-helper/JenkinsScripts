@@ -92,6 +92,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (CLEAN_BUILDENV == "true") {
       BUILDSCRIPT="rm -rf ${buildDir}; ${BUILDSCRIPT}"
     }
+    else {
+      BUILDSCRIPT="rm -rf ${buildDir}/CMakeFiles ${buildDir}/CMakeCache.txt ; ${BUILDSCRIPT}"
+    }
     if (!Reliable) {
       BUILDSCRIPT="nohup ${BUILDSCRIPT} > nohup.out 2>&1 & PID=\$!; echo \$PID > pid; tail -f nohup.out & wait \$PID; kill %2"
       try {
