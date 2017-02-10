@@ -171,14 +171,26 @@ else {
     if (fileExists(lastKnownGoodGitFile)) {
       lastKnownGitRev=readFile(lastKnownGoodGitFile)
     }
-    git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
+    // git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
     currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-    if (FORCE_GITBRANCH != "") {
-      sh "git checkout ${FORCE_GITBRANCH}; git pull --all"
-      sh 'echo "${GITTAG}" | sed "s;^v;;" > VERSION'
-    } else {
-      sh "git checkout ${GITTAG}"
-    }
+    checkout([$class: 'GitSCM',
+              branches: [[name: "${GITTAG}"]],
+              doGenerateSubmoduleConfigurations: false,
+              extensions: [[$class: 'SubmoduleOption',
+                            disableSubmodules: false,
+                            parentCredentials: false,
+                            recursiveSubmodules: true,
+                            reference: '',
+                            trackingSubmodules: false]],
+              submoduleCfg: [],
+              userRemoteConfigs:
+              [[url: 'https://github.com/arangodb/arangodb.git']]])
+    // if (FORCE_GITBRANCH != "") {
+    //   sh "git checkout ${FORCE_GITBRANCH}; git pull --all"
+    //   sh 'echo "${GITTAG}" | sed "s;^v;;" > VERSION'
+    // } else {
+    //   sh "git checkout ${GITTAG}"
+    // }
     print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
   }
 }
