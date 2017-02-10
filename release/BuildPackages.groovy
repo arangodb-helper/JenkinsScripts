@@ -220,9 +220,26 @@ stage("cloning source") {
       if (fileExists(lastKnownGoodGitFile)) {
         lastKnownGitRev=readFile(lastKnownGoodGitFile)
       }
-      git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
+      // git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
+
+      checkout([$class: 'GitSCM',
+                branches: [[name: "${GITTAG}"]],
+                doGenerateSubmoduleConfigurations: false,
+                extensions: [[$class: 'SubmoduleOption',
+                              disableSubmodules: false,
+                              parentCredentials: false,
+                              recursiveSubmodules: true,
+                              reference: '',
+                              trackingSubmodules: false]],
+                submoduleCfg: [],
+                userRemoteConfigs:
+                [[url: 'https://github.com/arangodb/arangodb.git']]])
+      
       currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-      sh "git checkout ${GITTAG}"
+      // sh "git checkout ${GITTAG}"
+      // sh "git submodule update --recursive"
+      // sh "git submodule update --init --recursive"
+      // sh "git submodule update"
       print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
     }
   }
