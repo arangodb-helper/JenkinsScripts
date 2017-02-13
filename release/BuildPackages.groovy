@@ -88,7 +88,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     }
     print(buildEnv)
     def buildDir = ""
-    if (buildenv['BUILD'].size() == 0) {
+    if (buildEnv['BUILD'].size() == 0) {
       buildDir = "build-${XEP}package-${buildEnv['name']}"
     }
     else {
