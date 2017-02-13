@@ -244,7 +244,7 @@ stage("cloning source") {
                 userRemoteConfigs:
                 [[url: 'https://github.com/arangodb/arangodb.git']]])
       
-      currentGitRev = sh(returnStdout: true, script: 'git rqev-parse HEAD').trim()
+      currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
       // sh "git checkout ${GITTAG}"
       // sh "git submodule update --recursive"
       // sh "git submodule update --init --recursive"
