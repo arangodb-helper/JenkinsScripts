@@ -151,7 +151,7 @@ def runTests(where, testWorkingDirectory) {
     echo "${where['testRunName']}: recording results [ ${testWorkingDirectory}/out/UNITTEST_RESULT_*.xml ]:"
     sh "ls -l ${testWorkingDirectory}/out/UNITTEST_RESULT_*.xml"
   }
-  junit "out/UNITTEST_RESULT_*.xml"
+  junit "${testWorkingDirectory}/out/UNITTEST_RESULT_*.xml"
   //step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
   print("The currentBuild.result is: ${currentBuild.result}")
   def testFailuresFile = "${testWorkingDirectory}/out/testfailures.txt"
