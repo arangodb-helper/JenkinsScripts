@@ -129,31 +129,29 @@ stage("building packages") {
           // Windows doesn't like if we compile multiple times at once...
           ///----------------------------------------------------------------------
           echo "building Windows Enterprise Release"
-          build( job: 'RELEASE__BuildWindows',
+          build( job: 'RELEASE__BuildPackages',
                  parameters: [
+                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                    string(name: 'GITTAG', value: "v${params['GITTAG']}"),
                    string(name: 'preferBuilder', value: 'windows'),
-                   string(name: 'ENTERPRISE_URL_PARAM', value: "--enterprise ${params['ENTERPRISE_URL']}"),
-                   string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
-                   booleanParam(name: 'FLUSH_OUTPUT', value: true),
-                   booleanParam(name: 'UPLOAD_RESULTS', value: false),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                  ]
                )
-                 
+
           ///----------------------------------------------------------------------
           echo "building Windows Community Release"
-          build( job: 'RELEASE__BuildWindows',
+          build( job: 'RELEASE__BuildPackages',
                  parameters: [
+                   string(name: 'ENTERPRISE_URL', value: ''),
                    string(name: 'GITTAG', value: "v${params['GITTAG']}"),
                    string(name: 'preferBuilder', value: 'windows'),
-                   string(name: 'ENTERPRISE_URL_PARAM', value: ''),
-                   string(name: 'JENKINSMASTER', value: params['JENKINSMASTER']),
-                   booleanParam(name: 'FLUSH_OUTPUT', value: false),
-                   booleanParam(name: 'UPLOAD_RESULTS', value: true),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                  ]
                )
+          node('windows') {
+            sh "scp -r /var/tmp/[CO|EP]  ${JENKINSMASTER}:/mnt/data/fileserver/"
+            sh "rm -rf  /var/tmp/[CO|EP]"
+          }
         },
         ////////////////////////////////////////////////////////////////////////////////
         "documentation": {
