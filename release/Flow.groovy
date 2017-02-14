@@ -75,7 +75,7 @@ stage("building packages") {
           echo "building MacOS X Enterprise Release"
           ///----------------------------------------------------------------------
           node("macos") {
-            sh "rm -rf /Users/jenkins/net/fileserver/*"
+            sh "mkdir -p /Users/jenkins/net/fileserver/; rm -rf /Users/jenkins/net/fileserver/*"
           }
           ///----------------------------------------------------------------------
           build( job: 'RELEASE__BuildPackages',
@@ -126,6 +126,9 @@ stage("building packages") {
         },
         ////////////////////////////////////////////////////////////////////////////////
         "Windows": {
+          node('windows') {
+            sh "rm -rf /var/tmp/r/; mkdir -p /var/tmp/r/"
+          }
           // Windows doesn't like if we compile multiple times at once...
           ///----------------------------------------------------------------------
           echo "building Windows Enterprise Release"
@@ -149,8 +152,7 @@ stage("building packages") {
                  ]
                )
           node('windows') {
-            sh "scp -r /var/tmp/[CO|EP]  ${JENKINSMASTER}:/mnt/data/fileserver/"
-            sh "rm -rf  /var/tmp/[CO|EP]"
+            sh "scp -r /var/tmp/r/*  ${JENKINSMASTER}:/mnt/data/fileserver/"
           }
         },
         ////////////////////////////////////////////////////////////////////////////////
