@@ -172,7 +172,6 @@ else {
       lastKnownGitRev=readFile(lastKnownGoodGitFile)
     }
     // git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
-    currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     checkout([$class: 'GitSCM',
               branches: [[name: "${GITTAG}"]],
               doGenerateSubmoduleConfigurations: false,
@@ -185,6 +184,7 @@ else {
               submoduleCfg: [],
               userRemoteConfigs:
               [[url: 'https://github.com/arangodb/arangodb.git']]])
+    currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     // if (FORCE_GITBRANCH != "") {
     //   sh "git checkout ${FORCE_GITBRANCH}; git pull --all"
     //   sh 'echo "${GITTAG}" | sed "s;^v;;" > VERSION'
