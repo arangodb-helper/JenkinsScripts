@@ -151,7 +151,7 @@ def runTests(where, testWorkingDirectory) {
     echo "${where['testRunName']}: recording results [ ${testWorkingDirectory}/out/UNITTEST_RESULT_*.xml ]:"
     sh "ls -l ${testWorkingDirectory}/out/UNITTEST_RESULT_*.xml"
   }
-  junit "${testWorkingDirectory}/out/UNITTEST_RESULT_*.xml"
+  junit allowEmptyResults: true, keepLongStdio: true, testResults: "${testWorkingDirectory}/out/UNITTEST_RESULT_*.xml"
   //step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
   print("The currentBuild.result is: ${currentBuild.result}")
   def testFailuresFile = "${testWorkingDirectory}/out/testfailures.txt"
@@ -175,11 +175,11 @@ def runTests(where, testWorkingDirectory) {
 
 def runThisTest(which, buildEnvironment)
 {
-    print('runThisTest')
-    def testWorkingDirectory;
+  print('runThisTest')
+  def testWorkingDirectory;
   def where = testParams[which]
-    if (buildEnvironment['testType'] == 'docker') {
-	print("in")
+  if (buildEnvironment['testType'] == 'docker') {
+    print("in")
     node {
       sh 'pwd > workspace.loc'
       def WORKSPACE = readFile('workspace.loc').trim()
@@ -202,39 +202,39 @@ def runThisTest(which, buildEnvironment)
               sh "pwd"
               echo "${env} ${buildHost}"
             }
-              copyExtractTarBall(where, buildHost, testWorkingDirectory)
-              setupTestArea(where, testWorkingDirectory)
-              runTests(where, testWorkingDirectory)
+            copyExtractTarBall(where, buildHost, testWorkingDirectory)
+            setupTestArea(where, testWorkingDirectory)
+            runTests(where, testWorkingDirectory)
 
           }
         }
       }
     }
   }
-    else {
-	print("else")
-	print(buildEnvironment)
-	node(buildEnvironment['name']){
-	    print("on node")
-	    sh 'pwd > workspace.loc'
-	    def WORKSPACE = readFile('workspace.loc').trim()
-	    print("setting workspace")
-	    testWorkingDirectory="${WORKSPACE}/${where['testRunName']}"
-	    print("done")
-	    if (VERBOSE) {
-		print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
-	    }
-	    dir("${where['testRunName']}") {
-		print("on directory")
-		if (VERBOSE) {
-		    echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
-		}
-		def buildHost=buildEnvironment['name']
-		copyExtractTarBall(where, buildHost, testWorkingDirectory)
-		setupTestArea(where, testWorkingDirectory)
-		runTests(where, testWorkingDirectory)
-	    }
-	}
+  else {
+    print("else")
+    print(buildEnvironment)
+    node(buildEnvironment['name']){
+      print("on node")
+      sh 'pwd > workspace.loc'
+      def WORKSPACE = readFile('workspace.loc').trim()
+      print("setting workspace")
+      testWorkingDirectory="${WORKSPACE}/${where['testRunName']}"
+      print("done")
+      if (VERBOSE) {
+        print("hello ${which}: ${where['testRunName']} ${where} RUNNING in ${WORKSPACE}")
+      }
+      dir("${where['testRunName']}") {
+        print("on directory")
+        if (VERBOSE) {
+          echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
+        }
+        def buildHost=buildEnvironment['name']
+        copyExtractTarBall(where, buildHost, testWorkingDirectory)
+        setupTestArea(where, testWorkingDirectory)
+        runTests(where, testWorkingDirectory)
+      }
+    }
   }
 }
 
