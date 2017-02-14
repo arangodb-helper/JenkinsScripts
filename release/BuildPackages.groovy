@@ -175,7 +175,6 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
         def myBuildImage = docker.image("${buildEnvironment['name']}/build")
         myBuildImage.pull()
         echo "hello before docker ${RELEASE_OUT_DIR}"
-        echo """hello before docker ${RELEASE_OUT_DIR}"""
         docker.image(myBuildImage.imageName()).inside("""\
  --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw\
  --volume /jenkins:/mnt/:rw \
@@ -187,7 +186,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
           // --volume /var/lib/jenkins/workspace/ArangoDB_Release:/var/lib/jenkins/workspace/ArangoDB_Release:rw \
           // """) { c->
           echo "hello from docker"
-          if (VERBOSE) {
+          if (VERBOSE && Reliable) {
             sh "mount"
             sh "pwd"
             sh "cat /etc/issue /mnt/workspace/issue /etc/passwd"
