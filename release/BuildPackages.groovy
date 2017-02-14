@@ -96,7 +96,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     }
     def cBuildDir = ""
     if (buildEnv['CBUILD'].size() != 0) {
-      cBuildDir = "--clientBuildDir ${buildEnv['BUILD']}${XEP}"
+      cBuildDir = "--clientBuildDir ${buildEnv['CBUILD']}${XEP}"
     }
     def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard --parallel 16 --buildDir ${buildDir} ${cBuildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
     if (! buildUnittestTarball) {
