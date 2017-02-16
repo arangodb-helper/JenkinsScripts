@@ -1,9 +1,9 @@
 
 def parts=params['GITTAG'].tokenize(".")
-def VERSION_MAJOR=parts[0]
-def VERSION_MINOR=parts[1]
-def VERSION_MAJOR_MINOR="${VERSION_MAJOR}.${VERSION_MINOR}"
-def REPO_TL_DIR="arangodb${VERSION_MAJOR}${VERSION_MINOR}"
+VERSION_MAJOR=parts[0]
+VERSION_MINOR=parts[1]
+VERSION_MAJOR_MINOR="${VERSION_MAJOR}.${VERSION_MINOR}"
+REPO_TL_DIR="arangodb${VERSION_MAJOR}${VERSION_MINOR}"
 //================================================================================
 stage("building packages") {
   echo "skip build is: ${SKIP_BUILD}"
@@ -152,7 +152,7 @@ stage("create repositories") {
       job: 'RELEASE__BuildRepositories',
           parameters: [
             string(name: 'GITTAG', value: params['GITTAG']),
-            string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
+            string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
             booleanParam(name: 'DEBUG', value: false)
             
           ]
@@ -179,14 +179,14 @@ stage("Generating HTML snippets & test it with the packages") {
     job: 'RELEASE__CreateDownloadSnippets',
         parameters: [
           string(name: 'GITTAG', value: params['GITTAG'])
-          string(name: 'REPO_TL_DIR', value: REPO_TL_DIR)
+          string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}")
         ]
   )
   build(
     job: 'RELEASE__TestPackages',
         parameters: [
           string(name: 'preferBuilder', value: ''),
-          string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
+          string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
           booleanParam(name: 'DEBUG', value: false),
           booleanParam(name: 'testLiveDownloads', value: false)
         ]
@@ -229,7 +229,7 @@ stage("updating other repos") {
             build( job: 'RELEASE__BuildAMI',
                    parameters: [
                      string(name: 'GITTAG', value: params['GITTAG']),
-                     string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
+                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
                      booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
                      booleanParam(name: 'DEBUG', value: false)
                    ]
@@ -242,7 +242,7 @@ stage("updating other repos") {
           build( job: 'RELEASE__PublishSnap',
                  parameters: [
                    string(name: 'GITTAG', value: params['GITTAG']),
-                   string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
+                   string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
                  ]
                )
         }
