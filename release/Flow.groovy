@@ -1,3 +1,10 @@
+
+def parts=params['GITTAG'].tokenize(".")
+def VERSION_MAJOR=parts[0]
+def VERSION_MINOR=parts[1]
+def VERSION_MAJOR_MINOR="${VERSION_MAJOR}.${VERSION_MINOR}"
+def REPO_TL_DIR="arangodb${VERSION_MAJOR}${VERSION_MINOR}"
+//================================================================================
 stage("building packages") {
   echo "skip build is: ${SKIP_BUILD}"
   if (SKIP_BUILD == "false") {
@@ -13,40 +20,6 @@ stage("building packages") {
         },
         ////////////////////////////////////////////////////////////////////////////////
         "linuxPackages": {
-                 
-          ///----------------------------------------------------------------------
-          // echo "building Unstable builds with several attempts"
-          // EP_PARAMS=[ params['ENTERPRISE_URL'], '']
-          // UNSTABLE_BUILDERS = ['ubuntutwelveofour', 'centosix', 'fedoratwentyfive']
-          // finalSuccess = true
-          // for (EP_PARAM in EP_PARAMS ) {
-          //   for (BUILDER in UNSTABLE_BUILDERS) {
-          //     def rc
-          //     done=false
-          //     count=0
-          //     while (!done && count < 10) {
-          //       rc = build( job: 'RELEASE__BuildPackages',
-          //                   propagate: false,
-          //                   parameters: [
-          //                     string(name: 'ENTERPRISE_URL', value: EP_PARAM),
-          //                     string(name: 'GITTAG', value: "v3.1.1"),
-          //                     string(name: 'preferBuilder', value: BUILDER),
-          //                     booleanParam(name: 'CLEAN_BUILDENV', value: false),
-          //                     booleanParam(name: 'propagate', value:false)
-          //                   ]
-          //                 )
-          //       echo "Completed Run ${count} from ${BUILDER} (${EP_PARAM}) with ${rc.result}!"
-          //       done = rc.result == "SUCCESS"
-          //       count = count + 1
-          //     }
-          //     finalSuccess = finalSuccess && (rc.result == "SUCCESS")
-          //   }
-          // }
-          // if (!finalSuccess) {
-          //   currentBuild.result = 'FAILURE'
-          //   error "some builds failed even after 10 retries!"
-          // }
-          
           ///----------------------------------------------------------------------
           echo "building Linux Enterprise Release"
           build( job: 'RELEASE__BuildPackages',
@@ -171,7 +144,7 @@ stage("building packages") {
     )
   }
 }
-
+//================================================================================
 
 stage("create repositories") {
   if (SKIP_REPOBUILD == 'false') {
@@ -179,7 +152,9 @@ stage("create repositories") {
       job: 'RELEASE__BuildRepositories',
           parameters: [
             string(name: 'GITTAG', value: params['GITTAG']),
+            string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
             booleanParam(name: 'DEBUG', value: false)
+            
           ]
     )
   }
@@ -204,24 +179,29 @@ stage("Generating HTML snippets & test it with the packages") {
     job: 'RELEASE__CreateDownloadSnippets',
         parameters: [
           string(name: 'GITTAG', value: params['GITTAG'])
+          string(name: 'REPO_TL_DIR', value: REPO_TL_DIR)
         ]
   )
   build(
     job: 'RELEASE__TestPackages',
         parameters: [
           string(name: 'preferBuilder', value: ''),
+          string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
           booleanParam(name: 'DEBUG', value: false),
           booleanParam(name: 'testLiveDownloads', value: false)
         ]
   )
 }
-
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
 input("message": "Everything we did so far was private. Proceed to the publish step now?")
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
 
 stage("publish packages") {
   node('master') {
-    sh "${ARANGO_SCRIPT_DIR}/publish/stage2public.sh"
-    sh "${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
+    sh "export REPO_TL_DIR=${REPO_TL_DIR} ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh"
+    sh "export REPO_TL_DIR=${REPO_TL_DIR} ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
     sh "echo '${params['GITTAG']}' > ${env.PUBLIC_CO_DIR}VERSION"
   }
 }
@@ -249,6 +229,7 @@ stage("updating other repos") {
             build( job: 'RELEASE__BuildAMI',
                    parameters: [
                      string(name: 'GITTAG', value: params['GITTAG']),
+                     string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
                      booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
                      booleanParam(name: 'DEBUG', value: false)
                    ]
@@ -260,7 +241,8 @@ stage("updating other repos") {
         node('master') {
           build( job: 'RELEASE__PublishSnap',
                  parameters: [
-                   string(name: 'GITTAG', value: params['GITTAG'])
+                   string(name: 'GITTAG', value: params['GITTAG']),
+                   string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
                  ]
                )
         }
