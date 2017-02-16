@@ -178,7 +178,7 @@ stage("Generating HTML snippets & test it with the packages") {
   build(
     job: 'RELEASE__CreateDownloadSnippets',
         parameters: [
-          string(name: 'GITTAG', value: params['GITTAG'])
+          string(name: 'GITTAG', value: params['GITTAG']),
           string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}")
         ]
   )
