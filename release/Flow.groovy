@@ -166,7 +166,7 @@ stage("Build Travis CI") {
       job: 'RELEASE__BuildTravisCI',
           parameters: [
             string(name: 'GITTAG', value: params['GITTAG']),
-            string(name: 'DEBFILE', value: "${env.INTERMEDIATE_CO_DIR}/xUbuntu_12.04/amd64/arangodb3-${GITTAG}-*_amd64.deb"),
+            string(name: 'DEBFILE', value: "${env.INTERMEDIATE_CO_DIR}/${REPO_TL_DIR}/xUbuntu_12.04/amd64/arangodb3-${GITTAG}-*_amd64.deb"),
             booleanParam(name: 'UPDATE_LINK', value: true),
             booleanParam(name: 'DEBUG', value: false)
           ]
