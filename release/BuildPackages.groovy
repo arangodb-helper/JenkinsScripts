@@ -1,4 +1,6 @@
 #!groovy
+DOCKER_HOST=params['DOCKER_HOST']
+
 REGISTRY="192.168.0.1"
 REGISTRY_URL="https://${REGISTRY}/"
 
@@ -176,7 +178,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
   def outDir = ""
   print(buildEnvironment)
   if (buildEnvironment['buildType'] == 'docker') {
-    node('docker') {
+    node(DOCKER_HOST) {
       sh "set"
       docker.withRegistry(REGISTRY_URL, '') {
         def myBuildImage = docker.image("${buildEnvironment['name']}/build")
@@ -227,7 +229,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
 
 stage("cloning source") {
   if (DOCKER_CONTAINER['buildType'] == 'docker') {
-    node {
+    node(DOCKER_HOST) {
       if (VERBOSE) {
         sh "pwd"
         sh "cat /etc/issue /jenkins/workspace/issue"

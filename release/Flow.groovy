@@ -1,4 +1,15 @@
-
+def LinuxTargets
+def DOCKER_HOST_2
+def DOCKER_HOST="docker"
+def enableDocker2=params['HAVE_2_BUILDERS'] == 'true'
+if enableDocker2 {
+   DOCKER_HOST_2='docker2'
+   LinuxTargets="LinuxEnterprise"
+}
+else {
+   DOCKER_HOST_2='docker'
+   LinuxTargets="linuxPackages"
+}
 def parts=params['GITTAG'].tokenize(".")
 VERSION_MAJOR=parts[0]
 VERSION_MINOR=parts[1]
@@ -19,7 +30,7 @@ stage("building packages") {
           }
         },
         ////////////////////////////////////////////////////////////////////////////////
-        "linuxPackages": {
+        LinuxTargets: {
           ///----------------------------------------------------------------------
           echo "building Linux Enterprise Release"
           build( job: 'RELEASE__BuildPackages',
@@ -27,20 +38,41 @@ stage("building packages") {
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                    string(name: 'GITTAG', value: "v${params['GITTAG']}"),
                    string(name: 'preferBuilder', value: params['preferBuilder']),
+		   string(name: 'DOCKER_HOST', value DOCKER_HOST),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                  ]
                )
 
           ///----------------------------------------------------------------------
-          echo "building Linux Community Release"
-          build( job: 'RELEASE__BuildPackages',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: ''),
-                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
-                   string(name: 'preferBuilder', value: params['preferBuilder']),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
+	  if ! enableDocker2 {
+            echo "building Linux Community Release"
+            build( job: 'RELEASE__BuildPackages',
+                   parameters: [
+                     string(name: 'ENTERPRISE_URL', value: ''),
+                     string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                     string(name: 'preferBuilder', value: params['preferBuilder']),
+		     string(name: 'DOCKER_HOST', value DOCKER_HOST),
+                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                   ]
+                 )
+	  }
+
+        },
+        ////////////////////////////////////////////////////////////////////////////////
+        "linuxCommunityPackages": {
+          ///----------------------------------------------------------------------
+	  if enableDocker2 {
+            echo "building Linux Community Release"
+            build( job: 'RELEASE__BuildPackages',
+                   parameters: [
+                     string(name: 'ENTERPRISE_URL', value: ''),
+                     string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                     string(name: 'preferBuilder', value: params['preferBuilder']),
+		     string(name: 'DOCKER_HOST', value DOCKER_HOST_2),
+                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                   ]
+                 )
+	  }
 
         },
         ////////////////////////////////////////////////////////////////////////////////
@@ -203,7 +235,7 @@ input("message": "Everything we did so far was private. Proceed to the publish s
 stage("publish packages") {
   node('master') {
     sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh"
-    sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
+    sh "export REPO_TL_DIR=${REPO_TL_DIR};
     sh "echo '${params['GITTAG']}' > ${env.PUBLIC_CO_DIR}VERSION"
   }
 }
