@@ -183,16 +183,19 @@ stage("Generating HTML snippets & test it with the packages") {
           string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}")
         ]
   )
-  build(
-    job: 'RELEASE__TestPackages',
-        parameters: [
-          string(name: 'preferBuilder', value: ''),
-          string(name: 'GITTAG', value: params['GITTAG']),
-          string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
-          booleanParam(name: 'DEBUG', value: false),
-          booleanParam(name: 'testLiveDownloads', value: false)
-        ]
-  )
+
+  if (SKIP_INSTALL_TEST == "false") {
+    build(
+      job: 'RELEASE__TestPackages',
+          parameters: [
+            string(name: 'preferBuilder', value: ''),
+            string(name: 'GITTAG', value: params['GITTAG']),
+            string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
+            booleanParam(name: 'DEBUG', value: false),
+            booleanParam(name: 'testLiveDownloads', value: false)
+          ]
+    )
+  }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
