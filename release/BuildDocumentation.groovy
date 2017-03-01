@@ -161,7 +161,7 @@ if (DOCKER_CONTAINER['buildType'] == 'docker') {
     // } else {
     //   sh "git checkout ${GITTAG}"
     // }
-    sh "mkdir Cookbook"
+    sh "mkdir -p Cookbook"
     dir ('Cookbook') {
       checkout([$class: 'GitSCM',
                 branches: [[name: "devel"]],
@@ -208,7 +208,7 @@ else {
     // } else {
     //   sh "git checkout ${GITTAG}"
     // }
-    sh "mkdir Cookbook"
+    sh "mkdir -p Cookbook"
     dir ('Cookbook') {
       checkout([$class: 'GitSCM',
                 branches: [[name: "devel"]],
