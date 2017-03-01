@@ -142,7 +142,7 @@ if (DOCKER_CONTAINER['buildType'] == 'docker') {
       lastKnownGitRev=readFile(lastKnownGoodGitFile)
     }
     checkout([$class: 'GitSCM',
-              branches: [[name: "${GITTAG}"]],
+              branches: "3.0",
               doGenerateSubmoduleConfigurations: false,
               extensions: [[$class: 'SubmoduleOption',
                             disableSubmodules: false,
