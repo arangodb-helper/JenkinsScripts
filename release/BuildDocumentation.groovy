@@ -66,7 +66,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (!buildUnittestTarball) {
       outDir = getReleaseOutDir(enterpriseUrl, envName)
     }
-
+    
+    echo "building cookbook: "
     sh "cd Cookbook; ./build.sh; cd .."
     print(buildEnv)
     def BUILDSCRIPT = "cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} COOKBOOK_DIR=../../Cookbook/cookbook/"
@@ -164,7 +165,7 @@ if (DOCKER_CONTAINER['buildType'] == 'docker') {
     sh "mkdir -p Cookbook"
     dir ('Cookbook') {
       checkout([$class: 'GitSCM',
-                branches: [[name:"3.0"]],
+                branches: [[name:"master"]],
                 doGenerateSubmoduleConfigurations: false,
                 extensions: [[$class: 'SubmoduleOption',
                               disableSubmodules: false,
@@ -211,7 +212,7 @@ else {
     sh "mkdir -p Cookbook"
     dir ('Cookbook') {
       checkout([$class: 'GitSCM',
-                branches: [[name:"3.0"]],
+                branches: [[name:"master"]],
                 doGenerateSubmoduleConfigurations: false,
                 extensions: [[$class: 'SubmoduleOption',
                               disableSubmodules: false,
