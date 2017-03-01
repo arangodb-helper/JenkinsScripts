@@ -67,7 +67,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       outDir = getReleaseOutDir(enterpriseUrl, envName)
     }
 
-    sh "cd Cookbook; exec build.sh"
+    sh "pwd; cd Cookbook; ./build.sh"
     print(buildEnv)
     def BUILDSCRIPT = "cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} COOKBOOK_DIR=../../Cookbook/cookbook/"
     sh BUILDSCRIPT
