@@ -66,8 +66,10 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (!buildUnittestTarball) {
       outDir = getReleaseOutDir(enterpriseUrl, envName)
     }
+
+    sh "cd Cookbook; exec build.sh"
     print(buildEnv)
-    def BUILDSCRIPT = "cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir}"
+    def BUILDSCRIPT = "cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} COOKBOOK_DIR=../../Cookbook/cookbook/"
     sh BUILDSCRIPT
     
     if (VERBOSE) {
@@ -159,6 +161,21 @@ if (DOCKER_CONTAINER['buildType'] == 'docker') {
     // } else {
     //   sh "git checkout ${GITTAG}"
     // }
+    sh "mkdir Cookbook"
+    dir ('Cookbook') {
+      checkout([$class: 'GitSCM',
+                branches: [[name: "devel"]],
+                doGenerateSubmoduleConfigurations: false,
+                extensions: [[$class: 'SubmoduleOption',
+                              disableSubmodules: false,
+                              parentCredentials: false,
+                              recursiveSubmodules: true,
+                              reference: '',
+                              trackingSubmodules: false]],
+                submoduleCfg: [],
+                userRemoteConfigs:
+                [[url: 'https://github.com/arangodb/Cookbook.git']]])
+    }
     print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
   }
 }
@@ -191,6 +208,21 @@ else {
     // } else {
     //   sh "git checkout ${GITTAG}"
     // }
+    sh "mkdir Cookbook"
+    dir ('Cookbook') {
+      checkout([$class: 'GitSCM',
+                branches: [[name: "devel"]],
+                doGenerateSubmoduleConfigurations: false,
+                extensions: [[$class: 'SubmoduleOption',
+                              disableSubmodules: false,
+                              parentCredentials: false,
+                              recursiveSubmodules: true,
+                              reference: '',
+                              trackingSubmodules: false]],
+                submoduleCfg: [],
+                userRemoteConfigs:
+                [[url: 'https://github.com/arangodb/Cookbook.git']]])
+    }
     print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
   }
 }
