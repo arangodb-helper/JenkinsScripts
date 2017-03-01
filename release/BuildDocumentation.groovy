@@ -164,7 +164,7 @@ if (DOCKER_CONTAINER['buildType'] == 'docker') {
     sh "mkdir -p Cookbook"
     dir ('Cookbook') {
       checkout([$class: 'GitSCM',
-                branches: "3.0",
+                branches: [[name:"3.0"]],
                 doGenerateSubmoduleConfigurations: false,
                 extensions: [[$class: 'SubmoduleOption',
                               disableSubmodules: false,
@@ -211,7 +211,7 @@ else {
     sh "mkdir -p Cookbook"
     dir ('Cookbook') {
       checkout([$class: 'GitSCM',
-                branches: "3.0",
+                branches: [[name:"3.0"]],
                 doGenerateSubmoduleConfigurations: false,
                 extensions: [[$class: 'SubmoduleOption',
                               disableSubmodules: false,
