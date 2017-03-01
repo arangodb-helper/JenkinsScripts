@@ -142,7 +142,7 @@ if (DOCKER_CONTAINER['buildType'] == 'docker') {
       lastKnownGitRev=readFile(lastKnownGoodGitFile)
     }
     checkout([$class: 'GitSCM',
-              branches: "3.0",
+              branches: [[name: "devel"]],
               doGenerateSubmoduleConfigurations: false,
               extensions: [[$class: 'SubmoduleOption',
                             disableSubmodules: false,
@@ -164,7 +164,7 @@ if (DOCKER_CONTAINER['buildType'] == 'docker') {
     sh "mkdir -p Cookbook"
     dir ('Cookbook') {
       checkout([$class: 'GitSCM',
-                branches: [[name: "devel"]],
+                branches: "3.0",
                 doGenerateSubmoduleConfigurations: false,
                 extensions: [[$class: 'SubmoduleOption',
                               disableSubmodules: false,
@@ -211,7 +211,7 @@ else {
     sh "mkdir -p Cookbook"
     dir ('Cookbook') {
       checkout([$class: 'GitSCM',
-                branches: [[name: "devel"]],
+                branches: "3.0",
                 doGenerateSubmoduleConfigurations: false,
                 extensions: [[$class: 'SubmoduleOption',
                               disableSubmodules: false,
