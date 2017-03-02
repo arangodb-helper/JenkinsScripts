@@ -112,29 +112,29 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       BUILDSCRIPT="rm -rf ${buildDir}/CMakeFiles ${buildDir}/CMakeCache.txt ${buildDir}/CMakeCPackOptions.cmake ${buildDir}/cmake_install.cmake ${buildDir}/CPackConfig.cmake ${buildDir}/CPackSourceConfig.cmake ;${BUILDSCRIPT}"
     }
     if (!Reliable) {
-      //BUILDSCRIPT="""nohup bash -c "${BUILDSCRIPT}" > nohup.out 2>&1 & PID=\$!; echo \$PID > pid; tail -f nohup.out & wait \$PID; kill %2"""
-      //try {
-      //  if (VERBOSE) {
-      //    print(BUILDSCRIPT)
-      //  }
-      //  sh BUILDSCRIPT
-      //}
-      //catch (err) {
-      //  RUNNING_PID=readFile("pid").trim()
-      //  def stillRunning=true
-      //  while (stillRunning) {
-      //    def processStat=""
-      //    try{
-      //      scripT="cat /proc/${RUNNING_PID}/stat 2>/dev/null"
-      //      echo "script: ${scripT}"
-      //      processStat = sh(returnStdout: true, script: scripT).trim()
-      //    }
-      //    catch (x){}
-      //    stillRunning=(processStat != "")
-      //    sleep 5
-      //  }
-      //  sh "tail -n 100 nohup.out"
-      //}
+      BUILDSCRIPT="""nohup bash -c "${BUILDSCRIPT}" > nohup.out 2>&1 & PID=\$!; echo \$PID > pid; tail -f nohup.out & wait \$PID; kill %2"""
+      try {
+        if (VERBOSE) {
+          print(BUILDSCRIPT)
+        }
+        sh BUILDSCRIPT
+      }
+      catch (err) {
+        RUNNING_PID=readFile("pid").trim()
+        def stillRunning=true
+        while (stillRunning) {
+          def processStat=""
+          try{
+            scripT="cat /proc/${RUNNING_PID}/stat 2>/dev/null"
+            echo "script: ${scripT}"
+            processStat = sh(returnStdout: true, script: scripT).trim()
+          }
+          catch (x){}
+          stillRunning=(processStat != "")
+          sleep 5
+        }
+        sh "tail -n 100 nohup.out"
+      }
       sh script: BUILDSCRIPT, nohup: true
     }
     else {
