@@ -135,7 +135,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       //  }
       //  sh "tail -n 100 nohup.out"
       //}
-      sh script: BUILDSCRIPT, noup: true
+      sh script: BUILDSCRIPT, nohup: true
     }
     else {
       // we expect this docker to run stable, so we don't fuck aroundwith nohup
