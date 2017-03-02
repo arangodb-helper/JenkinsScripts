@@ -21,7 +21,7 @@ testParams = [:]
 def CONTAINERS=[
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': false, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'fedoratwentyfive',   'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'fedoratwentyfive',   'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': false, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'opensusethirteen',    'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro SUSE13", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessie',        'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntutwelveofour',   'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': false, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
@@ -112,29 +112,30 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       BUILDSCRIPT="rm -rf ${buildDir}/CMakeFiles ${buildDir}/CMakeCache.txt ${buildDir}/CMakeCPackOptions.cmake ${buildDir}/cmake_install.cmake ${buildDir}/CPackConfig.cmake ${buildDir}/CPackSourceConfig.cmake ;${BUILDSCRIPT}"
     }
     if (!Reliable) {
-      BUILDSCRIPT="""nohup bash -c "${BUILDSCRIPT}" > nohup.out 2>&1 & PID=\$!; echo \$PID > pid; tail -f nohup.out & wait \$PID; kill %2"""
-      try {
-        if (VERBOSE) {
-          print(BUILDSCRIPT)
-        }
-        sh BUILDSCRIPT
-      }
-      catch (err) {
-        RUNNING_PID=readFile("pid").trim()
-        def stillRunning=true
-        while (stillRunning) {
-          def processStat=""
-          try{
-            scripT="cat /proc/${RUNNING_PID}/stat 2>/dev/null"
-            echo "script: ${scripT}"
-            processStat = sh(returnStdout: true, script: scripT).trim()
-          }
-          catch (x){}
-          stillRunning=(processStat != "")
-          sleep 5
-        }
-        sh "tail -n 100 nohup.out"
-      }
+      //BUILDSCRIPT="""nohup bash -c "${BUILDSCRIPT}" > nohup.out 2>&1 & PID=\$!; echo \$PID > pid; tail -f nohup.out & wait \$PID; kill %2"""
+      //try {
+      //  if (VERBOSE) {
+      //    print(BUILDSCRIPT)
+      //  }
+      //  sh BUILDSCRIPT
+      //}
+      //catch (err) {
+      //  RUNNING_PID=readFile("pid").trim()
+      //  def stillRunning=true
+      //  while (stillRunning) {
+      //    def processStat=""
+      //    try{
+      //      scripT="cat /proc/${RUNNING_PID}/stat 2>/dev/null"
+      //      echo "script: ${scripT}"
+      //      processStat = sh(returnStdout: true, script: scripT).trim()
+      //    }
+      //    catch (x){}
+      //    stillRunning=(processStat != "")
+      //    sleep 5
+      //  }
+      //  sh "tail -n 100 nohup.out"
+      //}
+      sh script: BUILDSCRIPT, noup: true
     }
     else {
       // we expect this docker to run stable, so we don't fuck aroundwith nohup
