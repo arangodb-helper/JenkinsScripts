@@ -1,9 +1,8 @@
 def LinuxTargets
 def DOCKER_HOST_2
 def DOCKER_HOST="docker"
-enableDocker2=(params['HAVE_2_BUILDERS'] == 'true')
 echo " ${params['HAVE_2_BUILDERS']} - ${enableDocker2}"
-if (enableDocker2) {
+if (params['HAVE_2_BUILDERS'] == 'true') {
   echo "Have 2 docker hosts!"
   DOCKER_HOST_2='docker2'
   LinuxTargets="LinuxEnterprise"
@@ -47,7 +46,7 @@ stage("building packages") {
                )
 
           ///----------------------------------------------------------------------
-	  if (! enableDocker2) {
+	  if (params['HAVE_2_BUILDERS'] != 'true') {
             echo "building Linux Community Release"
             build( job: 'RELEASE__BuildPackages',
                    parameters: [
@@ -64,7 +63,7 @@ stage("building packages") {
         ////////////////////////////////////////////////////////////////////////////////
         "linuxCommunityPackages": {
           ///----------------------------------------------------------------------
-	  if (enableDocker2) {
+	  if (params['HAVE_2_BUILDERS'] == 'true') {
             echo "building Linux Community Release"
             build( job: 'RELEASE__BuildPackages',
                    parameters: [
