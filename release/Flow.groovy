@@ -2,7 +2,7 @@ def LinuxTargets
 def DOCKER_HOST_2
 def DOCKER_HOST="docker"
 echo "${params['HAVE_MORE_BUILDERS']}"
-if (params['HAVE_MORE_BUILDERS'] == "true") {
+if (HAVE_MORE_BUILDERS == "true") {
   echo "Have 2 docker hosts!"
   DOCKER_HOST_2='docker2'
   LinuxTargets="LinuxEnterprise"
@@ -46,7 +46,7 @@ stage("building packages") {
                )
 
           ///----------------------------------------------------------------------
-	  if (params['HAVE_MORE_BUILDERS'] == "false") {
+	  if (HAVE_MORE_BUILDERS == "false") {
             echo "building Linux Community Release"
             build( job: 'RELEASE__BuildPackages',
                    parameters: [
@@ -63,7 +63,7 @@ stage("building packages") {
         ////////////////////////////////////////////////////////////////////////////////
         "linuxCommunityPackages": {
           ///----------------------------------------------------------------------
-	  if (params['HAVE_MORE_BUILDERS'] == "true") {
+	  if (HAVE_MORE_BUILDERS == "true") {
             echo "building Linux Community Release"
             build( job: 'RELEASE__BuildPackages',
                    parameters: [
