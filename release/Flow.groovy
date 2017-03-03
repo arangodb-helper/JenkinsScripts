@@ -51,7 +51,7 @@ stage("building packages") {
                      string(name: 'ENTERPRISE_URL', value: ''),
                      string(name: 'GITTAG', value: "v${params['GITTAG']}"),
                      string(name: 'preferBuilder', value: params['preferBuilder']),
-		     string(name: 'DOCKER_HOST', value DOCKER_HOST),
+		     string(name: 'DOCKER_HOST', value: DOCKER_HOST),
                      booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                    ]
                  )
