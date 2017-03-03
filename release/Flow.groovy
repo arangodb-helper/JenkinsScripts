@@ -1,14 +1,16 @@
 def LinuxTargets
 def DOCKER_HOST_2
 def DOCKER_HOST="docker"
-enableDocker2=params['HAVE_2_BUILDERS'] == 'true'
+enableDocker2=(params['HAVE_2_BUILDERS'] == 'true')
 if (enableDocker2) {
-   DOCKER_HOST_2='docker2'
-   LinuxTargets="LinuxEnterprise"
+  echo "Have 2 docker hosts!"
+  DOCKER_HOST_2='docker2'
+  LinuxTargets="LinuxEnterprise"
 }
 else {
-   DOCKER_HOST_2='docker'
-   LinuxTargets="linuxPackages"
+  echo "building with one docker host"
+  DOCKER_HOST_2='docker'
+  LinuxTargets="linuxPackages"
 }
 def parts=params['GITTAG'].tokenize(".")
 VERSION_MAJOR=parts[0]
@@ -30,7 +32,7 @@ stage("building packages") {
           }
         },
         ////////////////////////////////////////////////////////////////////////////////
-        LinuxTargets: {
+       LinuxTargets: {
           ///----------------------------------------------------------------------
           echo "building Linux Enterprise Release"
           build( job: 'RELEASE__BuildPackages',
