@@ -1,7 +1,6 @@
 def LinuxTargets
 def DOCKER_HOST_2
 def DOCKER_HOST="docker"
-echo " ${params['HAVE_2_BUILDERS']} - ${enableDocker2}"
 if (params['HAVE_2_BUILDERS'] == 'true') {
   echo "Have 2 docker hosts!"
   DOCKER_HOST_2='docker2'
