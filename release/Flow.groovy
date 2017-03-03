@@ -238,11 +238,10 @@ input("message": "Everything we did so far was private. Proceed to the publish s
 stage("publish packages") {
   node('master') {
     sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh"
-    sh "export REPO_TL_DIR=${REPO_TL_DIR};
+    sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
     sh "echo '${params['GITTAG']}' > ${env.PUBLIC_CO_DIR}VERSION"
   }
 }
-
 
 stage("updating other repos") {
   parallel(
