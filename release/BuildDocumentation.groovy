@@ -134,7 +134,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
 
 stage("cloning source")
 if (DOCKER_CONTAINER['buildType'] == 'docker') {
-  node {
+  node('docker') {
     if (VERBOSE) {
       sh "pwd"
       sh "cat /etc/issue /jenkins/workspace/issue"
@@ -258,12 +258,17 @@ try {
 
 
 stage("generating release build report")
-  node {
+if (DOCKER_CONTAINER['buildType'] == 'docker') {
+  nodeName = 'docker'
+} else {
+  nodeName = DOCKER_CONTAINER['name']
+}
+node(nodeName) {
       
-    def subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) is finished"
+  def subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) is finished"
       
-    mail (to: 'release-bot@arangodb.com',
-          subject: subject,
-          body: "we successfully compiled ${GITTAG} \nfind the results at ${env.BUILD_URL}.");
-  }
+  mail (to: 'release-bot@arangodb.com',
+        subject: subject,
+        body: "we successfully compiled ${GITTAG} \nfind the results at ${env.BUILD_URL}.");
+}
 
