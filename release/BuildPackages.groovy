@@ -311,11 +311,14 @@ stage("building ArangoDB") {
     }
   } catch (err) {
     stage('Send Notification for build' ) {
-      mail (to: ADMIN_ACCOUNT, 
-            subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
-            body: err.getMessage());
-      currentBuild.result = 'FAILURE'
-      throw(err)
+      msgBody = err.getMessage()
+      if (msgBody.size() > 0) {
+        mail (to: ADMIN_ACCOUNT, 
+              subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
+              body: );
+        currentBuild.result = 'FAILURE'
+        throw(err)
+      }
     }
   }
 }
