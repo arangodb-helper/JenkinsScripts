@@ -12,7 +12,6 @@ branches = [:]
 failures = ""
 parallelJobNames = []
 ADMIN_ACCOUNT = "willi@arangodb.com"
-lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
 lastKnownGitRev = ""
 currentGitRev = ""
 WORKSPACE = ""
@@ -45,6 +44,8 @@ for (int c  = 0; c < CONTAINERS.size(); c++) {
 }
 
 OS = DOCKER_CONTAINER['OS']
+
+lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
 
 def getReleaseOutDir(String enterpriseUrl, String jobname) {
   if (enterpriseUrl.size() > 10) {
@@ -383,157 +384,159 @@ stage("cloning source") {
   }
 }
 
-stage("building ArangoDB")
-try {
+stage("building ArangoDB") {
+  try {
     print(DOCKER_CONTAINER)
-  setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
-} catch (err) {
-  stage('Send Notification for build' )
-  mail (to: ADMIN_ACCOUNT, 
-        subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
-        body: err.getMessage());
-  currentBuild.result = 'FAILURE'
-  throw(err)
+    setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
+  } catch (err) {
+    stage('Send Notification for build' )
+    mail (to: ADMIN_ACCOUNT, 
+          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
+          body: err.getMessage());
+    currentBuild.result = 'FAILURE'
+    throw(err)
+  }
 }
 
-stage("running unittest")
-try {
+stage("running unittest") {
+  try {
     def testCaseSets = [:]
     if (DOCKER_CONTAINER['cluster']) {
-	testCaseSets = [ 
-	    //  ["fail", 'fail', ""],
-	    //    ["fail", 'fail', ""],
-	    ['http_server', 'http_server', "",
-	     "--cluster true --testBuckets 4/1 ",
-	     "--cluster true --testBuckets 4/2 ",
-	     "--cluster true --testBuckets 4/3 ",
-	     "--cluster true --testBuckets 4/4 "],
-	    ["shell_client", 'shell_client', "",
-	     "--cluster true --testBuckets 4/1 ",
-	     "--cluster true --testBuckets 4/2 ",
-	     "--cluster true --testBuckets 4/3 ",
-	     "--cluster true --testBuckets 4/4 "],
-	    ["shell_server_aql", 'shell_server_aql', "",
-	     "--cluster true --testBuckets 4/1 ",
-	     "--cluster true --testBuckets 4/2 ",
-	     "--cluster true --testBuckets 4/3 ",
-	     "--cluster true --testBuckets 4/4 "],
-	    ["dump_import", 'dump.importing', "", "--cluster true"],
-	    ["shell_server", 'shell_server', "",
-	     "--cluster true --testBuckets 4/1 ",
-	     "--cluster true --testBuckets 4/2 ",
-	     "--cluster true --testBuckets 4/3 ",
-	     "--cluster true --testBuckets 4/4 "],
-	    ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
-	    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
-	    ["arangosh", 'arangosh', ""],
-	]
+      testCaseSets = [ 
+        //  ["fail", 'fail', ""],
+        //    ["fail", 'fail', ""],
+        ['http_server', 'http_server', "",
+         "--cluster true --testBuckets 4/1 ",
+         "--cluster true --testBuckets 4/2 ",
+         "--cluster true --testBuckets 4/3 ",
+         "--cluster true --testBuckets 4/4 "],
+        ["shell_client", 'shell_client', "",
+         "--cluster true --testBuckets 4/1 ",
+         "--cluster true --testBuckets 4/2 ",
+         "--cluster true --testBuckets 4/3 ",
+         "--cluster true --testBuckets 4/4 "],
+        ["shell_server_aql", 'shell_server_aql', "",
+         "--cluster true --testBuckets 4/1 ",
+         "--cluster true --testBuckets 4/2 ",
+         "--cluster true --testBuckets 4/3 ",
+         "--cluster true --testBuckets 4/4 "],
+        ["dump_import", 'dump.importing', "", "--cluster true"],
+        ["shell_server", 'shell_server', "",
+         "--cluster true --testBuckets 4/1 ",
+         "--cluster true --testBuckets 4/2 ",
+         "--cluster true --testBuckets 4/3 ",
+         "--cluster true --testBuckets 4/4 "],
+        ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
+        ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
+        ["arangosh", 'arangosh', ""],
+      ]
     } else {
-	testCaseSets = [ 
-	    //  ["fail", 'fail', ""],
-	    //    ["fail", 'fail', ""],
-	    ['http_server', 'http_server', ""],
-	    ["shell_client", 'shell_client', ""],
-	    ["shell_server_aql", 'shell_server_aql', ""],
-	    ["dump_import", 'dump.importing', ""],
-	    ["shell_server", 'shell_server', ""],
-	    ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
-	    ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
-	    ["arangosh", 'arangosh', ""],
-	]
+      testCaseSets = [ 
+        //  ["fail", 'fail', ""],
+        //    ["fail", 'fail', ""],
+        ['http_server', 'http_server', ""],
+        ["shell_client", 'shell_client', ""],
+        ["shell_server_aql", 'shell_server_aql', ""],
+        ["dump_import", 'dump.importing', ""],
+        ["shell_server", 'shell_server', ""],
+        ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
+        ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
+        ["arangosh", 'arangosh', ""],
+      ]
     }
     print("getting keyset\n")
-  def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, env.JOB_NAME)
+    def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, env.JOB_NAME)
     if (DOCKER_CONTAINER['buildType'] == 'docker') {
       node('docker') {
-	    sh "mkdir -p ${releaseOutDir}/results/ ; rm -f ${releaseOutDir}/results/*;"
-	}
+        sh "mkdir -p ${releaseOutDir}/results/ ; rm -f ${releaseOutDir}/results/*;"
+      }
     } else {
-	node(DOCKER_CONTAINER['name']) {
-	    sh "mkdir -p ${releaseOutDir}/results/ ; rm -f ${releaseOutDir}/results/*;"
-	}
+      node(DOCKER_CONTAINER['name']) {
+        sh "mkdir -p ${releaseOutDir}/results/ ; rm -f ${releaseOutDir}/results/*;"
+      }
     }
-  m = testCaseSets.size()
-  int n = 0;
-  for (int i = 0; i < m; i++) {
-    def unitTestSet = testCaseSets.getAt(i);
-    o = unitTestSet.size()
-    def unitTests = unitTestSet.getAt(1);
-    def shortName = unitTestSet.getAt(0);
-    for (int j = 2; j < o; j ++ ) {
-      def cmdLineArgs = unitTestSet.getAt(j)
-      echo " ${shortName} ${cmdLineArgs} -  ${j}"
-      testRunName = "${shortName}_${j}_${n}"
-      parallelJobNames[n]=testRunName
-      testParams[testRunName] = [:]
-      setDirectories(testParams[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, testRunName, unitTests, cmdLineArgs, releaseOutDir)
-      n += 1
+    m = testCaseSets.size()
+    int n = 0;
+    for (int i = 0; i < m; i++) {
+      def unitTestSet = testCaseSets.getAt(i);
+      o = unitTestSet.size()
+      def unitTests = unitTestSet.getAt(1);
+      def shortName = unitTestSet.getAt(0);
+      for (int j = 2; j < o; j ++ ) {
+        def cmdLineArgs = unitTestSet.getAt(j)
+        echo " ${shortName} ${cmdLineArgs} -  ${j}"
+        testRunName = "${shortName}_${j}_${n}"
+        parallelJobNames[n]=testRunName
+        testParams[testRunName] = [:]
+        setDirectories(testParams[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, testRunName, unitTests, cmdLineArgs, releaseOutDir)
+        n += 1
+      }
     }
-  }
-  print("setting up paralel branches")
-  for (int i = 0; i < parallelJobNames.size(); i++) {
-    def thisTestRunName = parallelJobNames[i]
-    branches[thisTestRunName] = {
-      runThisTest(thisTestRunName, DOCKER_CONTAINER)
+    print("setting up paralel branches")
+    for (int i = 0; i < parallelJobNames.size(); i++) {
+      def thisTestRunName = parallelJobNames[i]
+      branches[thisTestRunName] = {
+        runThisTest(thisTestRunName, DOCKER_CONTAINER)
+      }
     }
-  }
-  echo branches.toString();
+    echo branches.toString();
   
-  parallel branches
-  print("The currentBuild.result is now after the parallel: ${currentBuild.result}")
+    parallel branches
+    print("The currentBuild.result is now after the parallel: ${currentBuild.result}")
 
-} catch (err) {
-  stage('Send Notification unittest')
-  mail (to: ADMIN_ACCOUNT,
-        subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 
-        body: "error message: " + err.getMessage());
-  currentBuild.result = 'FAILURE'
-  throw(err)
+  } catch (err) {
+    stage('Send Notification unittest')
+    mail (to: ADMIN_ACCOUNT,
+          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 
+          body: "error message: " + err.getMessage());
+    currentBuild.result = 'FAILURE'
+    throw(err)
+  }
 }
 
-stage("generating test report")
-if (DOCKER_CONTAINER['buildType'] == 'docker') {
-  nodeName = 'docker'
-} else {
-  nodeName = DOCKER_CONTAINER['name']
-}
-node(nodeName) {
-  def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, env.JOB_NAME)
-  def failures = failures +  sh(returnStdout: true, script: "cat ${releaseOutDir}/results/* || echo ''").trim()
+stage("generating test report") {
+  if (DOCKER_CONTAINER['buildType'] == 'docker') {
+    nodeName = 'docker'
+  } else {
+    nodeName = DOCKER_CONTAINER['name']
+  }
+  node(nodeName) {
+    def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, env.JOB_NAME)
+    def failures = failures +  sh(returnStdout: true, script: "cat ${releaseOutDir}/results/* || echo ''").trim()
 
-  if (failures.size() > 5) {
+    if (failures.size() > 5) {
     
-    def gitRange = ""
-    if (lastKnownGitRev.size() > 1) {
-      gitRange = "${lastKnownGitRev}.."
-    }
-    gitRange = "${gitRange}${currentGitRev}"
-    if (VERBOSE) {
-      print(gitRange)
-    }
-    def gitcmd = 'git --no-pager show -s --format="%ae>" ${gitRange} |sort -u |sed -e :a -e \'$!N;s/\\n//;ta\' -e \'s;>;, ;g\' -e \'s;, $;;\''
-    if (VERBOSE) {
-      print(gitcmd)
-    }
-    gitCommitters = sh(returnStdout: true, script: gitcmd)
-    if (VERBOSE) {
-      echo gitCommitters
-    }
-    def subject = ""
-    if (fatalError) {
-      subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed MISERABLY! "
+      def gitRange = ""
+      if (lastKnownGitRev.size() > 1) {
+        gitRange = "${lastKnownGitRev}.."
+      }
+      gitRange = "${gitRange}${currentGitRev}"
+      if (VERBOSE) {
+        print(gitRange)
+      }
+      def gitcmd = 'git --no-pager show -s --format="%ae>" ${gitRange} |sort -u |sed -e :a -e \'$!N;s/\\n//;ta\' -e \'s;>;, ;g\' -e \'s;, $;;\''
+      if (VERBOSE) {
+        print(gitcmd)
+      }
+      gitCommitters = sh(returnStdout: true, script: gitcmd)
+      if (VERBOSE) {
+        echo gitCommitters
+      }
+      def subject = ""
+      if (fatalError) {
+        subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed MISERABLY! "
+      }
+      else {
+        subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed"
+      }
+
+      print("sending messages to ${gitCommitters}")
+      mail (to: gitCommitters,
+            subject: subject,
+            body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
     }
     else {
-      subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed"
+      sh "echo ${currentGitRev} > ${lastKnownGoodGitFile}";
     }
-
-    print("sending messages to ${gitCommitters}")
-    mail (to: gitCommitters,
-          subject: subject,
-          body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
-  }
-  else {
-    sh "echo ${currentGitRev} > ${lastKnownGoodGitFile}";
   }
 }
-
