@@ -32,7 +32,7 @@ stage("building packages") {
           }
         },
         ////////////////////////////////////////////////////////////////////////////////
-       LinuxTargets: {
+       "LinuxTargets": {
           ///----------------------------------------------------------------------
           echo "building Linux Enterprise Release"
           build( job: 'RELEASE__BuildPackages',
