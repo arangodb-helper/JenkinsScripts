@@ -180,7 +180,7 @@ def runThisTest(which, buildEnvironment)
   def where = testParams[which]
   if (buildEnvironment['testType'] == 'docker') {
     print("in")
-    node {
+    node('docker') {
       sh 'pwd > workspace.loc'
       def WORKSPACE = readFile('workspace.loc').trim()
       testWorkingDirectory="${WORKSPACE}/${where['testRunName']}"
@@ -293,7 +293,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
     def outDir = ""
     print("before")
   if (buildEnvironment['compileType'] == 'docker') {
-    node {
+    node('docker') {
       docker.withRegistry(REGISTRY_URL, '') {
         def myBuildImage = docker.image("${buildEnvironment['name']}/build")
         myBuildImage.pull()
@@ -328,7 +328,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
 
 stage("cloning source") {
   if (DOCKER_CONTAINER['buildType'] == 'docker') {
-    node {
+    node('docker') {
       if (VERBOSE) {
         sh "pwd"
         sh "cat /etc/issue /jenkins/workspace/issue"
@@ -445,7 +445,7 @@ try {
     print("getting keyset\n")
   def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, env.JOB_NAME)
     if (DOCKER_CONTAINER['buildType'] == 'docker') {
-	node {
+      node('docker') {
 	    sh "mkdir -p ${releaseOutDir}/results/ ; rm -f ${releaseOutDir}/results/*;"
 	}
     } else {
@@ -492,7 +492,12 @@ try {
 }
 
 stage("generating test report")
-node {
+if (DOCKER_CONTAINER['buildType'] == 'docker') {
+  nodeName = 'docker'
+} else {
+  nodeName = DOCKER_CONTAINER['name']
+}
+node(nodeName) {
   def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, env.JOB_NAME)
   def failures = failures +  sh(returnStdout: true, script: "cat ${releaseOutDir}/results/* || echo ''").trim()
 
