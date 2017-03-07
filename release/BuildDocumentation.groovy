@@ -256,7 +256,7 @@ try {
 }
 
 
-
+/*
 stage("generating release build report")
 if (DOCKER_CONTAINER['buildType'] == 'docker') {
   nodeName = 'docker'
@@ -272,3 +272,4 @@ node(nodeName) {
         body: "we successfully compiled ${GITTAG} \nfind the results at ${env.BUILD_URL}.");
 }
 
+*/

@@ -1,6 +1,10 @@
 def LinuxTargets
 def DOCKER_HOST_2
 def DOCKER_HOST="docker"
+VERSION_MAJOR_MINOR=""
+REPO_TL_DIR=""
+
+
 echo "${params['HAVE_MORE_BUILDERS']}"
 if (HAVE_MORE_BUILDERS == "true") {
   echo "Have 2 docker hosts!"
@@ -12,11 +16,18 @@ else {
   DOCKER_HOST_2='docker'
   LinuxTargets="linuxPackages"
 }
-def parts=params['GITTAG'].tokenize(".")
-VERSION_MAJOR=parts[0]
-VERSION_MINOR=parts[1]
-VERSION_MAJOR_MINOR="${VERSION_MAJOR}.${VERSION_MINOR}"
-REPO_TL_DIR="arangodb${VERSION_MAJOR}${VERSION_MINOR}"
+
+if (params['GITTAG'] == 'devel') {
+  VERSION_MAJOR_MINOR="3.2"
+  REPO_TL_DIR="nightly"
+}
+else {
+  def parts=params['GITTAG'].tokenize(".")
+  VERSION_MAJOR=parts[0]
+  VERSION_MINOR=parts[1]
+  VERSION_MAJOR_MINOR="${VERSION_MAJOR}.${VERSION_MINOR}"
+  REPO_TL_DIR="arangodb${VERSION_MAJOR}${VERSION_MINOR}"
+}
 //================================================================================
 stage("building packages") {
   echo "skip build is: ${SKIP_BUILD}"
@@ -74,6 +85,9 @@ stage("building packages") {
                      booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                    ]
                  )
+            echo "uploading to master"
+            
+            sh "rsync -ua /mnt/data/fileserver/CO root@master.jenkins.arangodb.info:/mnt/data/fileserver/"
 	  }
 
         },

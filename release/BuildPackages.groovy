@@ -323,6 +323,7 @@ stage("building ArangoDB") {
   }
 }
 
+/*
 stage("generating release build report") {
   node {
       
@@ -334,3 +335,4 @@ stage("generating release build report") {
   }
 
 }
+*/
