@@ -86,9 +86,10 @@ stage("building packages") {
                    ]
                  )
             echo "uploading to master"
-            
-            sh "rsync -ua /mnt/data/fileserver/CO root@master.jenkins.arangodb.info:/mnt/data/fileserver/"
-	  }
+            node(DOCKER_HOST_2) {
+              sh "rsync -ua ${INTERMEDIATE_DIR}/CO ${JENKINSMASTER}:${INTERMEDIATE_DIR}"
+            }
+          }
 
         },
         ////////////////////////////////////////////////////////////////////////////////
