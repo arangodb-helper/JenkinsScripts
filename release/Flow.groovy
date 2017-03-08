@@ -21,6 +21,9 @@ if (params['GITTAG'] == 'devel') {
   TRAVIS_DEB_FILE="xUbuntu_12.04/amd64/arangodb3-3.2.devel-*_amd64.deb"
   VERSION_MAJOR_MINOR="3.2"
   REPO_TL_DIR="nightly"
+  // if we build devel, we don't have any v's at all:
+  GITTAG="devel"
+  GIT_VERSION="devel"
 }
 else {
   TRAVIS_DEB_FILE="xUbuntu_12.04/amd64/arangodb3-${GITTAG}-*_amd64.deb"
@@ -29,6 +32,10 @@ else {
   VERSION_MINOR=parts[1]
   VERSION_MAJOR_MINOR="${VERSION_MAJOR}.${VERSION_MINOR}"
   REPO_TL_DIR="arangodb${VERSION_MAJOR}${VERSION_MINOR}"
+  // the GITTAG actualy matches the tag on the repo...
+  GITTAG="v${params['GITTAG']}"
+  // while this one is the human readable value:
+  GIT_VERSION="${params['GITTAG']}"
 }
 //================================================================================
 stage("building packages") {
@@ -40,18 +47,18 @@ stage("building packages") {
         ////////////////////////////////////////////////////////////////////////////////
         "sourceTarballs": {
           node("master") {
-            sh "export GITTAG=${params['GITTAG']}; ${ARANGO_SCRIPT_DIR}/source/build.sh"
+            sh "export GITTAG=${GIT_VERSION}; ${ARANGO_SCRIPT_DIR}/source/build.sh"
 
           }
         },
         ////////////////////////////////////////////////////////////////////////////////
-       "LinuxTargets": {
+        "LinuxTargets": {
           ///----------------------------------------------------------------------
           echo "building Linux Enterprise Release"
           build( job: 'RELEASE__BuildPackages',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: params['preferBuilder']),
 		   string(name: 'DOCKER_HOST', value: DOCKER_HOST),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
@@ -64,7 +71,7 @@ stage("building packages") {
             build( job: 'RELEASE__BuildPackages',
                    parameters: [
                      string(name: 'ENTERPRISE_URL', value: ''),
-                     string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                     string(name: 'GITTAG', value: "${GITTAG}"),
                      string(name: 'preferBuilder', value: params['preferBuilder']),
 		     string(name: 'DOCKER_HOST', value: DOCKER_HOST),
                      booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
@@ -81,7 +88,7 @@ stage("building packages") {
             build( job: 'RELEASE__BuildPackages',
                    parameters: [
                      string(name: 'ENTERPRISE_URL', value: ''),
-                     string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                     string(name: 'GITTAG', value: "${GITTAG}"),
                      string(name: 'preferBuilder', value: params['preferBuilder']),
 		     string(name: 'DOCKER_HOST', value: DOCKER_HOST_2),
                      booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
@@ -105,7 +112,7 @@ stage("building packages") {
           build( job: 'RELEASE__BuildPackages',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'macos'),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                  ]
@@ -116,7 +123,7 @@ stage("building packages") {
           build( job: 'RELEASE__BuildPackages',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: ''),
-                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'macos'),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                  ]
@@ -132,7 +139,7 @@ stage("building packages") {
           build( job: 'RELEASE__BuildTest',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: ''),
-                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'macos'),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                  ]
@@ -141,7 +148,7 @@ stage("building packages") {
           build( job: 'RELEASE__BuildTest',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'macos'),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                  ]
@@ -159,7 +166,7 @@ stage("building packages") {
           build( job: 'RELEASE__BuildPackages',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'windows'),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                  ]
@@ -170,7 +177,7 @@ stage("building packages") {
           build( job: 'RELEASE__BuildPackages',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: ''),
-                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'windows'),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                  ]
@@ -185,7 +192,7 @@ stage("building packages") {
           build( job: 'RELEASE__BuildDocumentation',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                   string(name: 'GITTAG', value: "v${params['GITTAG']}"),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'debianjessieDocu'),
                    string(name: 'FORCE_GITBRANCH', value:''),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
@@ -203,7 +210,7 @@ stage("create repositories") {
     build(
       job: 'RELEASE__BuildRepositories',
           parameters: [
-            string(name: 'GITTAG', value: params['GITTAG']),
+            string(name: 'GITTAG', value: GIT_VERSION),
             string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
             booleanParam(name: 'DEBUG', value: false)
             
@@ -217,7 +224,7 @@ stage("Build Travis CI") {
     build(
       job: 'RELEASE__BuildTravisCI',
           parameters: [
-            string(name: 'GITTAG', value: params['GITTAG']),
+            string(name: 'GITTAG', value: GIT_VERSION),
             string(name: 'DEBFILE', value: "${env.INTERMEDIATE_CO_DIR}/${REPO_TL_DIR}/${TRAVIS_DEB_FILE}"),
             booleanParam(name: 'UPDATE_LINK', value: true),
             booleanParam(name: 'DEBUG', value: false)
@@ -230,7 +237,7 @@ stage("Generating HTML snippets & test it with the packages") {
   build(
     job: 'RELEASE__CreateDownloadSnippets',
         parameters: [
-          string(name: 'GITTAG', value: params['GITTAG']),
+          string(name: 'GITTAG', value: GIT_VERSION),
           string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}")
         ]
   )
@@ -240,7 +247,7 @@ stage("Generating HTML snippets & test it with the packages") {
       job: 'RELEASE__TestPackages',
           parameters: [
             string(name: 'preferBuilder', value: ''),
-            string(name: 'GITTAG', value: params['GITTAG']),
+            string(name: 'GITTAG', value: GIT_VERSION),
             string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
             booleanParam(name: 'DEBUG', value: false),
             booleanParam(name: 'testLiveDownloads', value: false)
@@ -250,7 +257,7 @@ stage("Generating HTML snippets & test it with the packages") {
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
-if (params['GITTAG'] != 'devel') {
+if (GIT_VERSION != 'devel') {
   input("message": "Everything we did so far was private. Proceed to the publish step now?")
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -260,7 +267,7 @@ stage("publish packages") {
   node('master') {
     sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh"
     sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
-    sh "echo '${params['GITTAG']}' > ${env.PUBLIC_CO_DIR}VERSION"
+    sh "echo '${GIT_VERSION}' > ${env.PUBLIC_CO_DIR}VERSION"
   }
 }
 
@@ -273,7 +280,7 @@ stage("updating other repos") {
           if (IS_RELEASE == 'true') {
             build( job: 'RELEASE__BuildHomebrew',
                    parameters: [
-                     string(name: 'GITTAG', value: params['GITTAG']),
+                     string(name: 'GITTAG', value: GIT_VERSION),
                      booleanParam(name: 'DEBUG', value: false),
                    ]
                  )
@@ -285,7 +292,7 @@ stage("updating other repos") {
           if (IS_RELEASE == 'true') {
             build( job: 'RELEASE__BuildAMI',
                    parameters: [
-                     string(name: 'GITTAG', value: params['GITTAG']),
+                     string(name: 'GITTAG', value: GIT_VERSION),
                      string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
                      booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
                      booleanParam(name: 'DEBUG', value: false)
@@ -298,7 +305,7 @@ stage("updating other repos") {
         node('master') {
           build( job: 'RELEASE__PublishSnap',
                  parameters: [
-                   string(name: 'GITTAG', value: params['GITTAG']),
+                   string(name: 'GITTAG', value: GIT_VERSION),
                    string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
                  ]
                )
@@ -309,7 +316,7 @@ stage("updating other repos") {
           node('master') {
             build( job: 'RELEASE__UpdateDockerResources',
                    parameters: [
-                     string(name: 'GITTAG', value: params['GITTAG']),
+                     string(name: 'GITTAG', value: GIT_VERSION),
                      string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
                      booleanParam(name: 'NEW_MAJOR_RELEASE', value: params['NEW_MAJOR_RELEASE']),
                      booleanParam(name: 'UPDATE_MESOS_IMAGE', value: true),
@@ -327,7 +334,7 @@ stage("updating other repos") {
           node("master") {
             build( job: 'RELEASE__UpdateGithubMaster',
                    parameters: [
-                     string(name: 'GITTAG', value: params['GITTAG'])
+                     string(name: 'GITTAG', value: GIT_VERSION)
                    ]
                  )
           }
@@ -337,7 +344,7 @@ stage("updating other repos") {
         node("master") {
           build( job: 'RELEASE__UpdateGithubUnstable',
                  parameters: [
-                   string(name: 'GITTAG', value: params['GITTAG'])
+                   string(name: 'GITTAG', value: GIT_VERSION)
                  ]
                )
         }
