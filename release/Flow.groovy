@@ -18,10 +18,12 @@ else {
 }
 
 if (params['GITTAG'] == 'devel') {
+  TRAVIS_DEB_FILE="${env.INTERMEDIATE_CO_DIR}/${REPO_TL_DIR}/xUbuntu_12.04/amd64/arangodb3-3.2-devel-*_amd64.deb"
   VERSION_MAJOR_MINOR="3.2"
   REPO_TL_DIR="nightly"
 }
 else {
+  TRAVIS_DEB_FILE="${env.INTERMEDIATE_CO_DIR}/${REPO_TL_DIR}/xUbuntu_12.04/amd64/arangodb3-${GITTAG}-*_amd64.deb"
   def parts=params['GITTAG'].tokenize(".")
   VERSION_MAJOR=parts[0]
   VERSION_MINOR=parts[1]
@@ -216,7 +218,7 @@ stage("Build Travis CI") {
       job: 'RELEASE__BuildTravisCI',
           parameters: [
             string(name: 'GITTAG', value: params['GITTAG']),
-            string(name: 'DEBFILE', value: "${env.INTERMEDIATE_CO_DIR}/${REPO_TL_DIR}/xUbuntu_12.04/amd64/arangodb3-${GITTAG}-*_amd64.deb"),
+            string(name: 'DEBFILE', value: TRAVIS_DEB_FILE),
             booleanParam(name: 'UPDATE_LINK', value: true),
             booleanParam(name: 'DEBUG', value: false)
           ]
