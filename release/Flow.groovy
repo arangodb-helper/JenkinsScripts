@@ -302,13 +302,15 @@ stage("updating other repos") {
         }
       },
       "SNAPPY": {
-        node('master') {
-          build( job: 'RELEASE__PublishSnap',
-                 parameters: [
-                   string(name: 'GITTAG', value: GIT_VERSION),
-                   string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
-                 ]
-               )
+        if (GITTAG != "devel") {
+          node('master') {
+            build( job: 'RELEASE__PublishSnap',
+                   parameters: [
+                     string(name: 'GITTAG', value: GIT_VERSION),
+                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
+                   ]
+                 )
+          }
         }
       },
       "Docker": {
@@ -342,11 +344,13 @@ stage("updating other repos") {
       },
       "Update Github Unstable": {
         node("master") {
-          build( job: 'RELEASE__UpdateGithubUnstable',
-                 parameters: [
-                   string(name: 'GITTAG', value: GIT_VERSION)
-                 ]
-               )
+          if (GITTAG != "devel") {
+            build( job: 'RELEASE__UpdateGithubUnstable',
+                   parameters: [
+                     string(name: 'GITTAG', value: GIT_VERSION)
+                   ]
+                 )
+          }
         }
       }
     ])
