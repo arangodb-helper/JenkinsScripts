@@ -156,6 +156,9 @@ if (DOCKER_CONTAINER['buildType'] == 'docker') {
               [[url: 'https://github.com/arangodb/arangodb.git']]])
     // git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
     currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+    // follow deletion of upstream tags:
+    sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
+
     // if (FORCE_GITBRANCH != "") {
     //   sh "git checkout ${FORCE_GITBRANCH}; git pull --all"
     //   sh 'echo "${GITTAG}" | sed "s;^v;;" > VERSION'
@@ -202,6 +205,8 @@ else {
               submoduleCfg: [],
               userRemoteConfigs:
               [[url: 'https://github.com/arangodb/arangodb.git']]])
+    // follow deletion of upstream tags:
+    sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
     currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     // if (FORCE_GITBRANCH != "") {
     //   sh "git checkout ${FORCE_GITBRANCH}; git pull --all"

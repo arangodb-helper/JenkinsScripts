@@ -254,6 +254,8 @@ stage("cloning source") {
                 [[url: 'https://github.com/arangodb/arangodb.git']]])
       
       currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+      // follow deletion of upstream tags:
+      sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
       // sh "git checkout ${GITTAG}"
       // sh "git submodule update --recursive"
       // sh "git submodule update --init --recursive"
@@ -284,6 +286,8 @@ stage("cloning source") {
                 userRemoteConfigs:
                 [[url: 'https://github.com/arangodb/arangodb.git']]])
       
+      // follow deletion of upstream tags:
+      sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
       currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
       // sh "git checkout ${GITTAG}"
       print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")

@@ -355,6 +355,8 @@ stage("cloning source") {
                 userRemoteConfigs:
                 [[url: 'https://github.com/arangodb/arangodb.git']]])
       
+      // follow deletion of upstream tags:
+      sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
       currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
       if (fileExists(lastKnownGoodGitFile)) {
         lastKnownGitRev=readFile(lastKnownGoodGitFile)
@@ -381,6 +383,8 @@ stage("cloning source") {
                 submoduleCfg: [],
                 userRemoteConfigs:
                 [[url: 'https://github.com/arangodb/arangodb.git']]])
+      // follow deletion of upstream tags:
+      sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
       
       if (fileExists(lastKnownGoodGitFile)) {
         lastKnownGitRev=readFile(lastKnownGoodGitFile)
