@@ -240,6 +240,8 @@ stage("cloning source") {
       }
       // git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
 
+      sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
+      
       checkout([$class: 'GitSCM',
                 branches: [[name: "${GITTAG}"]],
                 doGenerateSubmoduleConfigurations: false,
@@ -273,6 +275,8 @@ stage("cloning source") {
         lastKnownGitRev=readFile(lastKnownGoodGitFile)
       }
       // git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
+      sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
+      
       checkout([$class: 'GitSCM',
                 branches: [[name: "${GITTAG}"]],
                 doGenerateSubmoduleConfigurations: false,

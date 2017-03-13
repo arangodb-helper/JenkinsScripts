@@ -342,6 +342,7 @@ stage("cloning source") {
         sh "cat /etc/issue /jenkins/workspace/issue"
       }
 
+      sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
       checkout([$class: 'GitSCM',
                 branches: [[name: "${GITTAG}"]],
                 doGenerateSubmoduleConfigurations: false,
@@ -371,6 +372,7 @@ stage("cloning source") {
         sh "pwd"
         sh "uname -a"
       }
+      sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
       checkout([$class: 'GitSCM',
                 branches: [[name: "${GITTAG}"]],
                 doGenerateSubmoduleConfigurations: false,

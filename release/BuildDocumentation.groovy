@@ -142,6 +142,7 @@ if (DOCKER_CONTAINER['buildType'] == 'docker') {
     if (fileExists(lastKnownGoodGitFile)) {
       lastKnownGitRev=readFile(lastKnownGoodGitFile)
     }
+    sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
     checkout([$class: 'GitSCM',
               branches: [[name: "devel"]],
               doGenerateSubmoduleConfigurations: false,
@@ -192,6 +193,7 @@ else {
     if (fileExists(lastKnownGoodGitFile)) {
       lastKnownGitRev=readFile(lastKnownGoodGitFile)
     }
+    sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
     // git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
     checkout([$class: 'GitSCM',
               branches: [[name: "${GITTAG}"]],
