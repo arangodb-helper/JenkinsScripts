@@ -202,6 +202,9 @@ stage("building packages") {
       ]
     )
   }
+  else {
+    echo "step deactivated"
+  }
 }
 //================================================================================
 
@@ -216,6 +219,9 @@ stage("create repositories") {
             
           ]
     )
+  }
+  else {
+    echo "Compile step deactivated"
   }
 }    
 
@@ -254,11 +260,17 @@ stage("Generating HTML snippets & test it with the packages") {
           ]
     )
   }
+  else {
+    echo "Install Test deactivated"
+  }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 if (GIT_VERSION != 'devel') {
   input("message": "Everything we did so far was private. Proceed to the publish step now?")
+}
+else {
+  echo "building devel version without user trigger"
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,6 +297,9 @@ stage("updating other repos") {
                    ]
                  )
           }
+          else {
+            echo "publish homebrew deactivated"
+          }
         }
       },
       "AMI": {
@@ -299,6 +314,9 @@ stage("updating other repos") {
                    ]
                  )
           }
+          else {
+            echo "publish ami deactivated"
+          }
         }
       },
       "SNAPPY": {
@@ -312,11 +330,14 @@ stage("updating other repos") {
                  )
           }
         }
+        else {
+          echo "publish snappy deactivated"
+        }
       },
       "Docker": {
-        echo "(${SKIP_DOCKER_PUBLISH} == 'false' && ${IS_RELEASE} == 'true') ${GITTAG}"
-        if (SKIP_DOCKER_PUBLISH == 'false' && IS_RELEASE == 'true') {
-          node('master') {
+        node('master') {
+          echo "(${SKIP_DOCKER_PUBLISH} == 'false' && ${IS_RELEASE} == 'true') ${GITTAG}"
+          if (SKIP_DOCKER_PUBLISH == 'false' && IS_RELEASE == 'true') {
             build( job: 'RELEASE__UpdateDockerResources',
                    parameters: [
                      string(name: 'GITTAG', value: GIT_VERSION),
@@ -332,22 +353,22 @@ stage("updating other repos") {
           }
         }
         else if (GITTAG == "devel") {
-          node('master') {
-            build( job: 'RELEASE__UpdateDockerResources',
-                   parameters: [
-                     string(name: 'GITTAG', value: GIT_VERSION),
-                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
-                     booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
-                     booleanParam(name: 'UPDATE_MESOS_IMAGE', value: false),
-                     booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
-                     booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: false),
-                     booleanParam(name: 'CREATE_NEW_VERSION', value: false),
-                     booleanParam(name: 'DEBUG', value: false)
-                   ]
-                 )
-          }
+          build( job: 'RELEASE__UpdateDockerResources',
+                 parameters: [
+                   string(name: 'GITTAG', value: GIT_VERSION),
+                   string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
+                   booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
+                   booleanParam(name: 'UPDATE_MESOS_IMAGE', value: false),
+                   booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
+                   booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: false),
+                   booleanParam(name: 'CREATE_NEW_VERSION', value: false),
+                   booleanParam(name: 'DEBUG', value: false)
+                 ]
+               )
         }
-        
+        else {
+          echo "publish docker deactivated"
+        }
       },
       "Update Github Master": {
         if (IS_RELEASE == 'true') {
@@ -359,6 +380,9 @@ stage("updating other repos") {
                  )
           }
         }
+        else {
+          echo "update github master deactivated"
+        }
       },
       "Update Github Unstable": {
         node("master") {
@@ -368,6 +392,9 @@ stage("updating other repos") {
                      string(name: 'GITTAG', value: GIT_VERSION)
                    ]
                  )
+          }
+          else {
+            echo "update github unstable deactivated"
           }
         }
       }
