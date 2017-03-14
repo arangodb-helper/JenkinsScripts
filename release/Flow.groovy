@@ -330,7 +330,7 @@ stage("updating other repos") {
                  )
           }
         }
-        else if (GITTAG != "devel") {
+        else if (GITTAG == "devel") {
           node('master') {
             build( job: 'RELEASE__UpdateDockerResources',
                    parameters: [
