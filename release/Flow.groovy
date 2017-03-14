@@ -351,24 +351,24 @@ stage("updating other repos") {
                    ]
                  )
           }
-        }
-        else {
-          if (GITTAG == "devel") {
-            build( job: 'RELEASE__UpdateDockerResources',
-                   parameters: [
-                     string(name: 'GITTAG', value: GIT_VERSION),
-                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
-                     booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
-                     booleanParam(name: 'UPDATE_MESOS_IMAGE', value: false),
-                     booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
-                     booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: false),
-                     booleanParam(name: 'CREATE_NEW_VERSION', value: false),
-                     booleanParam(name: 'DEBUG', value: false)
-                   ]
-                 )
-          }
           else {
-            echo "publish docker deactivated"
+            if (GITTAG == "devel") {
+              build( job: 'RELEASE__UpdateDockerResources',
+                     parameters: [
+                       string(name: 'GITTAG', value: GIT_VERSION),
+                       string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
+                       booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
+                       booleanParam(name: 'UPDATE_MESOS_IMAGE', value: false),
+                       booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
+                       booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: false),
+                       booleanParam(name: 'CREATE_NEW_VERSION', value: false),
+                       booleanParam(name: 'DEBUG', value: false)
+                     ]
+                   )
+            }
+            else {
+              echo "publish docker deactivated"
+            }
           }
         }
       },
