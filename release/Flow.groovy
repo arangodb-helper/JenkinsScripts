@@ -314,6 +314,7 @@ stage("updating other repos") {
         }
       },
       "Docker": {
+        echo "(${SKIP_DOCKER_PUBLISH} == 'false' && ${IS_RELEASE} == 'true') ${GITTAG}"
         if (SKIP_DOCKER_PUBLISH == 'false' && IS_RELEASE == 'true') {
           node('master') {
             build( job: 'RELEASE__UpdateDockerResources',
