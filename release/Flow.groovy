@@ -39,7 +39,6 @@ else {
 }
 //================================================================================
 stage("building packages") {
-  echo "skip build is: ${SKIP_BUILD}"
   if (SKIP_BUILD == "false") {
     echo "Now starting to build:"
     parallel(
@@ -203,7 +202,7 @@ stage("building packages") {
     )
   }
   else {
-    echo "step deactivated"
+    echo "Compile step deactivated"
   }
 }
 //================================================================================
@@ -221,7 +220,7 @@ stage("create repositories") {
     )
   }
   else {
-    echo "Compile step deactivated"
+    echo "Create Repositories step deactivated"
   }
 }    
 
