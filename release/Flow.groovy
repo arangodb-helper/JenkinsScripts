@@ -130,6 +130,12 @@ stage("building packages") {
                )
 
           ///----------------------------------------------------------------------
+          echo "codesigning dmg's"
+          node("macos") {
+            sh "codesign --force --sign \"ArangoDB GmbH\" /Users/jenkins/net/fileserver/CO/macos/*.dmg"
+            sh "codesign --force --sign \"ArangoDB GmbH\" /Users/jenkins/net/fileserver/EP/macos/*.dmg"
+          }
+          ///----------------------------------------------------------------------
           echo "uploading dmg's"
           node("macos") {
             sh "scp -r /Users/jenkins/net/fileserver/* ${env.JENKINSMASTER}:${env.INTERMEDIATE_DIR}"
