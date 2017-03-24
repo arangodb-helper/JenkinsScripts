@@ -50,6 +50,9 @@ for (int c  = 0; c < CONTAINERS.size(); c++) {
 }
 
 OS = DOCKER_CONTAINER['OS']
+if (RUN_CLUSTER_TESTS == "true") {
+  DOCKER_CONTAINER['cluster'] = true
+}
 
 lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
 
@@ -418,6 +421,7 @@ stage("running unittest") {
       testCaseSets = [ 
         //  ["fail", 'fail', ""],
         //    ["fail", 'fail', ""],
+        ['catch', 'catch', ""],
         ['http_server', 'http_server', "",
          "--cluster true --testBuckets 4/1 ",
          "--cluster true --testBuckets 4/2 ",
@@ -447,6 +451,7 @@ stage("running unittest") {
       testCaseSets = [ 
         //  ["fail", 'fail', ""],
         //    ["fail", 'fail', ""],
+        ['catch', 'catch', ""],
         ['http_server', 'http_server', ""],
         ["shell_client", 'shell_client', ""],
         ["shell_server_aql", 'shell_server_aql', ""],

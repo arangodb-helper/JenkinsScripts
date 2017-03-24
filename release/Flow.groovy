@@ -39,7 +39,6 @@ else {
 }
 //================================================================================
 stage("building packages") {
-  echo "skip build is: ${SKIP_BUILD}"
   if (SKIP_BUILD == "false") {
     echo "Now starting to build:"
     parallel(
@@ -147,6 +146,7 @@ stage("building packages") {
                    string(name: 'ENTERPRISE_URL', value: ''),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'macos'),
+                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                  ]
                )
@@ -156,6 +156,28 @@ stage("building packages") {
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'macos'),
+                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                 ]
+               )
+
+          echo "running MacOS X Release Cluster unittests"
+          build( job: 'RELEASE__BuildTest',
+                 parameters: [
+                   string(name: 'ENTERPRISE_URL', value: ''),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
+                   string(name: 'preferBuilder', value: 'macos'),
+                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                 ]
+               )
+          
+          build( job: 'RELEASE__BuildTest',
+                 parameters: [
+                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
+                   string(name: 'preferBuilder', value: 'macos'),
+                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                  ]
                )
@@ -209,7 +231,7 @@ stage("building packages") {
     )
   }
   else {
-    echo "step deactivated"
+    echo "Compile step deactivated"
   }
 }
 //================================================================================
@@ -227,7 +249,7 @@ stage("create repositories") {
     )
   }
   else {
-    echo "Compile step deactivated"
+    echo "Create Repositories step deactivated"
   }
 }    
 
