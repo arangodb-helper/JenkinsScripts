@@ -305,7 +305,12 @@ else {
 
 stage("publish packages") {
   node('master') {
-    sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh"
+    if (GIT_VERSION != 'devel') {
+      sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh"
+    }
+    else {
+      message("skipping snippets publishing for nightly build.")
+    }
     sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
     sh "echo '${GIT_VERSION}' > ${env.PUBLIC_CO_DIR}VERSION"
   }
