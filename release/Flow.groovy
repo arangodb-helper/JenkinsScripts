@@ -127,12 +127,11 @@ stage("building packages") {
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                  ]
                )
-
           ///----------------------------------------------------------------------
           echo "codesigning dmg's"
           node("macos") {
-            sh "codesign --force --sign \"ArangoDB GmbH\" /Users/jenkins/net/fileserver/CO/macos/*.dmg"
-            sh "codesign --force --sign \"ArangoDB GmbH\" /Users/jenkins/net/fileserver/EP/macos/*.dmg"
+            sh 'codesign --force --deep --sign "Developer ID Application: ArangoDB GmbH (W7UC4UQXPV)" /Users/jenkins/net/fileserver/CO/macos/*.dmg'
+            sh 'codesign --force --deep --sign "Developer ID Application: ArangoDB GmbH (W7UC4UQXPV)" /Users/jenkins/net/fileserver/EP/macos/*.dmg'
           }
           ///----------------------------------------------------------------------
           echo "uploading dmg's"
