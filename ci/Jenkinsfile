@@ -19,7 +19,6 @@ BUILT_FILE = ""
 DIST_FILE = ""
 fatalError = false
 VERBOSE = true
-ENTERPRISE_URL=""// TODO from param
 testParams = [:]
 //def preferBuilder="ubuntusixteenofour"
 def preferBuilder="macos"
