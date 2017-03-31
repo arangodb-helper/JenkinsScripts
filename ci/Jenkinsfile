@@ -299,7 +299,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
   }
 }
 
-def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl) {
+def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl, String EPDIR) {
     def outDir = ""
     print("before")
   if (buildEnvironment['compileType'] == 'docker') {
@@ -318,7 +318,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
         
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
-          outDir = "${WORKSPACE}/out"
+          outDir = "${WORKSPACE}/out${EPDIR}"
           compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir)
         }
       }
@@ -330,7 +330,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
       echo "building on ${buildEnvironment['name']}"
       sh 'pwd > workspace.loc'
       WORKSPACE = readFile('workspace.loc').trim()
-      outDir = "${WORKSPACE}/out"
+      outDir = "${WORKSPACE}/out${EPDIR}"
       compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir)
     }
   }
@@ -400,9 +400,13 @@ stage("cloning source") {
 }
 
 stage("building ArangoDB") {
+  EPDIR=""
+  if (ENTERPRISE_URL != "") {
+    EPDIR="EP"
+  }
   try {
     print(DOCKER_CONTAINER)
-    setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL)
+    setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL, EPDIR)
   } catch (err) {
     stage('Send Notification for build' )
     mail (to: ADMIN_ACCOUNT, 
