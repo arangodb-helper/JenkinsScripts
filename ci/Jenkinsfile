@@ -64,12 +64,12 @@ def getReleaseOutDir(String enterpriseUrl, String jobname) {
   return outDir
 }
 
-def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile, String testRunName, String unitTests, String cmdLineArgs, String releaseOutDir) {
+def setDirectories(where, String localTarDir, String OS, String jobName, String MD5SUM, String distFile, String testRunName, String unitTests, String cmdLineArgs, String releaseOutDir, String EPDIR) {
   localTarball="${localTarDir}/arangodb-${OS}.tar.gz"
   where['localTarDir'] = localTarDir
   where['localTarball'] = localTarball
   where['localWSDir']="${localTarDir}/${jobName}"
-  where['localExtractDir']=where['localWSDir'] + "/x/"
+  where['localExtractDir']="${where['localWSDir']}/x${EPDIR}/"
   where['MD5SUM'] = MD5SUM
   where['distFile'] = distFile
 
@@ -485,7 +485,11 @@ stage("running unittest") {
         testRunName = "${shortName}_${j}_${n}"
         parallelJobNames[n]=testRunName
         testParams[testRunName] = [:]
-        setDirectories(testParams[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, testRunName, unitTests, cmdLineArgs, releaseOutDir)
+        EPDIR = ""
+        if (ENTERPRISE_URL != "") {
+          EPDIR = "EP"
+        }
+        setDirectories(testParams[testRunName], LOCAL_TAR_DIR, DOCKER_CONTAINER['OS'], env.JOB_NAME, MD5SUM, DIST_FILE, testRunName, unitTests, cmdLineArgs, releaseOutDir, EPDIR)
         n += 1
       }
     }
