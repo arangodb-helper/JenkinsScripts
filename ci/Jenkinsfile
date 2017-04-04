@@ -295,8 +295,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     sh BUILDSCRIPT
     
     if (buildUnittestTarball) {
-      BUILT_FILE = "${outDir}/arangodb-${OS}.tar.gz".replaceAll(/^\\cygdrive\\(.)/ , { full, driveletter -> driveletter + ":" }))
-      DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz".replaceAll(/^\\cygdrive\\(.)/ , { full, driveletter -> driveletter + ":" }))
+      BUILT_FILE = "${outDir}/arangodb-${OS}.tar.gz".replaceAll(/^\\cygdrive\\(.)/ , { full, driveletter -> driveletter + ":" })
+      DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz".replaceAll(/^\\cygdrive\\(.)/ , { full, driveletter -> driveletter + ":" })
       MD5FILE = "${BUILT_FILE}.md5"
       MD5SUM = readFile(MD5FILE).trim()
       if (VERBOSE) {
