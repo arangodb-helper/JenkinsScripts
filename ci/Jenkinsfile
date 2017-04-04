@@ -1,7 +1,6 @@
 #!groovy
-// We need these modules:
-//
-// We need permisions for several string manipulation operations, like take()
+DOCKER_HOST=params['DOCKER_HOST']
+
 REGISTRY="192.168.0.1"
 REGISTRY_URL="https://${REGISTRY}/"
 
@@ -10,6 +9,8 @@ RELEASE_OUT_DIR="/net/fileserver/"
 LOCAL_TAR_DIR="/mnt/workspace/tmp/"
 branches = [:]
 failures = ""
+ADMIN_ACCOUNT = "release-bot@arangodb.com"
+lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
 parallelJobNames = []
 ADMIN_ACCOUNT = "willi@arangodb.com"
 lastKnownGitRev = ""
@@ -17,11 +18,10 @@ currentGitRev = ""
 WORKSPACE = ""
 BUILT_FILE = ""
 DIST_FILE = ""
+BUILD_DIR = ""
 fatalError = false
 VERBOSE = true
 testParams = [:]
-//def preferBuilder="ubuntusixteenofour"
-def preferBuilder="macos"
 def CONTAINERS=[
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': false, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
@@ -40,11 +40,29 @@ def CONTAINERS=[
   [ 'buildType': 'native', 'testType': 'native', 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "Darwin",  'buildArgs': "--clang --staticOpenSSL",    'cluster': false, 'LOCALFS': '/Users/jenkins/mnt/workspace/tmp/', 'FS': '/Users/jenkins/net/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
 ]
 
-for (int c  = 0; c < CONTAINERS.size(); c++) {
-  if (CONTAINERS[c]['name'] == preferBuilder) {
+if (preferBuilder.size() > 0) {
+  found=false
+  for (int c  = 0; c < CONTAINERS.size(); c++) {
+    if (CONTAINERS[c]['name'] == preferBuilder) {
+      print("prefering: ${CONTAINERS[c]}")
+      found=true
       DOCKER_CONTAINER = CONTAINERS[c]
       RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
       LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
+      BUILD_DIR = DOCKER_CONTAINER['BUILD']
+    }
+  }
+  if (!found) {
+    throw new Exception("didn't find the builder '${preferBuilder}' you specified!")
+  }
+} else {
+  for (int c  = 0; c < CONTAINERS.size(); c++) {
+    if (CONTAINERS[c]['buildType'] == 'docker') {
+      DOCKER_CONTAINER = CONTAINERS[c]
+      RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
+      LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
+      BUILD_DIR = DOCKER_CONTAINER['BUILD']
+    }
   }
 }
 
@@ -53,7 +71,7 @@ if (RUN_CLUSTER_TESTS == "true") {
   DOCKER_CONTAINER['cluster'] = true
 }
 
-lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
+
 
 def getReleaseOutDir(String enterpriseUrl, String jobname) {
   if (enterpriseUrl.size() > 10) {
