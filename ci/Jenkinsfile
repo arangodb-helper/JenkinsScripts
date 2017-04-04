@@ -71,7 +71,8 @@ if (RUN_CLUSTER_TESTS == "true") {
   DOCKER_CONTAINER['cluster'] = true
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+// Test tarball
 
 def getReleaseOutDir(String enterpriseUrl, String jobname) {
   if (enterpriseUrl.size() > 10) {
@@ -230,6 +231,7 @@ def runThisTest(which, buildEnvironment)
               sh "pwd"
               echo "${env} ${buildHost}"
             }
+            // GO!
             copyExtractTarBall(where, buildHost, testWorkingDirectory)
             setupTestArea(where, testWorkingDirectory)
             runTests(where, testWorkingDirectory)
@@ -258,6 +260,7 @@ def runThisTest(which, buildEnvironment)
           echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
         }
         def buildHost=buildEnvironment['name']
+        // GO!
         copyExtractTarBall(where, buildHost, testWorkingDirectory)
         setupTestArea(where, testWorkingDirectory)
         runTests(where, testWorkingDirectory)
@@ -265,6 +268,9 @@ def runThisTest(which, buildEnvironment)
     }
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Build source
 
 def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir) {
   try {
@@ -289,9 +295,10 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     sh BUILDSCRIPT
     
     if (buildUnittestTarball) {
-      BUILT_FILE = "${outDir}/arangodb-${OS}.tar.gz"
-      DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
-      MD5SUM = readFile("${BUILT_FILE}.md5").trim()
+      BUILT_FILE = "${outDir}/arangodb-${OS}.tar.gz".replaceAll(/^\\cygdrive\\(.)/ , { full, driveletter -> driveletter + ":" }))
+      DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz".replaceAll(/^\\cygdrive\\(.)/ , { full, driveletter -> driveletter + ":" }))
+      MD5FILE = "${BUILT_FILE}.md5"
+      MD5SUM = readFile(MD5FILE).trim()
       if (VERBOSE) {
         echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
       }
@@ -318,8 +325,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 }
 
 def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl, String EPDIR) {
-    def outDir = ""
-    print("before")
+  def outDir = ""
+  print("before")
   if (buildEnvironment['compileType'] == 'docker') {
     node('docker') {
       docker.withRegistry(REGISTRY_URL, '') {
@@ -342,8 +349,8 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
       }
     }
   }
-    else {
-	print("else")
+  else {
+    print("else")
     node(buildEnvironment['name']){
       echo "building on ${buildEnvironment['name']}"
       sh 'pwd > workspace.loc'
