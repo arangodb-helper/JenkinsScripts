@@ -76,6 +76,8 @@ def getReleaseOutDir(String enterpriseUrl, String jobname) {
   return outDir
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Build source
 def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir, String envName, Boolean Reliable) {
   try {
     // sh "cmake --version"
@@ -227,21 +229,18 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
   }
 }
 
-
-stage("cloning source") {
-  if (DOCKER_CONTAINER['buildType'] == 'docker') {
-    node(DOCKER_HOST) {
+def CloneSource(inDocker){
       if (VERBOSE) {
         sh "pwd"
-        sh "cat /etc/issue /jenkins/workspace/issue"
+        if (inDocker) {
+          sh "cat /etc/issue /jenkins/workspace/issue"
+        }
+        else {
+          sh "uname -a"
+        }
       }
-      if (fileExists(lastKnownGoodGitFile)) {
-        lastKnownGitRev=readFile(lastKnownGoodGitFile)
-      }
-      // git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
 
       sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
-      
       checkout([$class: 'GitSCM',
                 branches: [[name: "${GITTAG}"]],
                 doGenerateSubmoduleConfigurations: false,
@@ -255,46 +254,26 @@ stage("cloning source") {
                 userRemoteConfigs:
                 [[url: 'https://github.com/arangodb/arangodb.git']]])
       
-      currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
       // follow deletion of upstream tags:
       sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
-      // sh "git checkout ${GITTAG}"
-      // sh "git submodule update --recursive"
-      // sh "git submodule update --init --recursive"
-      // sh "git submodule update"
+      currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+      if (fileExists(lastKnownGoodGitFile)) {
+        lastKnownGitRev=readFile(lastKnownGoodGitFile)
+      }
+      currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
       print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
+}
+
+stage("cloning source") {
+  print(DOCKER_CONTAINER)
+  if (DOCKER_CONTAINER['buildType'] == 'docker') {
+    node('docker') {
+      CloneSource(true)
     }
   }
   else {
     node(DOCKER_CONTAINER['name']) {
-      if (VERBOSE) {
-        sh "pwd"
-        sh "uname -a"
-      }
-      if (fileExists(lastKnownGoodGitFile)) {
-        lastKnownGitRev=readFile(lastKnownGoodGitFile)
-      }
-      // git url: 'https://github.com/arangodb/arangodb.git', tag: "${GITTAG}"
-      sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
-      
-      checkout([$class: 'GitSCM',
-                branches: [[name: "${GITTAG}"]],
-                doGenerateSubmoduleConfigurations: false,
-                extensions: [[$class: 'SubmoduleOption',
-                              disableSubmodules: false,
-                              parentCredentials: false,
-                              recursiveSubmodules: true,
-                              reference: '',
-                              trackingSubmodules: false]],
-                submoduleCfg: [],
-                userRemoteConfigs:
-                [[url: 'https://github.com/arangodb/arangodb.git']]])
-      
-      // follow deletion of upstream tags:
-      sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
-      currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-      // sh "git checkout ${GITTAG}"
-      print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
+      CloneSource(false)
     }
   }
 }
