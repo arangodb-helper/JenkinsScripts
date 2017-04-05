@@ -271,34 +271,80 @@ def runThisTest(which, buildEnvironment)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Build source
-
-def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir) {
+def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, String outDir, String envName, Boolean Reliable) {
   try {
+    // sh "cmake --version"
     def EP=""
     def XEP=""
     if (enterpriseUrl.size() > 10) {
-      EP="--enterprise ${enterpriseUrl}"
+      EP="--enterprise ${ENTERPRISE_URL}"
       XEP="EP"
     }
     if (!buildUnittestTarball) {
-      outDir = getReleaseOutDir(enterpriseUrl, ${env.JOB_NAME})
+      outDir = getReleaseOutDir(enterpriseUrl, envName)
     }
-      print(buildEnv)
-    def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard  --rpath --parallel 5 --buildDir build-${XEP}package-${buildEnv['name']} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
+    print(buildEnv)
+    def buildDir = ""
+    if (buildEnv['BUILD'].size() == 0) {
+      buildDir = "build-${XEP}package-${buildEnv['name']}"
+    }
+    else {
+      buildDir = "${buildEnv['BUILD']}${XEP}"
+    }
+    def cBuildDir = ""
+    if (buildEnv['CBUILD'].size() != 0) {
+      cBuildDir = "--clientBuildDir ${buildEnv['CBUILD']}${XEP}"
+    }
+    def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard --parallel 16 --buildDir ${buildDir} ${cBuildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
     if (! buildUnittestTarball) {
       BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} "
     }
-    if (VERBOSE) {
-      print(BUILDSCRIPT)
+    if (buildEnv['SYMSRV'].size() != 0) {
+      BUILDSCRIPT="${BUILDSCRIPT} --symsrv ${buildEnv['SYMSRV']} "
     }
-    
-    sh BUILDSCRIPT
-    
+    if (CLEAN_BUILDENV == "true") {
+      BUILDSCRIPT="rm -rf ${buildDir} ; ${BUILDSCRIPT}"
+    }
+    else {
+      BUILDSCRIPT="rm -rf ${buildDir}/CMakeFiles ${buildDir}/CMakeCache.txt ${buildDir}/CMakeCPackOptions.cmake ${buildDir}/cmake_install.cmake ${buildDir}/CPackConfig.cmake ${buildDir}/CPackSourceConfig.cmake ;${BUILDSCRIPT}"
+    }
+    if (!Reliable) {
+      BUILDSCRIPT="""nohup bash -c "${BUILDSCRIPT}" > nohup.out 2>&1 & PID=\$!; echo \$PID > pid; tail -f nohup.out & wait \$PID; kill %2 ||true"""
+      try {
+        if (VERBOSE) {
+          print(BUILDSCRIPT)
+        }
+        sh BUILDSCRIPT
+      }
+      catch (err) {
+        RUNNING_PID=readFile("pid").trim()
+        def stillRunning=true
+        while (stillRunning) {
+          def processStat=""
+          try{
+            scripT="cat /proc/${RUNNING_PID}/stat 2>/dev/null"
+            echo "script: ${scripT}"
+            processStat = sh(returnStdout: true, script: scripT).trim()
+          }
+          catch (x){}
+          stillRunning=(processStat != "")
+          sleep 5
+        }
+        sh "tail -n 100 nohup.out"
+      }
+      sh script: BUILDSCRIPT, nohup: true
+    }
+    else {
+      // we expect this docker to run stable, so we don't fuck aroundwith nohup
+      if (VERBOSE) {
+        print(BUILDSCRIPT)
+      }
+      sh BUILDSCRIPT
+    }
     if (buildUnittestTarball) {
-      BUILT_FILE = "${outDir}/arangodb-${OS}.tar.gz".replaceAll(/^\\cygdrive\\(.)/ , { full, driveletter -> driveletter + ":" })
-      DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz".replaceAll(/^\\cygdrive\\(.)/ , { full, driveletter -> driveletter + ":" })
-      MD5FILE = "${BUILT_FILE}.md5"
-      MD5SUM = readFile(MD5FILE).trim()
+      BUILT_FILE = "${outDir}/arangodb-${OS}.tar.gz"
+      DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz"
+      MD5SUM = readFile("${BUILT_FILE}.md5").trim()
       if (VERBOSE) {
         echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
       }
@@ -317,14 +363,14 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
       mail (to: gitCommitter,
             subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' failed to compile.", 
-            body: "${err.getMessage()} - ${err}");
+            body: err.getMessage());
       currentBuild.result = 'FAILURE'
       throw(err)
     }
   }
 }
 
-def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl, String EPDIR) {
+def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl, String EPDIR, Boolean Reliable) {
   def outDir = ""
   print("before")
   if (buildEnvironment['compileType'] == 'docker') {
@@ -344,7 +390,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
           outDir = "${WORKSPACE}/out${EPDIR}"
-          compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir)
+          compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir, buildEnvironment['name'], Reliable)
         }
       }
     }
@@ -356,7 +402,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
       sh 'pwd > workspace.loc'
       WORKSPACE = readFile('workspace.loc').trim()
       outDir = "${WORKSPACE}/out${EPDIR}"
-      compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir)
+      compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir, buildEnvironment['name'], Reliable)
     }
   }
 }
@@ -417,7 +463,7 @@ stage("building ArangoDB") {
   }
   try {
     print(DOCKER_CONTAINER)
-    setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL, EPDIR)
+    setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL, EPDIR, DOCKER_CONTAINER['reliable'])
   } catch (err) {
     stage('Send Notification for build' )
     mail (to: ADMIN_ACCOUNT, 
