@@ -347,6 +347,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       echo(DIST_FILE)
       echo(BUILT_FILE)
       MD5SUM = readFile("${BUILT_FILE}.md5").trim()
+      sh "mkdir -p ${RELEASE_OUT_DIR}"
       if (VERBOSE) {
         echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
       }
