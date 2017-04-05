@@ -152,7 +152,8 @@ def runTests(where, testWorkingDirectory) {
   if (VERBOSE) {
     print("${where['testRunName']}: runTests")
   }
-
+  
+  TESTWD = "${testWorkingDirectory}/out".replace("/cygdrive/c", "c:")
   def RCFile = "${testWorkingDirectory}/out/rc"
   /*
   def EXECUTE_TEST="""pwd;
@@ -179,6 +180,7 @@ def runTests(where, testWorkingDirectory) {
          bash -x ${where['localExtractDir']}/scripts/unittest ${where['unitTests']} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
+                --testOutputDirectory ${TESTWD} \
                 ${where['cmdLineArgs']} || \
          echo \$? > ${RCFile}"""
 
