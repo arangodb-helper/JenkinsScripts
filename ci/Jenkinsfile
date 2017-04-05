@@ -154,6 +154,7 @@ def runTests(where, testWorkingDirectory) {
   }
 
   def RCFile = "${testWorkingDirectory}/out/rc"
+  /*
   def EXECUTE_TEST="""pwd;
          ulimit -c unlimited
          cat /mnt/workspace/issue
@@ -166,6 +167,22 @@ def runTests(where, testWorkingDirectory) {
                 --skipTimeCritical true \
                 ${where['cmdLineArgs']} || \
          echo \$? > ${RCFile}"""
+  */
+  def EXECUTE_TEST="""pwd;
+         ulimit -c unlimited
+         cat /mnt/workspace/issue
+         export TMPDIR=${testWorkingDirectory}/out/tmp
+         mkdir -p \${TMPDIR}
+         echo 0 > ${RCFile}
+         ls -l
+         bash -x ${where['localExtractDir']}/scripts/unittest ${where['unitTests']} \
+                --skipNondeterministic true \
+                --skipTimeCritical true \
+                ${where['cmdLineArgs']} || \
+         echo \$? > ${RCFile}"""
+
+  
+  
   if (VERBOSE) {
     echo "${where['testRunName']}: ${EXECUTE_TEST}"
   }
@@ -514,15 +531,19 @@ stage("running unittest") {
       testCaseSets = [ 
         //  ["fail", 'fail', ""],
         //    ["fail", 'fail', ""],
+        /*
         ['catch', 'catch', ""],
         ['http_server', 'http_server', ""],
         ["shell_client", 'shell_client', ""],
         ["shell_server_aql", 'shell_server_aql', ""],
         ["dump_import", 'dump.importing', ""],
+        */
         ["shell_server", 'shell_server', ""],
+        /*
         ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
         ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
         ["arangosh", 'arangosh', ""],
+        */
       ]
     }
     print("getting keyset\n")
