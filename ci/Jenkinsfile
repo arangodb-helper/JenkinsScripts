@@ -305,7 +305,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (CLEAN_BUILDENV == "true") {
       BUILDSCRIPT="rm -rf ${buildDir} ; ${BUILDSCRIPT}"
     }
-    else {
+    else if (CLEAN_CMAKE_STATE == "true") {
       BUILDSCRIPT="rm -rf ${buildDir}/CMakeFiles ${buildDir}/CMakeCache.txt ${buildDir}/CMakeCPackOptions.cmake ${buildDir}/cmake_install.cmake ${buildDir}/CPackConfig.cmake ${buildDir}/CPackSourceConfig.cmake ;${BUILDSCRIPT}"
     }
     if (!Reliable) {
