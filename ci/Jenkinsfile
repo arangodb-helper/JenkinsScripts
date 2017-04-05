@@ -171,6 +171,7 @@ def runTests(where, testWorkingDirectory) {
   def EXECUTE_TEST="""pwd;
          ulimit -c unlimited
          cat /mnt/workspace/issue
+         cd ${where['localExtractDir']}
          export TMPDIR=${testWorkingDirectory}/out/tmp
          mkdir -p \${TMPDIR}
          echo 0 > ${RCFile}
