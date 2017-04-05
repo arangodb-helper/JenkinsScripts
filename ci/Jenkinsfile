@@ -344,8 +344,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (buildUnittestTarball) {
       BUILT_FILE = "${outDir}/arangodb-${OS}.tar.gz".replace("/cygdrive/c", "c:")
       DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz".replace("/cygdrive/c", "c:")
-      message(DIST_FILE)
-      message(BUILT_FILE)
+      echo(DIST_FILE)
+      echo(BUILT_FILE)
       MD5SUM = readFile("${BUILT_FILE}.md5").trim()
       if (VERBOSE) {
         echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
