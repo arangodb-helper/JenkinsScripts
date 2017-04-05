@@ -339,7 +339,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       if (VERBOSE) {
         print(BUILDSCRIPT)
       }
-      sh BUILDSCRIPT
+      // sh BUILDSCRIPT
     }
     if (buildUnittestTarball) {
       BUILT_FILE = "${outDir}/arangodb-${OS}.tar.gz".replace("/cygdrive/c", "c:")
