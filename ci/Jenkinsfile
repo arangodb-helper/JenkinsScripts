@@ -132,7 +132,7 @@ def setupTestArea(where, testWorkingDirectory) {
   def createDirectory = "mkdir -p ${testWorkingDirectory}/out/ "
   def cleanOutFiles = "rm -rf ${testWorkingDirectory}/out/*"
   def removeOldSymlinks = "cd ${testWorkingDirectory}/; find . -type l -exec rm -f {} \\;;"
-  def createNewSymlinks = "ln -s ${where['localExtractDir']}/* ${testWorkingDirectory}/"
+  def createNewSymlinks = "ln -s ${where['localExtractDir']}/* ${testWorkingDirectory}/ || true"
   if (VERBOSE) {
     sh "cat /mnt/workspace/issue"
     print(cleanOutFiles)
