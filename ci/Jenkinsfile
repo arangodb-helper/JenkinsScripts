@@ -22,6 +22,7 @@ BUILD_DIR = ""
 fatalError = false
 VERBOSE = true
 testParams = [:]
+testPathPrefix = 'j'
 def CONTAINERS=[
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': false, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
@@ -36,7 +37,7 @@ def CONTAINERS=[
   // compiler to old ;-)  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntufourteenarmhfxc', 'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--xcArm /usr/bin/arm-linux-gnueabihf --noopt", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
   // [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessiearmhfxc', 'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--xcArm /usr/bin/arm-linux-gnueabihf --noopt", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
   
-  [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "CYGWIN_NT-10.0", 'buildArgs': "--msvc",     'cluster': false, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/var/tmp/r', 'reliable': true, 'BUILD': '../../r_', 'CBUILD': '../../c_', 'SYMSRV': '/cygdrive/e/symsrv/'],
+  [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "CYGWIN_NT-10.0", 'buildArgs': "--msvc",     'cluster': false, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/var/tmp/r', 'reliable': true, 'BUILD': '../../${testPathPrefix}_', 'CBUILD': '../../${testPathPrefix}c_', 'SYMSRV': '/cygdrive/e/symsrv/'],
   [ 'buildType': 'native', 'testType': 'native', 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "Darwin",  'buildArgs': "--clang --staticOpenSSL",    'cluster': false, 'LOCALFS': '/Users/jenkins/mnt/workspace/tmp/', 'FS': '/Users/jenkins/net/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
 ]
 
@@ -197,13 +198,14 @@ def runTests(where, testWorkingDirectory) {
     currentBuild.result = 'FAILURE'
   }
   if (VERBOSE) {
-    echo "${where['testRunName']}: recording results [ ${testWorkingDirectory}/out/UNITTEST_RESULT_*.xml ]:"
-    sh "ls -l ${testWorkingDirectory}/out/UNITTEST_RESULT_*.xml"
+    echo "${where['testRunName']}: recording results [ ${TESTWD}/UNITTEST_RESULT_*.xml ]:"
+    sh "ls -l ${TESTWD}/UNITTEST_RESULT_*.xml"
   }
-  junit allowEmptyResults: true, keepLongStdio: true, testResults: "${testWorkingDirectory}/out/UNITTEST_RESULT_*.xml"
+
+  junit allowEmptyResults: true, keepLongStdio: true, testResults: "${TESTWD}/UNITTEST_RESULT_*.xml"
   //step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
   print("The currentBuild.result is: ${currentBuild.result}")
-  def testFailuresFile = "${testWorkingDirectory}/out/testfailures.txt"
+  def testFailuresFile = "${TESTWD}/testfailures.txt"
   def failureOutput = readFile(testFailuresFile)
   if (failureOutput.size() > 5) {
     echo "FAILING NOW!"
@@ -212,7 +214,7 @@ def runTests(where, testWorkingDirectory) {
     currentBuild.result = 'FAILURE'
   }
   else {
-    def executiveSummary = readFile("${testWorkingDirectory}/out/UNITTEST_RESULT_EXECUTIVE_SUMMARY.json").trim()
+    def executiveSummary = readFile("${TESTWD}/UNITTEST_RESULT_EXECUTIVE_SUMMARY.json").trim()
     echo "executiveSummary: ${executiveSummary}"
     if (executiveSummary == "true") {
       currentBuild.result = 'SUCCESS'
