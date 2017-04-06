@@ -180,7 +180,7 @@ def runTests(where, testWorkingDirectory) {
          bash -x ${where['localExtractDir']}/scripts/unittest ${where['unitTests']} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
-                --testOutputDirectory ${TESTWD} \
+                --testOutput ${TESTWD} \
                 ${where['cmdLineArgs']} || \
          echo \$? > ${RCFile}"""
 
