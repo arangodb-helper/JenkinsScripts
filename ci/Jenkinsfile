@@ -36,7 +36,7 @@ def CONTAINERS=[
   //  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntusixteenarmhfxc', 'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--xcArm /usr/bin/arm-linux-gnueabihf --noopt", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
   // compiler to old ;-)  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntufourteenarmhfxc', 'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--xcArm /usr/bin/arm-linux-gnueabihf --noopt", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
   // [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessiearmhfxc', 'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--xcArm /usr/bin/arm-linux-gnueabihf --noopt", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
-  
+
   [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "CYGWIN_NT-10.0", 'buildArgs': "--msvc",     'cluster': false, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/var/tmp/r', 'reliable': true, 'BUILD': "../../${testPathPrefix}_", 'CBUILD': "../../${testPathPrefix}c_", 'SYMSRV': '/cygdrive/e/symsrv/'],
   [ 'buildType': 'native', 'testType': 'native', 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "Darwin",  'buildArgs': "--clang --staticOpenSSL",    'cluster': false, 'LOCALFS': '/Users/jenkins/mnt/workspace/tmp/', 'FS': '/Users/jenkins/net/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':''],
 ]
@@ -101,7 +101,7 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
 
 def copyExtractTarBall (where, String buildHost, String testWorkingDirectory) {
   print("${where['testRunName']}: copyExtractTarBall\n")
-  
+
   CMD = """
 if test ! -d ${where['localTarDir']}; then
         mkdir -p ${where['localTarDir']}
@@ -129,7 +129,7 @@ def setupTestArea(where, testWorkingDirectory) {
     print("${where['testRunName']}: setupTestArea\n")
     print(where)
   }
-  
+
   def createDirectory = "mkdir -p ${testWorkingDirectory}/out/ "
   def cleanOutFiles = "rm -rf ${testWorkingDirectory}/out/*"
   def removeOldSymlinks = "cd ${testWorkingDirectory}/; find . -type l -exec rm -f {} \\;;"
@@ -153,27 +153,19 @@ def runTests(where, testWorkingDirectory) {
   if (VERBOSE) {
     print("${where['testRunName']}: runTests")
   }
-  
-  TESTWD = "${testWorkingDirectory}/out".replace("/cygdrive/c", "c:")
+
+  def TESTWD = "${testWorkingDirectory}/out".replace("/cygdrive/c", "c:")
+  def cdTestWD = ""
+  if (OS == "CYGWIN_NT-10.0") {
+    def cdTestWD = "cd ${where['localExtractDir']}"
+  }
+
   def RCFile = "${testWorkingDirectory}/out/rc"
-  /*
+
   def EXECUTE_TEST="""pwd;
          ulimit -c unlimited
          cat /mnt/workspace/issue
-         export TMPDIR=${testWorkingDirectory}/out/tmp
-         mkdir -p \${TMPDIR}
-         echo 0 > ${RCFile}
-         ls -l
-         bash -x ${testWorkingDirectory}/scripts/unittest ${where['unitTests']} \
-                --skipNondeterministic true \
-                --skipTimeCritical true \
-                ${where['cmdLineArgs']} || \
-         echo \$? > ${RCFile}"""
-  */
-  def EXECUTE_TEST="""pwd;
-         ulimit -c unlimited
-         cat /mnt/workspace/issue
-         cd ${where['localExtractDir']}
+         ${cdTestWD}
          export TMPDIR=${testWorkingDirectory}/out/tmp
          mkdir -p \${TMPDIR}
          echo 0 > ${RCFile}
@@ -185,8 +177,6 @@ def runTests(where, testWorkingDirectory) {
                 ${where['cmdLineArgs']} || \
          echo \$? > ${RCFile}"""
 
-  
-  
   if (VERBOSE) {
     echo "${where['testRunName']}: ${EXECUTE_TEST}"
   }
@@ -373,7 +363,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       if (VERBOSE) {
         echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
       }
-      
+
       sh "python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE} ${env.JOB_NAME}"
     }
     else {
@@ -411,7 +401,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
           if (VERBOSE) {
             sh "cat /etc/issue /mnt/workspace/issue"
           }
-        
+
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
           outDir = "${WORKSPACE}/out${EPDIR}"
@@ -456,7 +446,7 @@ def CloneSource(inDocker){
                 submoduleCfg: [],
                 userRemoteConfigs:
                 [[url: 'https://github.com/arangodb/arangodb.git']]])
-      
+
       // follow deletion of upstream tags:
       sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
       currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
@@ -491,7 +481,7 @@ stage("building ArangoDB") {
     setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL, EPDIR, DOCKER_CONTAINER['reliable'])
   } catch (err) {
     stage('Send Notification for build' )
-    mail (to: ADMIN_ACCOUNT, 
+    mail (to: ADMIN_ACCOUNT,
           subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
           body: err.getMessage());
     currentBuild.result = 'FAILURE'
@@ -503,7 +493,7 @@ stage("running unittest") {
   try {
     def testCaseSets = [:]
     if (DOCKER_CONTAINER['cluster']) {
-      testCaseSets = [ 
+      testCaseSets = [
         //  ["fail", 'fail', ""],
         //    ["fail", 'fail', ""],
         ['catch', 'catch', ""],
@@ -528,27 +518,23 @@ stage("running unittest") {
          "--cluster true --testBuckets 4/2 ",
          "--cluster true --testBuckets 4/3 ",
          "--cluster true --testBuckets 4/4 "],
-        ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
+        // ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
         ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
         ["arangosh", 'arangosh', ""],
       ]
     } else {
-      testCaseSets = [ 
+      testCaseSets = [
         //  ["fail", 'fail', ""],
         //    ["fail", 'fail', ""],
-        /*
         ['catch', 'catch', ""],
         ['http_server', 'http_server', ""],
         ["shell_client", 'shell_client', ""],
         ["shell_server_aql", 'shell_server_aql', ""],
         ["dump_import", 'dump.importing', ""],
-        */
         ["shell_server", 'shell_server', ""],
-        /*
         ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
         ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
         ["arangosh", 'arangosh', ""],
-        */
       ]
     }
     print("getting keyset\n")
@@ -591,7 +577,7 @@ stage("running unittest") {
         //}
     }
     echo branches.toString();
-  
+
     // parallel branches
     print("The currentBuild.result is now after the parallel: ${currentBuild.result}")
 
@@ -616,7 +602,7 @@ stage("generating test report") {
     def failures = failures +  sh(returnStdout: true, script: "cat ${releaseOutDir}/results/* || echo ''").trim()
 
     if (failures.size() > 5) {
-    
+
       def gitRange = ""
       if (lastKnownGitRev.size() > 1) {
         gitRange = "${lastKnownGitRev}.."
