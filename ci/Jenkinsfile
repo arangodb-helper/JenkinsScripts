@@ -157,7 +157,7 @@ def runTests(where, testWorkingDirectory) {
   def TESTWD = "${testWorkingDirectory}/out".replace("/cygdrive/c", "c:")
   def cdTestWD = ""
   if (OS == "CYGWIN_NT-10.0") {
-    def cdTestWD = "cd ${where['localExtractDir']}"
+    cdTestWD = "cd ${where['localExtractDir']}"
   }
 
   def RCFile = "${testWorkingDirectory}/out/rc"
