@@ -171,6 +171,8 @@ def runTests(where, testWorkingDirectory) {
          mkdir -p \${TMPDIR}
          echo 0 > ${RCFile}
          ls -l
+         (cd ${where['localExtractDir']}; ./bin/arangosh --javascript.execute-string "print(require('process').env)"))
+         echo "-----------------------------------------------"
          bash -x ${where['localExtractDir']}/scripts/unittest ${where['unitTests']} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
