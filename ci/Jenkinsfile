@@ -323,7 +323,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     else if (CLEAN_CMAKE_STATE == "true") {
       BUILDSCRIPT="rm -rf ${buildDir}/CMakeFiles ${buildDir}/CMakeCache.txt ${buildDir}/CMakeCPackOptions.cmake ${buildDir}/cmake_install.cmake ${buildDir}/CPackConfig.cmake ${buildDir}/CPackSourceConfig.cmake ;${BUILDSCRIPT}"
     }
-    if (!Reliable) {
+    if (!Reliable && !SKIP_BUILD) {
       BUILDSCRIPT="""nohup bash -c "${BUILDSCRIPT}" > nohup.out 2>&1 & PID=\$!; echo \$PID > pid; tail -f nohup.out & wait \$PID; kill %2 ||true"""
       try {
         if (VERBOSE) {
@@ -354,7 +354,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       if (VERBOSE) {
         print(BUILDSCRIPT)
       }
-      sh BUILDSCRIPT
+      if (!SKIP_BUILD) {
+        sh BUILDSCRIPT
+      }
     }
     if (buildUnittestTarball) {
       BUILT_FILE = "${outDir}/arangodb-${OS}.tar.gz".replace("/cygdrive/c", "c:")
