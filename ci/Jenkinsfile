@@ -165,12 +165,16 @@ def runTests(where, testWorkingDirectory) {
   }
 
   def RCFile = "${testWorkingDirectory}/out/rc"
-
+  def SHELL = env.SHELL;
+  if (SHELL == "") {
+    SHELL="/bin/bash"
+  }
   def EXECUTE_TEST="""pwd;
          ulimit -c unlimited
          cat /mnt/workspace/issue
          ${cdTestWD}
          export TMPDIR=${testWorkingDirectory}/out/tmp
+         export SHELL=${SHELL}
          mkdir -p \${TMPDIR}
          echo 0 > ${RCFile}
          ls -l
