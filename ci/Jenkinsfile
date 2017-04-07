@@ -10,7 +10,6 @@ LOCAL_TAR_DIR="/mnt/workspace/tmp/"
 branches = [:]
 failures = ""
 ADMIN_ACCOUNT = "release-bot@arangodb.com"
-lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
 parallelJobNames = []
 ADMIN_ACCOUNT = "willi@arangodb.com"
 lastKnownGitRev = ""
@@ -71,6 +70,8 @@ OS = DOCKER_CONTAINER['OS']
 if (RUN_CLUSTER_TESTS == "true") {
   DOCKER_CONTAINER['cluster'] = true
 }
+
+lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test tarball
