@@ -83,7 +83,7 @@ def getReleaseOutDir(String enterpriseUrl, String jobname) {
   if (enterpriseUrl.size() > 10) {
     outDir = "${RELEASE_OUT_DIR}/EP/${jobname}"
   } else {
-    outDir = "${RELEASE_OUT_DIR}/${jobname}"
+    outDir = "${RELEASE_OUT_DIR}/CO/${jobname}"
   }
   return outDir
 }
@@ -396,19 +396,30 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
 def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl, String EPDIR, Boolean Reliable) {
   def outDir = ""
-  print("before")
-  if (buildEnvironment['compileType'] == 'docker') {
-    node('docker') {
+  print(buildEnvironment)
+  if (buildEnvironment['buildType'] == 'docker') {
+    node(DOCKER_HOST) {
+      sh "set"
       docker.withRegistry(REGISTRY_URL, '') {
         def myBuildImage = docker.image("${buildEnvironment['name']}/build")
         myBuildImage.pull()
-        docker.image(myBuildImage.imageName()).inside('--volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw --volume /jenkins:/mnt/:rw ') {
-          if (VERBOSE) {
+        echo "hello before docker ${RELEASE_OUT_DIR}"
+        docker.image(myBuildImage.imageName()).inside("""\
+ --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw\
+ --volume /jenkins:/mnt/:rw \
+""") {
+          //           docker.image(myBuildImage.imageName()).withRun("""\
+          //  -u 1000:1000 \
+          // --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw \
+          // --volume /jenkins:/mnt/:rw \
+          // --volume /var/lib/jenkins/workspace/ArangoDB_Release:/var/lib/jenkins/workspace/ArangoDB_Release:rw \
+          // """) { c->
+          echo "hello from docker"
+          if (VERBOSE && Reliable) {
             sh "mount"
             sh "pwd"
-          }
-          if (VERBOSE) {
-            sh "cat /etc/issue /mnt/workspace/issue"
+            sh "cat /etc/issue /mnt/workspace/issue /etc/passwd"
+            
           }
 
           sh 'pwd > workspace.loc'
@@ -420,8 +431,9 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
     }
   }
   else {
-    print("else")
+    print("building native")
     node(buildEnvironment['name']){
+      print "else:"
       echo "building on ${buildEnvironment['name']}"
       sh 'pwd > workspace.loc'
       WORKSPACE = readFile('workspace.loc').trim()
