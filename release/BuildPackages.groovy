@@ -294,7 +294,7 @@ stage("building ArangoDB") {
   try {
     if (preferBuilder.size() > 0) {
       print(DOCKER_CONTAINER)
-      setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL, EPDIR, DOCKER_CONTAINER['reliable'])
+      setupEnvCompileSource(DOCKER_CONTAINER, false, ENTERPRISE_URL, EPDIR, DOCKER_CONTAINER['reliable'])
     }
     else {
       for (int c  = 0; c < CONTAINERS.size(); c++) {
