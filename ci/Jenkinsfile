@@ -154,8 +154,10 @@ def setupTestArea(where, testWorkingDirectory) {
 }
 
 def runTests(where, testWorkingDirectory) {
+  def EXTREME_VERBOSITY=""
   if (VERBOSE) {
     print("${where['testRunName']}: runTests")
+    EXTREME_VERBOSITY="--extremeVerbosity true"
   }
 
   def TESTWD = "${testWorkingDirectory}/out".replace("/cygdrive/c", "c:")
@@ -184,6 +186,7 @@ def runTests(where, testWorkingDirectory) {
                 --skipNondeterministic true \
                 --skipTimeCritical true \
                 --testOutput ${TESTWD} \
+                ${EXTREME_VERBOSITY} \
                 ${TEST_ARGS} \
                 ${where['cmdLineArgs']} || \
          echo \$? > ${RCFile}"""
