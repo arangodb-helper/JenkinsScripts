@@ -139,45 +139,55 @@ stage("building packages") {
             sh "scp -r /Users/jenkins/net/fileserver/* ${env.JENKINSMASTER}:${env.INTERMEDIATE_DIR}"
           }
           ///----------------------------------------------------------------------
-          echo "running MacOS X Release unittests"
+          echo "running MacOS X Community Release Single unittests"
           build( job: 'RELEASE__BuildTest',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: ''),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'macos'),
+                   booleanParam(name: 'SKIP_BUILD', value: false),
                    booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
                )
           
+          echo "running MacOS X Community Release Cluster unittests"
+          build( job: 'RELEASE__BuildTest',
+                 parameters: [
+                   string(name: 'ENTERPRISE_URL', value: ''),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
+                   string(name: 'preferBuilder', value: 'macos'),
+                   booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
+                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+                 ]
+               )
+          
+          echo "running MacOS X Release Enterprise Single unittests"
           build( job: 'RELEASE__BuildTest',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'macos'),
+                   booleanParam(name: 'SKIP_BUILD', value: false),
                    booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
                )
 
-          echo "running MacOS X Release Cluster unittests"
-          build( job: 'RELEASE__BuildTest',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: ''),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: 'macos'),
-                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-          
+          echo "running MacOS X Release Enterprise Cluster unittests"
           build( job: 'RELEASE__BuildTest',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'macos'),
+                   booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
                    booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
                )
           
@@ -213,6 +223,58 @@ stage("building packages") {
             sh "scp -r /var/tmp/r/*  ${JENKINSMASTER}:/mnt/data/fileserver/"
             sh "/usr/bin/rsync -ua /cygdrive/e/symsrv ${JENKINSMASTER}:${PUBLIC_CO_DIR}"
           }
+          ///----------------------------------------------------------------------
+          echo "running Windows Community Release Single unittests"
+          build( job: 'RELEASE__BuildTest',
+                 parameters: [
+                   string(name: 'ENTERPRISE_URL', value: ''),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
+                   string(name: 'preferBuilder', value: 'windows'),
+                   booleanParam(name: 'SKIP_BUILD', value: false),
+                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+                 ]
+               )
+          
+          echo "running Windows Community Release Cluster unittests"
+          build( job: 'RELEASE__BuildTest',
+                 parameters: [
+                   string(name: 'ENTERPRISE_URL', value: ''),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
+                   string(name: 'preferBuilder', value: 'windows'),
+                   booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
+                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+                 ]
+               )
+          
+          echo "running Windows Release Enterprise Single unittests"
+          build( job: 'RELEASE__BuildTest',
+                 parameters: [
+                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
+                   string(name: 'preferBuilder', value: 'windows'),
+                   booleanParam(name: 'SKIP_BUILD', value: false),
+                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+                 ]
+               )
+
+          echo "running Windows Release Enterprise Cluster unittests"
+          build( job: 'RELEASE__BuildTest',
+                 parameters: [
+                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                   string(name: 'GITTAG', value: "${GITTAG}"),
+                   string(name: 'preferBuilder', value: 'windows'),
+                   booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
+                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+                 ]
+               )
         },
         ////////////////////////////////////////////////////////////////////////////////
         "documentation": {
@@ -222,7 +284,8 @@ stage("building packages") {
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'debianjessieDocu'),
                    string(name: 'FORCE_GITBRANCH', value:''),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
                )
         }
