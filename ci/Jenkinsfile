@@ -398,7 +398,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
   }
 }
 
-def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl, String EPDIR, Boolean Reliable) {
+def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl, String EPDIR, Boolean Reliable){
   def outDir = ""
   print(buildEnvironment)
   if (buildEnvironment['buildType'] == 'docker') {

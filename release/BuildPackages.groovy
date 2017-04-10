@@ -188,7 +188,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
   }
 }
 
-def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl, String EPDIR, Boolean Reliable) {
+def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String enterpriseUrl, String EPDIR, Boolean Reliable){
   def outDir = ""
   print(buildEnvironment)
   if (buildEnvironment['buildType'] == 'docker') {
@@ -238,38 +238,38 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
 }
 
 def CloneSource(inDocker){
-      if (VERBOSE) {
-        sh "pwd"
-        if (inDocker) {
-          sh "cat /etc/issue /jenkins/workspace/issue"
-        }
-        else {
-          sh "uname -a"
-        }
-      }
+  if (VERBOSE) {
+    sh "pwd"
+    if (inDocker) {
+      sh "cat /etc/issue /jenkins/workspace/issue"
+    }
+    else {
+      sh "uname -a"
+    }
+  }
 
-      sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
-      checkout([$class: 'GitSCM',
-                branches: [[name: "${GITTAG}"]],
-                doGenerateSubmoduleConfigurations: false,
-                extensions: [[$class: 'SubmoduleOption',
-                              disableSubmodules: false,
-                              parentCredentials: false,
-                              recursiveSubmodules: true,
-                              reference: '',
-                              trackingSubmodules: false]],
-                submoduleCfg: [],
-                userRemoteConfigs:
-                [[url: 'https://github.com/arangodb/arangodb.git']]])
+  sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
+  checkout([$class: 'GitSCM',
+            branches: [[name: "${GITTAG}"]],
+            doGenerateSubmoduleConfigurations: false,
+            extensions: [[$class: 'SubmoduleOption',
+                          disableSubmodules: false,
+                          parentCredentials: false,
+                          recursiveSubmodules: true,
+                          reference: '',
+                          trackingSubmodules: false]],
+            submoduleCfg: [],
+            userRemoteConfigs:
+            [[url: 'https://github.com/arangodb/arangodb.git']]])
 
-      // follow deletion of upstream tags:
-      sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
-      currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-      if (fileExists(lastKnownGoodGitFile)) {
-        lastKnownGitRev=readFile(lastKnownGoodGitFile)
-      }
-      currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-      print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
+  // follow deletion of upstream tags:
+  sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
+  currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+  if (fileExists(lastKnownGoodGitFile)) {
+    lastKnownGitRev=readFile(lastKnownGoodGitFile)
+  }
+  currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+  print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
 }
 
 stage("cloning source") {
@@ -323,15 +323,15 @@ stage("building ArangoDB") {
 }
 
 /*
-stage("generating release build report") {
+  stage("generating release build report") {
   node {
       
-    def subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) is finished"
+  def subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) is finished"
       
-    mail (to: 'release-bot@arangodb.com',
-          subject: subject,
-          body: "we successfully compiled ${GITTAG} \nfind the results at ${env.BUILD_URL}.");
+  mail (to: 'release-bot@arangodb.com',
+  subject: subject,
+  body: "we successfully compiled ${GITTAG} \nfind the results at ${env.BUILD_URL}.");
   }
 
-}
+  }
 */
