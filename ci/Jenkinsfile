@@ -562,7 +562,7 @@ stage("running unittest") {
         ["shell_server", 'shell_server', ""],
         ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
         ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
-        ["arangosh", 'arangosh', "" */],
+        ["arangosh", 'arangosh', ""],*/
       ]
     }
     print("getting keyset\n")
