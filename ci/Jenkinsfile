@@ -108,6 +108,7 @@ def setDirectories(where, String localTarDir, String OS, String jobName, String 
 
 def copyExtractTarBall (where, String buildHost, String testWorkingDirectory) {
   print("${where['testRunName']}: copyExtractTarBall\n")
+  extract_tarball = where['localTarball'].replace("c:", "/cygdrive/c")
 
   CMD = """
 if test ! -d ${where['localTarDir']}; then
@@ -122,7 +123,7 @@ fi
 if test ! -d ${where['releaseOutDir']}; then
         mkdir -p ${where['releaseOutDir']}
 fi
-python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']} ${where['localWSDir']} ${where['localTarball']} '${where['testRunName']}_${buildHost}' 'rm -rf ${where['localExtractDir']}; mkdir ${where['localExtractDir']}; cd ${where['localExtractDir']}; tar -xzf ${where['localTarball']}'
+python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']} ${where['localWSDir']} ${where['localTarball']} '${where['testRunName']}_${buildHost}' 'rm -rf ${where['localExtractDir']}; mkdir ${where['localExtractDir']}; cd ${where['localExtractDir']}; tar -xzf ${extract_tarball}'
 """
 
   if (VERBOSE) {
