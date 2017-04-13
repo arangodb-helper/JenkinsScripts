@@ -236,7 +236,7 @@ stage("building packages") {
                    booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
                )
-          
+          /*
           echo "running Windows Community Release Cluster unittests"
           build( job: 'RELEASE__BuildTest',
                  parameters: [
@@ -249,7 +249,7 @@ stage("building packages") {
                    booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
                )
-          
+          */
           echo "running Windows Release Enterprise Single unittests"
           build( job: 'RELEASE__BuildTest',
                  parameters: [
@@ -262,7 +262,7 @@ stage("building packages") {
                    booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
                )
-
+          /*
           echo "running Windows Release Enterprise Cluster unittests"
           build( job: 'RELEASE__BuildTest',
                  parameters: [
@@ -275,6 +275,7 @@ stage("building packages") {
                    booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
                )
+          */
         },
         ////////////////////////////////////////////////////////////////////////////////
         "documentation": {
