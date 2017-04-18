@@ -112,7 +112,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     }
     def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard --parallel 16 --buildDir ${buildDir} ${cBuildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
     if (! buildUnittestTarball) {
-      BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} --downloadStarter "
+      BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} --downloadStarter"
     }
     if (buildEnv['SYMSRV'].size() != 0) {
       BUILDSCRIPT="${BUILDSCRIPT} --symsrv ${buildEnv['SYMSRV']} "
