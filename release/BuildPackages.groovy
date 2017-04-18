@@ -275,7 +275,7 @@ def CloneSource(inDocker){
 stage("cloning source") {
   print(DOCKER_CONTAINER)
   if (DOCKER_CONTAINER['buildType'] == 'docker') {
-    node('docker') {
+    node(DOCKER_HOST) {
       CloneSource(true)
     }
   }
