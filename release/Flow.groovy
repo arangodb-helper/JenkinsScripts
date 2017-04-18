@@ -84,17 +84,17 @@ stage("building packages") {
           ///----------------------------------------------------------------------
 	  if (HAVE_MORE_BUILDERS == "true") {
             echo "building Linux Community Release"
-            build( job: 'RELEASE__BuildPackages',
-                   parameters: [
-                     string(name: 'ENTERPRISE_URL', value: ''),
-                     string(name: 'GITTAG', value: "${GITTAG}"),
-                     string(name: 'preferBuilder', value: params['preferBuilder']),
-		     string(name: 'DOCKER_HOST', value: DOCKER_HOST_2),
-                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
-                   ]
-                 )
-            echo "uploading to master"
             node(DOCKER_HOST_2) {
+              build( job: 'RELEASE__BuildPackages',
+                     parameters: [
+                       string(name: 'ENTERPRISE_URL', value: ''),
+                       string(name: 'GITTAG', value: "${GITTAG}"),
+                       string(name: 'preferBuilder', value: params['preferBuilder']),
+                       string(name: 'DOCKER_HOST', value: DOCKER_HOST_2),
+                       booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                     ]
+                   )
+              echo "uploading to master"
               sh "rsync -ua ${INTERMEDIATE_DIR}/CO ${JENKINSMASTER}:${INTERMEDIATE_DIR}"
             }
           }
