@@ -223,10 +223,13 @@ def runTests(where, testWorkingDirectory) {
   else {
     def executiveSummary = readFile("${TESTWD}/UNITTEST_RESULT_EXECUTIVE_SUMMARY.json").trim()
     echo "executiveSummary: ${executiveSummary} - ${crashy}"
-    if (executiveSummary == "true" && crashy == "false") {
-      currentBuild.result = 'SUCCESS'
+    if (executiveSummary == "true") {
+      flowRun.state.result = currentBuild.result = 'SUCCESS'
     } else {
-      currentBuild.result = 'UNSTABLE'
+      flowRun.state.result = currentBuild.result = 'UNSTABLE'
+    }
+    if (crashy == "false") {
+      flowRun.state.result = currentBuild.result = 'FAILURE'
     }
   }
 }
