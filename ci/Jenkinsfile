@@ -214,24 +214,26 @@ def runTests(where, testWorkingDirectory) {
   def crashy = readFile("${TESTWD}/UNITTEST_RESULT_CRASHED.json")
   def testFailuresFile = "${TESTWD}/testfailures.txt"
   def failureOutput = readFile(testFailuresFile)
+  def res = 'SUCCESS'
   if (failureOutput.size() > 5) {
     echo "FAILING NOW!"
     sh "cp ${testFailuresFile} ${where['releaseOutDir']}/results/${where['testRunName']}.txt"
     failures = "${failureOutput}"
-    currentBuild.result = 'FAILURE'
+    res = currentBuild.result = 'FAILURE'
   }
   else {
     def executiveSummary = readFile("${TESTWD}/UNITTEST_RESULT_EXECUTIVE_SUMMARY.json").trim()
     echo "executiveSummary: ${executiveSummary} - ${crashy}"
     if (executiveSummary == "true") {
-      currentBuild.result = 'SUCCESS'
+      res = currentBuild.result = 'SUCCESS'
     } else {
-      currentBuild.result = 'UNSTABLE'
+      res = currentBuild.result = 'UNSTABLE'
     }
     if (crashy == "true") {
-      currentBuild.result = 'FAILURE'
+      res = currentBuild.result = 'FAILURE'
     }
   }
+  return res
 }
 
 def runThisTest(which, buildEnvironment)
