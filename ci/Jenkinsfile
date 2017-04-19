@@ -211,6 +211,7 @@ def runTests(where, testWorkingDirectory) {
   junit allowEmptyResults: true, keepLongStdio: true, testResults: "${TESTWD}/UNITTEST_RESULT_*.xml"
   //step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
   print("The currentBuild.result is: ${currentBuild.result}")
+  def crashy = readFile("${TESTWD}/UNITTEST_RESULT_CRASHED.json")
   def testFailuresFile = "${TESTWD}/testfailures.txt"
   def failureOutput = readFile(testFailuresFile)
   if (failureOutput.size() > 5) {
@@ -221,8 +222,8 @@ def runTests(where, testWorkingDirectory) {
   }
   else {
     def executiveSummary = readFile("${TESTWD}/UNITTEST_RESULT_EXECUTIVE_SUMMARY.json").trim()
-    echo "executiveSummary: ${executiveSummary}"
-    if (executiveSummary == "true") {
+    echo "executiveSummary: ${executiveSummary} - ${crashy}"
+    if (executiveSummary == "true" && crashy == "false") {
       currentBuild.result = 'SUCCESS'
     } else {
       currentBuild.result = 'UNSTABLE'
