@@ -358,7 +358,7 @@ stage("Generating HTML snippets & test it with the packages") {
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 if (GIT_VERSION != 'devel') {
-  input("message": "Everything we did so far was private. Proceed to the publish step now?")
+  input("message": "Everything we did so far was private. DC/OS checketd? Proceed to the publish step now?")
 }
 else {
   echo "building devel version without user trigger"
