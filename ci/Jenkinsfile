@@ -161,7 +161,7 @@ def runTests(where, testWorkingDirectory) {
   def EXTREME_VERBOSITY=""
   if (VERBOSE) {
     print("${where['testRunName']}: runTests")
-    EXTREME_VERBOSITY="--extremeVerbosity true"
+    //EXTREME_VERBOSITY="--extremeVerbosity true"
   }
 
   def TESTWD = "${testWorkingDirectory}/out".replace("/cygdrive/c", "c:")
