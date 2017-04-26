@@ -637,6 +637,7 @@ stage("generating test report") {
     def failures = failures +  sh(returnStdout: true, script: "cat ${releaseOutDir}/results/* || echo ''").trim()
 
     if (failures.size() > 5) {
+      print(failures)
 
       def gitRange = ""
       if (lastKnownGitRev.size() > 1) {
