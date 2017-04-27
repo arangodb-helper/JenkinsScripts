@@ -27,7 +27,7 @@ def CONTAINERS=[
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': false, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'fedoratwentyfive',   'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
-  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'opensusethirteen',    'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --gcc6 --rpmDistro SUSE13", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'opensusefortytwo',    'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --gcc6 --rpmDistro SUSE13", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessie',        'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntutwelveofour',   'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': false, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'ubuntufourteenofour', 'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
@@ -562,16 +562,17 @@ stage("running unittest") {
     } else {
       testCaseSets = [
         ["fail", 'fail', ""],
-        ["fail", 'fail', ""],
+        ["fail", 'fail', ""]/*,
         ['catch', 'catch', ""],
         ['http_server', 'http_server', ""],
         ["shell_client", 'shell_client', ""],
         ["shell_server_aql", 'shell_server_aql', ""],
         ["dump_import", 'dump.importing', ""],
         ["shell_server", 'shell_server', ""],
-        ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
+        ['ssl_server', 'ssl_server', ""],
         ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
         ["arangosh", 'arangosh', ""],
+                             */
       ]
     }
     print("getting keyset\n")
@@ -640,8 +641,6 @@ stage("generating test report") {
 
     if (failures.size() > 5) {
 
-      slackSend channel: '#status-dev', color: '#439FE0', message: failures
-
       print(failures)
 
       def gitRange = ""
@@ -668,10 +667,20 @@ stage("generating test report") {
         subject = "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) has failed"
       }
 
-      print("sending messages to ${gitCommitters}")
-      mail (to: gitCommitters,
-            subject: subject,
-            body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
+      if (REPORT_TO == "slack") {
+
+        slackMsg = """${GITTAG} on ${OS} failed - ${env.BUILD_URL} \n ${failures}"
+        slackSend channel: '#status-dev', color: '#439FE0', message: slackMsg
+
+      }
+      else if (REPORT_TO == "mail") {
+        print("sending messages to ${gitCommitters}")
+        mail (to: gitCommitters,
+              subject: subject,
+              body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
+      }
+      else { // report to upstream process via artifact
+      }
     }
     else {
       sh "echo ${currentGitRev} > ${lastKnownGoodGitFile}";
