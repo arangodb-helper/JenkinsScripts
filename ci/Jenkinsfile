@@ -669,8 +669,8 @@ stage("generating test report") {
 
       if (REPORT_TO == "slack") {
 
-        slackMsg = """${GITTAG} on ${OS} failed (<a href='${env.BUILD_URL}'>Open</a>) \n Accusing: ${gitCommitters} \n ${failures}"""
-        slackSend channel: '#status-dev', color: '#439FE0', message: slackMsg
+        slackMsg = """${GITTAG} on ${preferBuilder} failed (${env.BUILD_URL}) \n Accusing: ${gitCommitters} \n ${failures}"""
+        slackSend channel: '#status-dev', color: '#FF0000', message: slackMsg
 
       }
       else if (REPORT_TO == "mail") {
@@ -684,7 +684,7 @@ stage("generating test report") {
     }
     else {
       sh "echo ${currentGitRev} > ${lastKnownGoodGitFile}";
-      slackSend channel: '#status-dev', color: '#439FE0', message: "OK"
+      slackSend channel: '#status-dev', color: '#00FF00', message: "${GITTAG} on ${preferBuilder} succeeded (${env.BUILD_URL}) OK"
     }
   }
 }
