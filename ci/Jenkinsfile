@@ -471,6 +471,7 @@ def CloneSource(inDocker){
       sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
       checkout([$class: 'GitSCM',
                 branches: [[name: "${GITTAG}"]],
+                /*
                 doGenerateSubmoduleConfigurations: false,
                 extensions: [[$class: 'SubmoduleOption',
                               disableSubmodules: false,
@@ -479,6 +480,7 @@ def CloneSource(inDocker){
                               reference: '',
                               trackingSubmodules: false]],
                 submoduleCfg: [],
+                */
                 userRemoteConfigs:
                 [[url: 'https://github.com/arangodb/arangodb.git']]])
 

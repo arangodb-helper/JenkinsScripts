@@ -250,6 +250,7 @@ def CloneSource(inDocker){
   sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
   checkout([$class: 'GitSCM',
             branches: [[name: "${GITTAG}"]],
+            /*
             doGenerateSubmoduleConfigurations: false,
             extensions: [[$class: 'SubmoduleOption',
                           disableSubmodules: false,
@@ -258,6 +259,7 @@ def CloneSource(inDocker){
                           reference: '',
                           trackingSubmodules: false]],
             submoduleCfg: [],
+            */
             userRemoteConfigs:
             [[url: 'https://github.com/arangodb/arangodb.git']]])
 
@@ -309,7 +311,9 @@ stage("building ArangoDB") {
     }
   } catch (err) {
     stage('Send Notification for build' ) {
-      msgBody = err.getMessage()
+      slackSend channel: '#status-dev', color: '#439FE0', message: err.getMessage()
+        /*
+      msgBody = 
       if (msgBody.size() > 0) {
         mail (to: ADMIN_ACCOUNT, 
               subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
@@ -317,6 +321,7 @@ stage("building ArangoDB") {
         currentBuild.result = 'FAILURE'
         throw(err)
       }
+        */
     }
   }
 }
