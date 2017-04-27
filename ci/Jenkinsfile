@@ -1,4 +1,5 @@
 #!groovy
+import groovy.json.*
 DOCKER_HOST=params['DOCKER_HOST']
 
 REGISTRY="192.168.0.1"
@@ -680,11 +681,24 @@ stage("generating test report") {
               body: "the failed testcases gave this output: ${failures}\nPlease go to ${env.BUILD_URL}.");
       }
       else { // report to upstream process via artifact
+        msg = """${GITTAG} on ${preferBuilder} failed (${env.BUILD_URL}) \n Accusing: ${gitCommitters} \n ${failures}"""
+        jstr = new JsonBuilder(['status':false, 'messge': msg]).toPrettyString()
+        writeFile file: REPORT_TO, text: jstr
+        archive REPORT_TO
       }
     }
     else {
       sh "echo ${currentGitRev} > ${lastKnownGoodGitFile}";
       slackSend channel: '#status-dev', color: '#00FF00', message: "${GITTAG} on ${preferBuilder} succeeded (${env.BUILD_URL}) OK"
+
+      if (REPORT_TO == "slack") {
+        jstr = new JsonBuilder(['status':false, 'messge': msg]).toPrettyString()
+      }
+      else if (REPORT_TO == "mail") {
+      }
+      else { // report to upstream process via artifact
+        writeFile file: REPORT_TO, text: jstr
+      }
     }
   }
 }
