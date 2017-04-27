@@ -561,9 +561,9 @@ stage("running unittest") {
         ["arangosh", 'arangosh', ""],
       ]
     } else {
-      testCaseSets = [
+      testCaseSets = [/*
         ["fail", 'fail', ""],
-        ["fail", 'fail', ""]/*,
+        ["fail", 'fail', ""],*/
         ['catch', 'catch', ""],
         ['http_server', 'http_server', ""],
         ["shell_client", 'shell_client', ""],
@@ -573,7 +573,6 @@ stage("running unittest") {
         ['ssl_server', 'ssl_server', ""],
         ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
         ["arangosh", 'arangosh', ""],
-                             */
       ]
     }
     print("getting keyset\n")
