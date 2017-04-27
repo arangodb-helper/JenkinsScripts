@@ -669,7 +669,7 @@ stage("generating test report") {
 
       if (REPORT_TO == "slack") {
 
-        slackMsg = """${GITTAG} on ${OS} failed - ${env.BUILD_URL} \n ${failures}"""
+        slackMsg = """${GITTAG} on ${OS} failed (<a href='${env.BUILD_URL}'>Open</a>) \n Accusing: ${gitCommitters} \n ${failures}"""
         slackSend channel: '#status-dev', color: '#439FE0', message: slackMsg
 
       }
