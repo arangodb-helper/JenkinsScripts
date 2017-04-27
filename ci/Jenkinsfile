@@ -559,8 +559,8 @@ stage("running unittest") {
       ]
     } else {
       testCaseSets = [
-        //  ["fail", 'fail', ""],
-        //    ["fail", 'fail', ""],
+        ["fail", 'fail', ""],
+        ["fail", 'fail', ""],
         ['catch', 'catch', ""],
         ['http_server', 'http_server', ""],
         ["shell_client", 'shell_client', ""],
@@ -637,6 +637,9 @@ stage("generating test report") {
     def failures = failures +  sh(returnStdout: true, script: "cat ${releaseOutDir}/results/* || echo ''").trim()
 
     if (failures.size() > 5) {
+
+      slackSend channel: '#status-dev', color: '#439FE0', message: failures
+
       print(failures)
 
       def gitRange = ""
@@ -670,6 +673,7 @@ stage("generating test report") {
     }
     else {
       sh "echo ${currentGitRev} > ${lastKnownGoodGitFile}";
+      slackSend channel: '#status-dev', color: '#439FE0', message: "OK"
     }
   }
 }
