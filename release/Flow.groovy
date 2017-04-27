@@ -145,6 +145,7 @@ stage("building packages") {
                    string(name: 'ENTERPRISE_URL', value: ''),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'macos'),
+                   string(name: 'REPORT_TO', value: "slack"),
                    booleanParam(name: 'SKIP_BUILD', value: false),
                    booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
@@ -158,6 +159,7 @@ stage("building packages") {
                    string(name: 'ENTERPRISE_URL', value: ''),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'macos'),
+                   string(name: 'REPORT_TO', value: "slack"),
                    booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
                    booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
@@ -171,6 +173,7 @@ stage("building packages") {
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'macos'),
+                   string(name: 'REPORT_TO', value: "slack"),
                    booleanParam(name: 'SKIP_BUILD', value: false),
                    booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
@@ -184,6 +187,7 @@ stage("building packages") {
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'macos'),
+                   string(name: 'REPORT_TO', value: "slack"),
                    booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
                    booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
@@ -230,6 +234,7 @@ stage("building packages") {
                    string(name: 'ENTERPRISE_URL', value: ''),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'windows'),
+                   string(name: 'REPORT_TO', value: "slack"),
                    booleanParam(name: 'SKIP_BUILD', value: false),
                    booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
@@ -243,6 +248,7 @@ stage("building packages") {
                    string(name: 'ENTERPRISE_URL', value: ''),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'windows'),
+                   string(name: 'REPORT_TO', value: "slack"),
                    booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
                    booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
@@ -256,6 +262,7 @@ stage("building packages") {
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'windows'),
+                   string(name: 'REPORT_TO', value: "slack"),
                    booleanParam(name: 'SKIP_BUILD', value: false),
                    booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
@@ -269,6 +276,7 @@ stage("building packages") {
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'windows'),
+                   string(name: 'REPORT_TO', value: "slack"),
                    booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
                    booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
