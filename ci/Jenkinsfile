@@ -688,14 +688,14 @@ stage("generating test report") {
     }
     else {
       sh "echo ${currentGitRev} > ${lastKnownGoodGitFile}";
-      slackSend channel: '#status-dev', color: '#00FF00', message: "${GITTAG} on ${preferBuilder} succeeded (${env.BUILD_URL}) OK"
 
       if (REPORT_TO == "slack") {
-        jstr = new JsonBuilder(['status':false, 'messge': msg]).toPrettyString()
+	slackSend channel: '#status-dev', color: '#00FF00', message: "${GITTAG} on ${preferBuilder} succeeded (${env.BUILD_URL}) OK"
       }
       else if (REPORT_TO == "mail") {
       }
       else { // report to upstream process via artifact
+        jstr = new JsonBuilder(['status':false, 'messge': "success"]).toPrettyString()
         writeFile file: REPORT_TO, text: jstr
       }
     }
