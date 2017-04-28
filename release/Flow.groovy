@@ -409,14 +409,16 @@ stage("updating other repos") {
       "AMI": {
         node('master') {
           if (IS_RELEASE == 'true') {
-            build( job: 'RELEASE__BuildAMI',
-                   parameters: [
-                     string(name: 'GITTAG', value: GIT_VERSION),
-                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
-                     booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
-                     booleanParam(name: 'DEBUG', value: false)
-                   ]
-                 )
+            retry(5) {
+              build( job: 'RELEASE__BuildAMI',
+                     parameters: [
+                       string(name: 'GITTAG', value: GIT_VERSION),
+                       string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
+                       booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
+                       booleanParam(name: 'DEBUG', value: false)
+                     ]
+                   )
+            }
           }
           else {
             echo "publish ami deactivated"
