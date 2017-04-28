@@ -668,8 +668,8 @@ stage("generating test report") {
       }
 
       if (REPORT_TO == "slack") {
-
-        slackMsg = """${GITTAG} on ${preferBuilder} failed (${env.BUILD_URL}) \n Accusing: ${gitCommitters} \n ${failures}"""
+        // Accusing: ${gitCommitters} \n
+        slackMsg = """Branch '${GITTAG}' on '${preferBuilder}' failed: (${env.BUILD_URL}) \n  ```${failures}```"""
         slackSend channel: '#status-dev', color: '#FF0000', message: slackMsg
 
       }
