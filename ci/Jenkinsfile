@@ -228,7 +228,7 @@ def runTests(where, testWorkingDirectory) {
     echo "executiveSummary: ${executiveSummary} - ${crashy}"
     // only escalate...
     if (executiveSummary == "true") {
-      // res = currentBuild.result = 'SUCCESS'
+      res = currentBuild.result = 'SUCCESS'
     } else {
       if (currentBuild.result == 'SUCCESS') {
         res = currentBuild.result = 'UNSTABLE'
