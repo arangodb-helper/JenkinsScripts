@@ -71,9 +71,7 @@ if (preferBuilder.size() > 0) {
 }
 
 OS = DOCKER_CONTAINER['OS']
-if (RUN_CLUSTER_TESTS == "true") {
-  DOCKER_CONTAINER['cluster'] = true
-}
+DOCKER_CONTAINER['cluster'] = (RUN_CLUSTER_TESTS == "true")
 
 lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
 
