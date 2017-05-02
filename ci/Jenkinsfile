@@ -195,7 +195,9 @@ def runTests(where, testWorkingDirectory) {
   if (VERBOSE) {
     echo "${where['testRunName']}: ${EXECUTE_TEST}"
   }
-  sh EXECUTE_TEST
+  wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+    sh EXECUTE_TEST
+  }
   def shellRC = sh(returnStdout: true, script: "cat ${RCFile}").trim()
   if (shellRC != "0") {
     echo "SHELL EXITED WITH FAILURE: ${shellRC}"
