@@ -521,11 +521,12 @@ stage("building ArangoDB") {
     print(DOCKER_CONTAINER)
     setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL, EPDIR, DOCKER_CONTAINER['reliable'])
   } catch (err) {
-    stage('Send Notification for build' )
-    mail (to: ADMIN_ACCOUNT,
-          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
-          body: err.getMessage());
-    currentBuild.result = 'FAILURE'
+    stage('Send Notification for build' ) {
+      mail (to: ADMIN_ACCOUNT,
+            subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
+            body: err.getMessage());
+      currentBuild.result = 'FAILURE'
+    }
     throw(err)
   }
 }
@@ -564,9 +565,10 @@ stage("running unittest") {
         ["arangosh", 'arangosh', ""],
       ]
     } else {
-      testCaseSets = [/*
+      testCaseSets = [//*
         ["fail", 'fail', ""],
-        ["fail", 'fail', ""],*/
+        ["fail", 'fail', ""],//*/
+        /*
         ['catch', 'catch', ""],
         ['http_server', 'http_server', ""],
         ["shell_client", 'shell_client', ""],
@@ -576,6 +578,7 @@ stage("running unittest") {
         ['ssl_server', 'ssl_server', ""],
         ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
         ["arangosh", 'arangosh', ""],
+        */
       ]
     }
     print("getting keyset\n")
@@ -623,11 +626,12 @@ stage("running unittest") {
     print("The currentBuild.result is now after the parallel: ${currentBuild.result}")
 
   } catch (err) {
-    stage('Send Notification unittest')
-    mail (to: ADMIN_ACCOUNT,
-          subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 
-          body: "error message: " + err.getMessage());
-    currentBuild.result = 'FAILURE'
+    stage('Send Notification unittest') {
+      mail (to: ADMIN_ACCOUNT,
+            subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 
+            body: "error message: " + err.getMessage());
+      currentBuild.result = 'FAILURE'
+    }
     throw(err)
   }
 }
