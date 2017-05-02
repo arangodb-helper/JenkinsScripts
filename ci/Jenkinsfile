@@ -199,7 +199,7 @@ def runTests(where, testWorkingDirectory) {
   def shellRC = sh(returnStdout: true, script: "cat ${RCFile}").trim()
   if (shellRC != "0") {
     echo "SHELL EXITED WITH FAILURE: ${shellRC}"
-    failures = "${failures}\ntest ${where['testRunName']} exited with ${shellRC}\n"
+    failures = "${failures};test ${where['testRunName']} exited with ${shellRC}"
     currentBuild.result = 'FAILURE'
   }
   if (VERBOSE) {
@@ -611,7 +611,7 @@ stage("running unittest") {
     for (int i = 0; i < parallelJobNames.size(); i++) {
       def thisTestRunName = parallelJobNames[i]
       branches[thisTestRunName] = {
-        runThisTest(thisTestRunName, DOCKER_CONTAINER)
+        return runThisTest(thisTestRunName, DOCKER_CONTAINER)
       }
     }
     echo branches.toString();
@@ -639,7 +639,7 @@ stage("generating test report") {
   node(nodeName) {
     def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, env.JOB_NAME)
     
-    def failures = failures +  sh(returnStdout: true, script: "cat ${releaseOutDir}/results/* || echo ''").trim()
+    def failures = failures + "\n" +  sh(returnStdout: true, script: "cat ${releaseOutDir}/results/* || echo ''").trim()
 
     if (failures.size() > 5) {
 
