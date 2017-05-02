@@ -210,7 +210,7 @@ def runTests(where, testWorkingDirectory) {
     sh "ls -l ${TESTWD}/UNITTEST_RESULT_*.xml"
   }
 
-  junit /* allowEmptyResults: true, */ keepLongStdio: true, testResults: "out/**.xml"
+  junit /* allowEmptyResults: true, */ keepLongStdio: true, testResults: "out/*.xml"
   //step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
   print("The currentBuild.result is: ${currentBuild.result}")
   def crashy = readFile("${TESTWD}/UNITTEST_RESULT_CRASHED.json")
