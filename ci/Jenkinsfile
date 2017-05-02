@@ -198,7 +198,7 @@ def runTests(where, testWorkingDirectory) {
   sh EXECUTE_TEST
   def shellRC = sh(returnStdout: true, script: "cat ${RCFile}").trim()
   if (shellRC != "0") {
-    echo "SHELL EXITED WITH FAILURE: ${shellRC}xxx"
+    echo "SHELL EXITED WITH FAILURE: ${shellRC}"
     failures = "${failures}\n\n test ${where['testRunName']} exited with ${shellRC}"
     currentBuild.result = 'FAILURE'
   }
@@ -217,7 +217,6 @@ def runTests(where, testWorkingDirectory) {
   if (failureOutput.size() > 5) {
     echo "FAILING NOW!"
     sh "cp ${testFailuresFile} ${where['releaseOutDir']}/results/${where['testRunName']}.txt"
-    failures = "${failureOutput}"
     res = currentBuild.result = 'FAILURE'
   }
   else {
@@ -257,11 +256,7 @@ def runThisTest(which, buildEnvironment)
           def myRunImage = docker.image("${buildEnvironment['name']}/run")
           myRunImage.pull()
           docker.image(myRunImage.imageName()).inside("--volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw --volume /jenkins:/mnt/:rw --volume /var/lib/systemd/coredump:/var/lib/systemd/coredump:rw") {
-            if (VERBOSE) {
-              sh "ls -l /mnt; ls -l /mnt/workspace;"
-            }
             def buildHost=sh(returnStdout: true, script: "cat /mnt/workspace/issue").trim()
-            print(buildHost)
             buildHost = buildHost[32..35]
             if (VERBOSE) {
               sh "cat /etc/issue"
@@ -566,8 +561,7 @@ stage("running unittest") {
     } else {
       testCaseSets = [//*
         ["fail", 'fail', ""],
-        ["fail", 'fail', ""],//*/
-        /*
+        ["fail", 'fail', ""],/*
         ['catch', 'catch', ""],
         ['http_server', 'http_server', ""],
         ["shell_client", 'shell_client', ""],
@@ -577,7 +571,7 @@ stage("running unittest") {
         ['ssl_server', 'ssl_server', ""],
         ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
         ["arangosh", 'arangosh', ""],
-        */
+        //*/
       ]
     }
     print("getting keyset\n")
@@ -643,6 +637,7 @@ stage("generating test report") {
   }
   node(nodeName) {
     def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, env.JOB_NAME)
+    
     def failures = failures +  sh(returnStdout: true, script: "cat ${releaseOutDir}/results/* || echo ''").trim()
 
     if (failures.size() > 5) {
