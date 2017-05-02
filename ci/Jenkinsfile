@@ -299,7 +299,9 @@ def runThisTest(which, buildEnvironment)
       }
     }
   }
-  return rc
+  if (!rc) {
+    new Exception("test failed.")
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -611,7 +613,7 @@ stage("running unittest") {
     for (int i = 0; i < parallelJobNames.size(); i++) {
       def thisTestRunName = parallelJobNames[i]
       branches[thisTestRunName] = {
-        return runThisTest(thisTestRunName, DOCKER_CONTAINER)
+        runThisTest(thisTestRunName, DOCKER_CONTAINER)
       }
     }
     echo branches.toString();
