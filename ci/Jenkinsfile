@@ -650,7 +650,7 @@ stage("running unittest") {
     throw(err)
   }
 }
-
+/*
 stage("generating test report") {
   if (DOCKER_CONTAINER['buildType'] == 'docker') {
     nodeName = 'docker'
@@ -724,3 +724,4 @@ stage("generating test report") {
     }
   }
 }
+*/
