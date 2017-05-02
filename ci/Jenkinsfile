@@ -25,7 +25,7 @@ VERBOSE = true
 MAINTAINERMODE = "true"
 testParams = [:]
 testPathPrefix = 'j'
-currentBuild.result = 'SUCCESS'
+//currentBuild.result = 'SUCCESS'
 def CONTAINERS=[
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': false, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
@@ -202,45 +202,33 @@ def runTests(where, testWorkingDirectory) {
   }
   def shellRC = sh(returnStdout: true, script: "cat ${RCFile}").trim()
   if (shellRC != "0") {
-    echo "SHELL EXITED WITH FAILURE: ${shellRC}"
     failures = "${failures};test ${where['testRunName']} exited with ${shellRC}"
-    // TODO currentBuild.result = 'FAILURE'
   }
   if (VERBOSE) {
     echo "${where['testRunName']}: recording results [ ${TESTWD}/*.xml ]:"
     sh "ls -l out/UNITTEST_RESULT_*.xml"
   }
 
-  junit /* allowEmptyResults: true, */ keepLongStdio: true, testResults: "out/*.xml"
-  //step([$class: 'JUnitResultArchiver', testResults: 'out/UNITTEST_RESULT_*.xml'])
+  junit keepLongStdio: true, testResults: "out/*.xml"
   print("The currentBuild.result is: ${currentBuild.result}")
   def crashy = readFile("${TESTWD}/UNITTEST_RESULT_CRASHED.json")
   def testFailuresFile = "${TESTWD}/testfailures.txt"
   def failureOutput = readFile(testFailuresFile)
   def res = 'SUCCESS'
   if (failureOutput.size() > 5) {
-    echo "FAILING NOW!"
+    echo "switching to UNSTABLE!"
     sh "cp ${testFailuresFile} ${where['releaseOutDir']}/results/${where['testRunName']}.txt"
-    // res = currentBuild.result = 'FAILURE'
+    return 'UNSTABLE'
   }
   else {
     def executiveSummary = readFile("${TESTWD}/UNITTEST_RESULT_EXECUTIVE_SUMMARY.json").trim()
     echo "executiveSummary: ${executiveSummary} - ${crashy}"
-    // only escalate...
-    /*
-    if (executiveSummary == "true") {
-      res = currentBuild.result = 'SUCCESS'
-    } else {
-      if (currentBuild.result == 'SUCCESS') {
-        res = currentBuild.result = 'UNSTABLE'
-      }
-    }
-    */
+
     if (crashy == "true") {
       res = currentBuild.result = 'FAILURE'
     }
   }
-  //return res
+  return res
 }
 
 def runThisTest(which, buildEnvironment)
@@ -580,10 +568,10 @@ stage("running unittest") {
         ["arangosh", 'arangosh', ""],
       ]
     } else {
-      testCaseSets = [//*
-        //["fail", 'fail', ""],
+      testCaseSets = [/*
+        ["fail", 'fail', ""],
         ["overal", 'config.authentication', ""],
-        ["fail", 'fail', ""],/*
+        ["fail", 'fail', ""],/*///
         ['catch', 'catch', ""],
         ['http_server', 'http_server', ""],
         ["shell_client", 'shell_client', ""],
@@ -650,7 +638,7 @@ stage("running unittest") {
     throw(err)
   }
 }
-/*
+
 stage("generating test report") {
   if (DOCKER_CONTAINER['buildType'] == 'docker') {
     nodeName = 'docker'
@@ -724,4 +712,3 @@ stage("generating test report") {
     }
   }
 }
-*/
