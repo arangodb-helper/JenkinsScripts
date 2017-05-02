@@ -22,6 +22,7 @@ DIST_FILE = ""
 BUILD_DIR = ""
 fatalError = false
 VERBOSE = true
+MAINTAINERMODE = "true"
 testParams = [:]
 testPathPrefix = 'j'
 def CONTAINERS=[
@@ -332,7 +333,14 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (buildEnv['CBUILD'].size() != 0) {
       cBuildDir = "--clientBuildDir ${buildEnv['CBUILD']}${XEP}"
     }
-    def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard --parallel ${PARALLEL_BUILD} --buildDir ${buildDir} ${cBuildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
+
+    def buildMode = "standard"
+    if (MAINTAINERMODE == "true") {
+      buildMode = "maintainer"
+    }
+
+    def BUILDSCRIPT = "./Installation/Jenkins/build.sh ${buildMode} --parallel ${PARALLEL_BUILD} --buildDir ${buildDir} ${cBuildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
+
     if (! buildUnittestTarball) {
       BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} "
     }
