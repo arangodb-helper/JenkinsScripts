@@ -199,7 +199,7 @@ def runTests(where, testWorkingDirectory) {
   def shellRC = sh(returnStdout: true, script: "cat ${RCFile}").trim()
   if (shellRC != "0") {
     echo "SHELL EXITED WITH FAILURE: ${shellRC}"
-    failures = "${failures}\n\n test ${where['testRunName']} exited with ${shellRC}"
+    failures = "${failures}\ntest ${where['testRunName']} exited with ${shellRC}\n"
     currentBuild.result = 'FAILURE'
   }
   if (VERBOSE) {
@@ -236,6 +236,7 @@ def runTests(where, testWorkingDirectory) {
 
 def runThisTest(which, buildEnvironment)
 {
+  def rc=false
   print('runThisTest')
   def testWorkingDirectory;
   def where = testParams[which]
@@ -266,8 +267,7 @@ def runThisTest(which, buildEnvironment)
             // GO!
             copyExtractTarBall(where, buildHost, testWorkingDirectory)
             setupTestArea(where, testWorkingDirectory)
-            runTests(where, testWorkingDirectory)
-
+            rc = runTests(where, testWorkingDirectory)
           }
         }
       }
@@ -295,10 +295,11 @@ def runThisTest(which, buildEnvironment)
         // GO!
         copyExtractTarBall(where, buildHost, testWorkingDirectory)
         setupTestArea(where, testWorkingDirectory)
-        runTests(where, testWorkingDirectory)
+        rc = runTests(where, testWorkingDirectory)
       }
     }
   }
+  return rc
 }
 
 ////////////////////////////////////////////////////////////////////////////////
