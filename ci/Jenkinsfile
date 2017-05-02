@@ -578,6 +578,7 @@ stage("running unittest") {
     } else {
       testCaseSets = [//*
         //["fail", 'fail', ""],
+        ["overal", 'config.authentication', ""],
         ["fail", 'fail', ""],/*
         ['catch', 'catch', ""],
         ['http_server', 'http_server', ""],
