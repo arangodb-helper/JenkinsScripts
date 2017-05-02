@@ -25,6 +25,7 @@ VERBOSE = true
 MAINTAINERMODE = "true"
 testParams = [:]
 testPathPrefix = 'j'
+currentBuild.result = 'SUCCESS'
 def CONTAINERS=[
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centosix',            'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': false, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
   [ 'buildType': 'docker', 'testType': 'docker', 'name': 'centoseven',          'packageFormat': 'RPM',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc --rpmDistro centos", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
@@ -220,15 +221,18 @@ def runTests(where, testWorkingDirectory) {
   if (failureOutput.size() > 5) {
     echo "FAILING NOW!"
     sh "cp ${testFailuresFile} ${where['releaseOutDir']}/results/${where['testRunName']}.txt"
-    res = currentBuild.result = 'FAILURE'
+    // res = currentBuild.result = 'FAILURE'
   }
   else {
     def executiveSummary = readFile("${TESTWD}/UNITTEST_RESULT_EXECUTIVE_SUMMARY.json").trim()
     echo "executiveSummary: ${executiveSummary} - ${crashy}"
+    // only escalate...
     if (executiveSummary == "true") {
-      res = currentBuild.result = 'SUCCESS'
+      // res = currentBuild.result = 'SUCCESS'
     } else {
-      res = currentBuild.result = 'UNSTABLE'
+      if (currentBuild.result == 'SUCCESS') {
+        res = currentBuild.result = 'UNSTABLE'
+      }
     }
     if (crashy == "true") {
       res = currentBuild.result = 'FAILURE'
