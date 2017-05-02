@@ -227,6 +227,7 @@ def runTests(where, testWorkingDirectory) {
     def executiveSummary = readFile("${TESTWD}/UNITTEST_RESULT_EXECUTIVE_SUMMARY.json").trim()
     echo "executiveSummary: ${executiveSummary} - ${crashy}"
     // only escalate...
+    /*
     if (executiveSummary == "true") {
       res = currentBuild.result = 'SUCCESS'
     } else {
@@ -234,6 +235,7 @@ def runTests(where, testWorkingDirectory) {
         res = currentBuild.result = 'UNSTABLE'
       }
     }
+    */
     if (crashy == "true") {
       res = currentBuild.result = 'FAILURE'
     }
