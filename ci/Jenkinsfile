@@ -262,7 +262,7 @@ def runThisTest(which, buildEnvironment)
             }
             def buildHost=sh(returnStdout: true, script: "cat /mnt/workspace/issue").trim()
             print(buildHost)
-            buildHost = buildHost[-40..-1]
+            buildHost = buildHost[32..35]
             if (VERBOSE) {
               sh "cat /etc/issue"
               sh "pwd"
