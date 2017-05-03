@@ -20,6 +20,7 @@ DIST_FILE = ""
 BUILD_DIR = ""
 fatalError = false
 VERBOSE = true
+MAINTAINERMODE = "false"
 testParams = [:]
 testPathPrefix = 'r'
 def CONTAINERS=[
@@ -110,7 +111,14 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (buildEnv['CBUILD'].size() != 0) {
       cBuildDir = "--clientBuildDir ${buildEnv['CBUILD']}${XEP}"
     }
-    def BUILDSCRIPT = "./Installation/Jenkins/build.sh standard --parallel 16 --buildDir ${buildDir} ${cBuildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
+
+    def buildMode = "standard"
+    if (MAINTAINERMODE == "true") {
+      buildMode = "maintainer"
+    }
+
+    def BUILDSCRIPT = "./Installation/Jenkins/build.sh ${buildMode} --parallel ${PARALLEL_BUILD} --buildDir ${buildDir} ${cBuildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
+
     if (! buildUnittestTarball) {
       BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} --downloadStarter"
     }
@@ -156,12 +164,14 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       sh BUILDSCRIPT
     }
     if (buildUnittestTarball) {
+      sh "mkdir -p ${RELEASE_OUT_DIR}"
+
       BUILT_FILE = "${outDir}/arangodb-${OS}.tar.gz".replace("/cygdrive/c", "c:")
       DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz".replace("/cygdrive/c", "c:")
       echo(DIST_FILE)
       echo(BUILT_FILE)
       MD5SUM = readFile("${BUILT_FILE}.md5").trim()
-      sh "mkdir -p ${RELEASE_OUT_DIR}"
+
       if (VERBOSE) {
         echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
       }
@@ -237,40 +247,40 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
 }
 
 def CloneSource(inDocker){
-  if (VERBOSE) {
-    sh "pwd"
-    if (inDocker) {
-      sh "cat /etc/issue /jenkins/workspace/issue"
-    }
-    else {
-      sh "uname -a"
-    }
-  }
+      if (VERBOSE) {
+        sh "pwd"
+        if (inDocker) {
+          sh "cat /etc/issue /jenkins/workspace/issue"
+        }
+        else {
+          sh "uname -a"
+        }
+      }
 
-  sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
-  checkout([$class: 'GitSCM',
-            branches: [[name: "${GITTAG}"]],
-            /*
-            doGenerateSubmoduleConfigurations: false,
-            extensions: [[$class: 'SubmoduleOption',
-                          disableSubmodules: false,
-                          parentCredentials: false,
-                          recursiveSubmodules: true,
-                          reference: '',
-                          trackingSubmodules: false]],
-            submoduleCfg: [],
-            */
-            userRemoteConfigs:
-            [[url: 'https://github.com/arangodb/arangodb.git']]])
+      sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
+      checkout([$class: 'GitSCM',
+                branches: [[name: "${GITTAG}"]],
+                /*
+                doGenerateSubmoduleConfigurations: false,
+                extensions: [[$class: 'SubmoduleOption',
+                              disableSubmodules: false,
+                              parentCredentials: false,
+                              recursiveSubmodules: true,
+                              reference: '',
+                              trackingSubmodules: false]],
+                submoduleCfg: [],
+                */
+                userRemoteConfigs:
+                [[url: 'https://github.com/arangodb/arangodb.git']]])
 
-  // follow deletion of upstream tags:
-  sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
-  currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-  if (fileExists(lastKnownGoodGitFile)) {
-    lastKnownGitRev=readFile(lastKnownGoodGitFile)
-  }
-  currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-  print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
+      // follow deletion of upstream tags:
+      sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
+      currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+      if (fileExists(lastKnownGoodGitFile)) {
+        lastKnownGitRev=readFile(lastKnownGoodGitFile)
+      }
+      currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+      print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
 }
 
 stage("cloning source") {
