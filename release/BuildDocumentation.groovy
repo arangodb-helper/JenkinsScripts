@@ -71,8 +71,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     sh "cd Cookbook; ./build.sh; cd .."
     print(buildEnv)
     def BUILDSCRIPT = "cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} COOKBOOK_DIR=../../Cookbook/cookbook/"
-    sh BUILDSCRIPT
-    
+    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+      sh BUILDSCRIPT
+    }
     if (VERBOSE) {
       sh "ls -l ${outDir}"
     }
