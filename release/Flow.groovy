@@ -130,8 +130,12 @@ stage("building packages") {
           ///----------------------------------------------------------------------
           echo "codesigning dmg's"
           node("macos") {
-            sh 'codesign --force --deep -s W7UC4UQXPV --sign "Developer ID Application: ArangoDB GmbH (W7UC4UQXPV)" /Users/jenkins/net/fileserver/CO/macos/*.dmg'
-            sh 'codesign --force --deep -s W7UC4UQXPV --sign "Developer ID Application: ArangoDB GmbH (W7UC4UQXPV)" /Users/jenkins/net/fileserver/EP/macos/*.dmg'
+            retry(5) {
+              sleep 5
+              sh 'codesign --force --deep -s W7UC4UQXPV --sign "Developer ID Application: ArangoDB GmbH (W7UC4UQXPV)" /Users/jenkins/net/fileserver/CO/macos/*.dmg'
+              sleep 5
+              sh 'codesign --force --deep -s W7UC4UQXPV --sign "Developer ID Application: ArangoDB GmbH (W7UC4UQXPV)" /Users/jenkins/net/fileserver/EP/macos/*.dmg'
+            }
           }
           ///----------------------------------------------------------------------
           echo "uploading dmg's"
