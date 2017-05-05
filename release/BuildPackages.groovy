@@ -129,7 +129,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       BUILDSCRIPT="rm -rf ${buildDir} ; ${BUILDSCRIPT}"
     }
     else {
-      BUILDSCRIPT="rm -rf ${buildDir}/CMakeFiles ${buildDir}/CMakeCache.txt ${buildDir}/CMakeCPackOptions.cmake ${buildDir}/cmake_install.cmake ${buildDir}/CPackConfig.cmake ${buildDir}/CPackSourceConfig.cmake ;${BUILDSCRIPT}"
+      BUILDSCRIPT="set; rm -rf ${buildDir}/CMakeFiles ${buildDir}/CMakeCache.txt ${buildDir}/CMakeCPackOptions.cmake ${buildDir}/cmake_install.cmake ${buildDir}/CPackConfig.cmake ${buildDir}/CPackSourceConfig.cmake ;${BUILDSCRIPT}"
     }
     if (!Reliable) {
       BUILDSCRIPT="""nohup bash -c "${BUILDSCRIPT}" > nohup.out 2>&1 & PID=\$!; echo \$PID > pid; tail -f nohup.out & wait \$PID; kill %2 ||true"""
