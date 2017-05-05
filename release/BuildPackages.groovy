@@ -132,7 +132,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       BUILDSCRIPT="set; rm -rf ${buildDir}/CMakeFiles ${buildDir}/CMakeCache.txt ${buildDir}/CMakeCPackOptions.cmake ${buildDir}/cmake_install.cmake ${buildDir}/CPackConfig.cmake ${buildDir}/CPackSourceConfig.cmake ;${BUILDSCRIPT}"
     }
     // BUILDSCRIPT="/usr/bin/codesign --verbose=4 --deep -f -s 'Developer ID Application: ArangoDB GmbH (W7UC4UQXPV)' '/Users/jenkins/workspace/RELEASE__BuildPackages/build-EPpackage-macos/_CPack_Packages/Darwin/Bundle/arangodb3e-3.2.devel-1.x86_64/ArangoDB3e-CLI.app'; ${BUILDSCRIPT} "
-    BUILDSCRIPT="/usr/bin/codesign --verbose=4 --deep -f -s 'W7UC4UQXPV' '/Users/jenkins/workspace/RELEASE__BuildPackages/build-EPpackage-macos/_CPack_Packages/Darwin/Bundle/arangodb3e-3.2.devel-1.x86_64/ArangoDB3e-CLI.app'; ${BUILDSCRIPT} "
+    BUILDSCRIPT="export DYLD_FALLBACK_LIBRARY_PATH=/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation:/System/Library/Frameworks/Security.framework/Versions/A/Security; /usr/bin/codesign --verbose=4 --deep -f -s 'W7UC4UQXPV' '/Users/jenkins/workspace/RELEASE__BuildPackages/build-EPpackage-macos/_CPack_Packages/Darwin/Bundle/arangodb3e-3.2.devel-1.x86_64/ArangoDB3e-CLI.app'; ${BUILDSCRIPT} "
     if (!Reliable) {
       BUILDSCRIPT="""nohup bash -c "${BUILDSCRIPT}" > nohup.out 2>&1 & PID=\$!; echo \$PID > pid; tail -f nohup.out & wait \$PID; kill %2 ||true"""
       try {
