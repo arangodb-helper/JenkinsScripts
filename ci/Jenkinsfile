@@ -24,6 +24,7 @@ fatalError = false
 VERBOSE = true
 
 testParams = [:]
+print("blarg")
 print("${env}")
 testPathPrefix = 'j'
 //currentBuild.result = 'SUCCESS'
