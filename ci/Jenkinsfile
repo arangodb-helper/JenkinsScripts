@@ -24,6 +24,7 @@ fatalError = false
 VERBOSE = true
 
 testParams = [:]
+print("${env}")
 testPathPrefix = 'j'
 //currentBuild.result = 'SUCCESS'
 def CONTAINERS=[
