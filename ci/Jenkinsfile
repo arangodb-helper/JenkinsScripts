@@ -25,7 +25,7 @@ VERBOSE = true
 
 testParams = [:]
 print("blarg")
-print("${env}")
+print(env)
 testPathPrefix = 'j'
 //currentBuild.result = 'SUCCESS'
 def CONTAINERS=[
