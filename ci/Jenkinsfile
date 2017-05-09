@@ -25,14 +25,12 @@ VERBOSE = true
 
 testParams = [:]
 
-@NonCPS
-def printParams() {
-  env.getEnvironment().each { name, value -> println "Name: $name -> Value $value" }
-}
+//@NonCPS
+//def printParams() {
+//  env.getEnvironment().each { name, value -> println "Name: $name -> Value $value" }
+//}
+//printParams()
 
-print("blarg")
-printParams()
-print(env)
 testPathPrefix = 'j'
 //currentBuild.result = 'SUCCESS'
 def CONTAINERS=[
