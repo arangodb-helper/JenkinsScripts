@@ -502,7 +502,7 @@ def CloneSource(inDocker){
                 extensions: [
                   [$class: 'CheckoutOption', timeout: 20],
                   [$class: 'CloneOption', timeout: 20]
-                ]
+                ],
                 userRemoteConfigs:
                 [[url: 'https://github.com/arangodb/arangodb.git']]])
 
