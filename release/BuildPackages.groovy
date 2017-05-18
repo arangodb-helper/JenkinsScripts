@@ -271,8 +271,8 @@ def CloneSource(inDocker){
                 submoduleCfg: [],
                 */
                 extensions: [
-                  [$class: 'CheckoutOption', timeout: 20],
-                  [$class: 'CloneOption', timeout: 20]
+                  [$class: 'CheckoutOption', timeout: 30],
+                  [$class: 'CloneOption', timeout: 30]
                 ],
                 userRemoteConfigs:
                 [[url: 'https://github.com/arangodb/arangodb.git']]])
