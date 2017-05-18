@@ -239,7 +239,7 @@ stage("building packages") {
           build( job: 'RELEASE__TestWindowsInstaller',
                  parameters: [
                    string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'PACKAGE_BASE', value: "/var/tmp/r/CO/windows/ArangoDB3"),
+                   string(name: 'PACKAGE_BASE', value: "/var/tmp/r/CO/windows/ArangoDB3-"),
                    string(name: 'COMMUNITY_ENTERPRISE', value: "CO")
                  ]
                )
@@ -248,7 +248,7 @@ stage("building packages") {
           build( job: 'RELEASE__TestWindowsInstaller',
                  parameters: [
                    string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'PACKAGE_BASE', value: "/var/tmp/r/EP/windows/ArangoDB3e"),
+                   string(name: 'PACKAGE_BASE', value: "/var/tmp/r/EP/windows/ArangoDB3e-"),
                    string(name: 'COMMUNITY_ENTERPRISE', value: "EP")
                  ]
                )
