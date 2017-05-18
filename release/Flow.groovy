@@ -43,6 +43,7 @@ stage("building packages") {
     echo "Now starting to build:"
     parallel(
       [
+        /*
         ////////////////////////////////////////////////////////////////////////////////
         "sourceTarballs": {
           node("master") {
@@ -199,7 +200,7 @@ stage("building packages") {
                  ]
                )
           
-        },
+               },*/
         ////////////////////////////////////////////////////////////////////////////////
         "Windows": {
           node('windows') {
@@ -231,7 +232,29 @@ stage("building packages") {
             sh "scp -r /var/tmp/r/*  ${JENKINSMASTER}:/mnt/data/fileserver/"
             sh "/usr/bin/rsync -ua /cygdrive/e/symsrv ${JENKINSMASTER}:${PUBLIC_CO_DIR}"
           }
+
+          ///----------------------------------------------------------------------          
+          echo "testing Windows Community Release NSIS Installer"
+          build( job: 'RELEASE__TestWindowsInstaller',
+                 parameters: [
+                   string(name: 'GITTAG', value: "${GITTAG}"),
+                   string(name: 'PACKAGE_BASE', value: "/var/tmp/r/CO/windows/ArangoDB3"),
+                   string(name: 'COMMUNITY_ENTERPRISE', value: "CO")
+                 ]
+               )
+          
+          echo "testing Windows Enterprise Release NSIS Installer"
+          build( job: 'RELEASE__TestWindowsInstaller',
+                 parameters: [
+                   string(name: 'GITTAG', value: "${GITTAG}"),
+                   string(name: 'PACKAGE_BASE', value: "/var/tmp/r/EP/windows/ArangoDB3e"),
+                   string(name: 'COMMUNITY_ENTERPRISE', value: "EP")
+                 ]
+               )
+          
+          
           ///----------------------------------------------------------------------
+          /*
           echo "running Windows Community Release Single unittests"
           build( job: 'RELEASE__BuildTest',
                  parameters: [
@@ -259,7 +282,7 @@ stage("building packages") {
                    booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
                )
-          */
+          * /
           echo "running Windows Release Enterprise Single unittests"
           build( job: 'RELEASE__BuildTest',
                  parameters: [
@@ -310,7 +333,7 @@ stage("building packages") {
   }
 }
 //================================================================================
-
+/*
 stage("create repositories") {
   if (SKIP_REPOBUILD == 'false') {
     build(
@@ -512,3 +535,4 @@ stage("updating other repos") {
       }
     ])
 }
+*/
