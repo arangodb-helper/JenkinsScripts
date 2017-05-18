@@ -203,7 +203,7 @@ stage("building packages") {
                },*/
         ////////////////////////////////////////////////////////////////////////////////
         "Windows": {
-          
+          /*
           node('windows') {
             sh "rm -rf /var/tmp/r/; mkdir -p /var/tmp/r/"
           }
@@ -233,7 +233,7 @@ stage("building packages") {
             sh "scp -r /var/tmp/r/*  ${JENKINSMASTER}:/mnt/data/fileserver/"
             sh "/usr/bin/rsync -ua /cygdrive/e/symsrv ${JENKINSMASTER}:${PUBLIC_CO_DIR}"
           }
-          
+          */
           ///----------------------------------------------------------------------          
           echo "testing Windows Community Release NSIS Installer"
           build( job: 'RELEASE__TestWindowsInstaller',
