@@ -325,7 +325,7 @@ stage("building ArangoDB") {
     }
   } catch (err) {
     stage('Send Notification for build' ) {
-      // no slack now. slackSend channel: '#status-dev', color: '#439FE0', message: err.getMessage()
+      slackSend channel: '#status-packaging', color: '#439FE0', message: err.getMessage()
         /*
       msgBody = 
       if (msgBody.size() > 0) {
