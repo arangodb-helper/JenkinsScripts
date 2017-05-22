@@ -238,7 +238,7 @@ stage("building packages") {
           echo "testing Windows Community Release NSIS Installer"
           build( job: 'RELEASE__TestWindowsInstaller',
                  parameters: [
-                   string(name: 'GITTAG', value: "${GITTAG}"),
+                   string(name: 'GITTAG', value: "${GIT_VERSION}"),
                    string(name: 'PACKAGE_BASE', value: "/var/tmp/r/CO/windows/ArangoDB3-"),
                    string(name: 'COMMUNITY_ENTERPRISE', value: "CO")
                  ]
@@ -247,7 +247,7 @@ stage("building packages") {
           echo "testing Windows Enterprise Release NSIS Installer"
           build( job: 'RELEASE__TestWindowsInstaller',
                  parameters: [
-                   string(name: 'GITTAG', value: "${GITTAG}"),
+                   string(name: 'GITTAG', value: "${GIT_VERSION}"),
                    string(name: 'PACKAGE_BASE', value: "/var/tmp/r/EP/windows/ArangoDB3e-"),
                    string(name: 'COMMUNITY_ENTERPRISE', value: "EP")
                  ]
@@ -393,7 +393,7 @@ stage("Generating HTML snippets & test it with the packages") {
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 if (GIT_VERSION != 'devel') {
-  input("message": "Everything we did so far was private. DC/OS checketd? Proceed to the publish step now?")
+  input("message": "Everything we did so far was private. DC/OS checked? Proceed to the publish step now?")
 }
 else {
   echo "building devel version without user trigger"
