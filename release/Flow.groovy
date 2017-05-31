@@ -230,8 +230,8 @@ stage("building packages") {
                  ]
                )
           node('windows') {
-            sh "scp -r /var/tmp/r/*  ${JENKINSMASTER}:/mnt/data/fileserver/"
-            sh "/usr/bin/rsync -ua /cygdrive/e/symsrv ${JENKINSMASTER}:${PUBLIC_CO_DIR}"
+            sh "/usr/bin/rsync -ua --progress /var/tmp/r/*  ${JENKINSMASTER}:/mnt/data/fileserver/"
+            sh "/usr/bin/rsync -ua --progress /cygdrive/e/symsrv ${JENKINSMASTER}:${PUBLIC_CO_DIR}"
           }
 
           ///----------------------------------------------------------------------          
