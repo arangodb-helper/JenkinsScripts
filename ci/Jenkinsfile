@@ -225,7 +225,7 @@ def runTests(where, testWorkingDirectory) {
   if (failureOutput.size() > 5) {
     echo "switching to UNSTABLE!"
     sh "cp ${testFailuresFile} ${where['releaseOutDir']}/results/${where['testRunName']}.txt"
-    return 'UNSTABLE'
+    res = currentBuild.result = 'UNSTABLE'
   }
   else {
     def executiveSummary = readFile("${TESTWD}/UNITTEST_RESULT_EXECUTIVE_SUMMARY.json").trim()
