@@ -148,7 +148,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
     node(DOCKER_HOST) {
       sh "set"
       docker.withRegistry(REGISTRY_URL, '') {
-        def myBuildImage = docker.image("${buildEnvironment['name']}/build")
+        def myBuildImage = docker.image("${buildEnvironment['name']}")
         myBuildImage.pull()
         echo "hello before docker ${RELEASE_OUT_DIR}"
         docker.image(myBuildImage.imageName()).inside("""\
