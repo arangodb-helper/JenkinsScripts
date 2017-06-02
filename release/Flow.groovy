@@ -230,8 +230,23 @@ stage("building packages") {
                  ]
                )
           node('windows') {
-            sh "/usr/bin/rsync -ua --progress /var/tmp/r/*  ${JENKINSMASTER}:/mnt/data/fileserver/"
-            sh "/usr/bin/rsync -ua --progress /cygdrive/e/symsrv ${JENKINSMASTER}:${PUBLIC_CO_DIR}"
+            sh """
+retries=0
+while test \"\${retries}\" -lt 10; do 
+    set +e
+    /usr/bin/rsync -ua --progress /var/tmp/r/*  ${JENKINSMASTER}:/mnt/data/fileserver/ && exit 0
+    retries=\$(( \${retries} + 1 ))
+done
+"""
+            sh """
+retries=0
+while test \"\${retries}\" -lt 10; do 
+    set +e
+    /usr/bin/rsync -ua --progress  /cygdrive/e/symsrv ${JENKINSMASTER}:${PUBLIC_CO_DIR} && exit 0
+    retries=\$(( \${retries} + 1 ))
+done
+"""
+
           }
 
           ///----------------------------------------------------------------------          
