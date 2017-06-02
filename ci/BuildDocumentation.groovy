@@ -47,7 +47,9 @@ def CONTAINERS=[
   // [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessiearmhfxc', 'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--xcArm /usr/bin/arm-linux-gnueabihf --noopt", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
 
   [ 'buildType': 'native', 'testType': 'native', 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "Darwin",  'buildArgs': "--clang --staticOpenSSL",    'cluster': false, 'LOCALFS': '/Users/jenkins/mnt/workspace/tmp/', 'FS': '/Users/jenkins/net/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
-  [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "CYGWIN_NT-10.0", 'buildArgs': "--msvc",     'cluster': false, 'LOCALFS': 'c:/mnt/workspace/tmp/', 'FS': '/var/tmp/r', 'reliable': true, 'BUILD': "../../${testPathPrefix}_", 'CBUILD': "../../${testPathPrefix}c_", 'SYMSRV': '/cygdrive/e/symsrv/', 'testArgs': "--ruby c:/tools/ruby23/bin/ruby.exe --rspec c:/tools/ruby23/bin/rspec"]
+  [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "CYGWIN_NT-10.0", 'buildArgs': "--msvc",     'cluster': false, 'LOCALFS': 'c:/mnt/workspace/tmp/', 'FS': '/var/tmp/r', 'reliable': true, 'BUILD': "../../${testPathPrefix}_", 'CBUILD': "../../${testPathPrefix}c_", 'SYMSRV': '/cygdrive/e/symsrv/', 'testArgs': "--ruby c:/tools/ruby23/bin/ruby.exe --rspec c:/tools/ruby23/bin/rspec"],
+
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'arangodb/documentation-builder',        'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc", 'cluster': false,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
 ]
 
 if (preferBuilder.size() > 0) {
@@ -97,8 +99,26 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       outDir = getReleaseOutDir(enterpriseUrl, envName)
     }
     print(buildEnv)
-    def BUILDSCRIPT = "cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir}"
-    sh BUILDSCRIPT
+    
+    def BUILDSCRIPT ="""
+    ARANGODB_VERSION_MAJOR=`grep 'set(ARANGODB_VERSION_MAJOR' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
+    ARANGODB_VERSION_MINOR=`grep 'set(ARANGODB_VERSION_MINOR' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
+    ARANGODB_VERSION_REVISION=`grep 'set(ARANGODB_VERSION_REVISION' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
+
+    if test \"\${ARANGODB_VERSION_REVISION}\" == \"devel\"; then
+        export NODE_MODULES_DIR=\"/tmp/devel/node_modules\"
+    else
+        export NODE_MODULES_DIR=\"/tmp/\${ARANGODB_VERSION_MAJOR}.\${ARANGODB_VERSION_MINOR}\"
+    fi
+    if test -d \"\${NODE_MODULES_DIR}\" ; then 
+      cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} NODE_MODULES_DIR=\${NODE_MODULES_DIR}
+    else
+      cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir}
+    fi
+"""
+    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+      sh BUILDSCRIPT
+    }
     
     if (VERBOSE) {
       sh "ls -l ${RELEASE_OUT_DIR}"
@@ -166,44 +186,44 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
 }
 
 def CloneSource(inDocker){
-      if (VERBOSE) {
-        sh "pwd"
-        if (inDocker) {
-          sh "cat /etc/issue /jenkins/workspace/issue"
-        }
-        else {
-          sh "uname -a"
-        }
-      }
+  if (VERBOSE) {
+    sh "pwd"
+    if (inDocker) {
+      sh "cat /etc/issue /jenkins/workspace/issue"
+    }
+    else {
+      sh "uname -a"
+    }
+  }
 
-      sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
-      checkout([$class: 'GitSCM',
-                branches: [[name: "${GITTAG}"]],
-                /*
-                doGenerateSubmoduleConfigurations: false,
-                extensions: [[$class: 'SubmoduleOption',
-                              disableSubmodules: false,
-                              parentCredentials: false,
-                              recursiveSubmodules: true,
-                              reference: '',
-                              trackingSubmodules: false]],
-                submoduleCfg: [],
-                */
-                extensions: [
-                  [$class: 'CheckoutOption', timeout: 20],
-                  [$class: 'CloneOption', timeout: 20]
-                ],
-                userRemoteConfigs:
-                [[url: 'https://github.com/arangodb/arangodb.git']]])
+  sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
+  checkout([$class: 'GitSCM',
+            branches: [[name: "${GITTAG}"]],
+            /*
+              doGenerateSubmoduleConfigurations: false,
+              extensions: [[$class: 'SubmoduleOption',
+              disableSubmodules: false,
+              parentCredentials: false,
+              recursiveSubmodules: true,
+              reference: '',
+              trackingSubmodules: false]],
+              submoduleCfg: [],
+            */
+            extensions: [
+              [$class: 'CheckoutOption', timeout: 20],
+              [$class: 'CloneOption', timeout: 20]
+            ],
+            userRemoteConfigs:
+            [[url: 'https://github.com/arangodb/arangodb.git']]])
 
-      // follow deletion of upstream tags:
-      sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
-      currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-      if (fileExists(lastKnownGoodGitFile)) {
-        lastKnownGitRev=readFile(lastKnownGoodGitFile)
-      }
-      currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-      print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
+  // follow deletion of upstream tags:
+  sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
+  currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+  if (fileExists(lastKnownGoodGitFile)) {
+    lastKnownGitRev=readFile(lastKnownGoodGitFile)
+  }
+  currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+  print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
 }
 
 stage("cloning source") {
