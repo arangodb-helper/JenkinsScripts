@@ -229,21 +229,21 @@ def CloneSource(inDocker){
   }
   currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
 
-    sh "mkdir -p Cookbook"
-    dir ('Cookbook') {
-      checkout([$class: 'GitSCM',
-                branches: [[name:"master"]],
-                doGenerateSubmoduleConfigurations: false,
-                extensions: [[$class: 'SubmoduleOption',
-                              disableSubmodules: false,
-                              parentCredentials: false,
-                              recursiveSubmodules: true,
-                              reference: '',
-                              trackingSubmodules: false]],
-                submoduleCfg: [],
-                userRemoteConfigs:
-                [[url: 'https://github.com/arangodb/Cookbook.git']]])
-    }  print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
+  sh "mkdir -p Cookbook"
+  dir ('Cookbook') {
+    checkout([$class: 'GitSCM',
+              branches: [[name:"master"]],
+              doGenerateSubmoduleConfigurations: false,
+              extensions: [[$class: 'SubmoduleOption',
+                            disableSubmodules: false,
+                            parentCredentials: false,
+                            recursiveSubmodules: true,
+                            reference: '',
+                            trackingSubmodules: false]],
+              submoduleCfg: [],
+              userRemoteConfigs:
+              [[url: 'https://github.com/arangodb/Cookbook.git']]])
+  }  print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
 }
 
 stage("cloning source") {
