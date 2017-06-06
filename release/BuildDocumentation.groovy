@@ -107,20 +107,21 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if test \"\${ARANGODB_VERSION_REVISION}\" -eq \"devel\"; then
         export NODE_MODULES_DIR=\"/tmp/devel/node_modules\"
     else
-        export NODE_MODULES_DIR=\"/tmp/\${ARANGODB_VERSION_MAJOR}.\${ARANGODB_VERSION_MINOR}\"
+        export NODE_MODULES_DIR=\"/tmp/\${ARANGODB_VERSION_MAJOR}.\${ARANGODB_VERSION_MINOR}/node_modules\"
     fi
     if test -d \"\${NODE_MODULES_DIR}\" ; then 
+      echo 'building cookbook: '
+      (cd Cookbook; NODE_MODULES_DIR=\${NODE_MODULES_DIR} ./build.sh;)
+      echo 'building documentation: '
       cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} NODE_MODULES_DIR=\${NODE_MODULES_DIR} COOKBOOK_DIR=../../Cookbook/cookbook/
     else
+      echo 'building cookbook: '
+      (cd Cookbook; NODE_MODULES_DIR=\${NODE_MODULES_DIR} ./build.sh;)
+      echo 'building documentation: '
       cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} COOKBOOK_DIR=../../Cookbook/cookbook/
     fi
 """
-    echo "building cookbook: "
-    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
-      sh "cd Cookbook; ./build.sh; cd .."
-    }
     print(buildEnv)
-
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
       sh BUILDSCRIPT
     }
