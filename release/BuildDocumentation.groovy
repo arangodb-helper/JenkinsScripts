@@ -104,7 +104,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     ARANGODB_VERSION_MINOR=`grep 'set(ARANGODB_VERSION_MINOR' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
     ARANGODB_VERSION_REVISION=`grep 'set(ARANGODB_VERSION_REVISION' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
 
-    if test \"\${ARANGODB_VERSION_REVISION}\" == \"devel\"; then
+    if test \"\${ARANGODB_VERSION_REVISION}\" -eq \"devel\"; then
         export NODE_MODULES_DIR=\"/tmp/devel/node_modules\"
     else
         export NODE_MODULES_DIR=\"/tmp/\${ARANGODB_VERSION_MAJOR}.\${ARANGODB_VERSION_MINOR}\"
