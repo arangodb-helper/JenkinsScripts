@@ -268,7 +268,7 @@ stage("building ArangoDB") {
   }
   try {
     print(DOCKER_CONTAINER)
-    setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL, EPDIR, DOCKER_CONTAINER['reliable'])
+    setupEnvCompileSource(DOCKER_CONTAINER, false, ENTERPRISE_URL, EPDIR, DOCKER_CONTAINER['reliable'])
   } catch (err) {
     stage('Send Notification for build' ) {
       mail (to: ADMIN_ACCOUNT,
