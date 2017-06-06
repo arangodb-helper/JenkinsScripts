@@ -336,7 +336,7 @@ done
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
                    string(name: 'FORCE_GITBRANCH', value:''),
-		   string(name: 'REPORT_TO', value: "slack")
+		   string(name: 'REPORT_TO', value: "slack"),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
                    booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
