@@ -333,6 +333,7 @@ done
           build( job: 'RELEASE__BuildDocumentation',
                  parameters: [
                    string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                   string(name: 'DOCKER_HOST', value: DOCKER_HOST),
                    string(name: 'GITTAG', value: "${GITTAG}"),
                    string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
                    string(name: 'FORCE_GITBRANCH', value:''),
