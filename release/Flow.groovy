@@ -410,6 +410,7 @@ stage("Generating HTML snippets & test it with the packages") {
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 if (GIT_VERSION != 'devel') {
+  slackSend channel: '#release', color: '#00ff00', message: "Private part of release process finished - Hit Continue to publish"
   input("message": "Everything we did so far was private. DC/OS checked? Proceed to the publish step now?")
 }
 else {
