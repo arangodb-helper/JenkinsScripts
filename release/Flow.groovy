@@ -419,16 +419,13 @@ else {
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-stage("publish packages") {
+stage("upload packages") {
   node('master') {
     if (GIT_VERSION != 'devel') {
       sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh true"
-    }
-    else {
+    } else {
       sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh false"
     }
-    sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
-    sh "echo '${GIT_VERSION}' > ${env.PUBLIC_CO_DIR}VERSION"
   }
 }
 
@@ -552,4 +549,16 @@ stage("updating other repos") {
         }
       }
     ])
+}
+
+if (GIT_VERSION != 'devel') {
+  slackSend channel: '#release', color: '#00ff00', message: "Invisible parts have been published - Hit Continue to publish websites"
+  input("message": "Invisible parts have been published - Hit Continue to publish websites!")
+}
+stage("publish website") {
+  node('master') {
+    sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_snippets.sh"
+    sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
+    sh "echo '${GIT_VERSION}' > ${env.PUBLIC_CO_DIR}VERSION"
+  }
 }
