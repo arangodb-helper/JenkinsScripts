@@ -551,11 +551,11 @@ stage("updating other repos") {
     ])
 }
 
-if (GIT_VERSION != 'devel') {
-  slackSend channel: '#release', color: '#00ff00', message: "Invisible parts have been published - Hit Continue to publish websites"
-  input("message": "Invisible parts have been published - Hit Continue to publish websites!")
-}
 stage("publish website") {
+  if (GIT_VERSION != 'devel') {
+    slackSend channel: '#release', color: '#00ff00', message: "Invisible parts have been published - Hit Continue to publish websites"
+    input("message": "Invisible parts have been published - Hit Continue to publish websites!")
+  }
   node('master') {
     sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_snippets.sh"
     sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
