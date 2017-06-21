@@ -529,7 +529,6 @@ stage("updating other repos") {
           }
           else {
             echo "publish docker deactivated"
-            }
           }
         }
       },
