@@ -408,6 +408,7 @@ stage("Generating HTML snippets & test it with the packages") {
 if (GIT_VERSION != 'devel') {
   slackSend channel: '#release', color: '#00ff00', message: "Private part of release process finished - Hit Continue to publish"
   input("message": "Everything we did so far was private. DC/OS checked? Proceed to the publish step now?")
+  echo "Continuing publish stage 1"
 }
 else {
   echo "building devel version without user trigger"
@@ -563,6 +564,7 @@ stage("publish website") {
   if (GIT_VERSION != 'devel') {
     slackSend channel: '#release', color: '#00ff00', message: "Invisible parts have been published - Hit Continue to publish websites"
     input("message": "Invisible parts have been published - Hit Continue to publish websites!")
+    echo "Continuing publish stage 2"
   }
   node('master') {
     sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_snippets.sh"
