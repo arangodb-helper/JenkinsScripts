@@ -427,137 +427,139 @@ stage("upload packages") {
 }
 
 stage("updating other repos") {
-  parallel(
-    [
-      ////////////////////////////////////////////////////////////////////////////////
-      "homeBrew": {
-        node('macos') {
-          if (IS_RELEASE == 'true') {
-            build( job: 'RELEASE__BuildHomebrew',
-                   parameters: [
-                     string(name: 'GITTAG', value: GIT_VERSION),
-                     booleanParam(name: 'DEBUG', value: false),
-                   ]
-                 )
+  if (SKIP_UPDATE_OTHER == "false") {
+    parallel(
+      [
+        ////////////////////////////////////////////////////////////////////////////////
+        "homeBrew": {
+          node('macos') {
+            if (IS_RELEASE == 'true') {
+              build( job: 'RELEASE__BuildHomebrew',
+                     parameters: [
+                       string(name: 'GITTAG', value: GIT_VERSION),
+                       booleanParam(name: 'DEBUG', value: false),
+                     ]
+                   )
+            }
+            else {
+              echo "publish homebrew deactivated"
+            }
           }
-          else {
-            echo "publish homebrew deactivated"
+        },
+        "AMI": {
+          node('master') {
+            if (IS_RELEASE == 'true') {
+              retry(5) {
+                build( job: 'RELEASE__BuildAMI',
+                       parameters: [
+                         string(name: 'GITTAG', value: GIT_VERSION),
+                         string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
+                         booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
+                         booleanParam(name: 'DEBUG', value: false)
+                       ]
+                     )
+              }
+            }
+            else {
+              echo "publish ami deactivated"
+            }
           }
-        }
-      },
-      "AMI": {
-        node('master') {
-          if (IS_RELEASE == 'true') {
-            retry(5) {
-              build( job: 'RELEASE__BuildAMI',
+        },
+        "SNAPPY": {
+          if (GITTAG != "devel") {
+            node('master') {
+              build( job: 'RELEASE__PublishSnap',
                      parameters: [
                        string(name: 'GITTAG', value: GIT_VERSION),
                        string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
-                       booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
-                       booleanParam(name: 'DEBUG', value: false)
                      ]
                    )
             }
           }
           else {
-            echo "publish ami deactivated"
+            echo "publish snappy deactivated"
           }
-        }
-      },
-      "SNAPPY": {
-        if (GITTAG != "devel") {
+        },
+        "Docker": {
           node('master') {
-            build( job: 'RELEASE__PublishSnap',
-                   parameters: [
-                     string(name: 'GITTAG', value: GIT_VERSION),
-                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
-                   ]
-                 )
+            echo "(${SKIP_DOCKER_PUBLISH} == 'false' && ${IS_RELEASE} == 'true') ${GITTAG}"
+            if (SKIP_DOCKER_PUBLISH == 'false' && IS_RELEASE == 'true') {
+              build( job: 'RELEASE__UpdateDockerResources',
+                     parameters: [
+                       string(name: 'GITTAG', value: GIT_VERSION),
+                       string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
+                       booleanParam(name: 'NEW_MAJOR_RELEASE', value: params['NEW_MAJOR_RELEASE']),
+                       booleanParam(name: 'UPDATE_MESOS_IMAGE', value: true),
+                       booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
+                       booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: true),
+                       booleanParam(name: 'CREATE_NEW_VERSION', value: true),
+                       booleanParam(name: 'DEBUG', value: false)
+                     ]
+                   )
+            }
+            else if (GITTAG == "devel") {
+              build( job: 'RELEASE__UpdateDockerResources',
+                     parameters: [
+                       string(name: 'GITTAG', value: GIT_VERSION),
+                       string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
+                       booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
+                       booleanParam(name: 'UPDATE_MESOS_IMAGE', value: false),
+                       booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
+                       booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: false),
+                       booleanParam(name: 'CREATE_NEW_VERSION', value: false),
+                       booleanParam(name: 'DEBUG', value: false)
+                     ]
+                   )
+            }
+            else if (SKIP_DOCKER_PUBLISH == 'false' && IS_RELEASE == 'false') {
+              build( job: 'RELEASE__UpdateDockerResources',
+                     parameters: [
+                       string(name: 'GITTAG', value: GIT_VERSION),
+                       string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
+                       booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
+                       booleanParam(name: 'UPDATE_MESOS_IMAGE', value: false),
+                       booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
+                       booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: false),
+                       booleanParam(name: 'CREATE_NEW_VERSION', value: true),
+                       booleanParam(name: 'DEBUG', value: false)
+                     ]
+                   )
+            }
+            else {
+              echo "publish docker deactivated"
+            }
           }
-        }
-        else {
-          echo "publish snappy deactivated"
-        }
-      },
-      "Docker": {
-        node('master') {
-          echo "(${SKIP_DOCKER_PUBLISH} == 'false' && ${IS_RELEASE} == 'true') ${GITTAG}"
-          if (SKIP_DOCKER_PUBLISH == 'false' && IS_RELEASE == 'true') {
-            build( job: 'RELEASE__UpdateDockerResources',
-                   parameters: [
-                     string(name: 'GITTAG', value: GIT_VERSION),
-                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
-                     booleanParam(name: 'NEW_MAJOR_RELEASE', value: params['NEW_MAJOR_RELEASE']),
-                     booleanParam(name: 'UPDATE_MESOS_IMAGE', value: true),
-                     booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
-                     booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: true),
-                     booleanParam(name: 'CREATE_NEW_VERSION', value: true),
-                     booleanParam(name: 'DEBUG', value: false)
-                   ]
-                 )
-          }
-          else if (GITTAG == "devel") {
-            build( job: 'RELEASE__UpdateDockerResources',
-                   parameters: [
-                     string(name: 'GITTAG', value: GIT_VERSION),
-                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
-                     booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
-                     booleanParam(name: 'UPDATE_MESOS_IMAGE', value: false),
-                     booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
-                     booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: false),
-                     booleanParam(name: 'CREATE_NEW_VERSION', value: false),
-                     booleanParam(name: 'DEBUG', value: false)
-                   ]
-                 )
-          }
-          else if (SKIP_DOCKER_PUBLISH == 'false' && IS_RELEASE == 'false') {
-            build( job: 'RELEASE__UpdateDockerResources',
-                   parameters: [
-                     string(name: 'GITTAG', value: GIT_VERSION),
-                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
-                     booleanParam(name: 'NEW_MAJOR_RELEASE', value: false),
-                     booleanParam(name: 'UPDATE_MESOS_IMAGE', value: false),
-                     booleanParam(name: 'UPDATE_UNOFFICIAL_IMAGE', value: true),
-                     booleanParam(name: 'CREATE_DOCKER_LIBRARY_PULLREQ', value: false),
-                     booleanParam(name: 'CREATE_NEW_VERSION', value: true),
-                     booleanParam(name: 'DEBUG', value: false)
-                   ]
-                 )
+        },
+        "Update Github Master": {
+          if (IS_RELEASE == 'true') {
+            node("master") {
+              build( job: 'RELEASE__UpdateGithubMaster',
+                     parameters: [
+                       string(name: 'GITTAG', value: GIT_VERSION)
+                     ]
+                   )
+            }
           }
           else {
-            echo "publish docker deactivated"
+            echo "update github master deactivated"
           }
-        }
-      },
-      "Update Github Master": {
-        if (IS_RELEASE == 'true') {
+        },
+        "Update Github Unstable": {
           node("master") {
-            build( job: 'RELEASE__UpdateGithubMaster',
-                   parameters: [
-                     string(name: 'GITTAG', value: GIT_VERSION)
-                   ]
-                 )
+            if (GITTAG != "devel") {
+              build( job: 'RELEASE__UpdateGithubUnstable',
+                     parameters: [
+                       string(name: 'GITTAG', value: GIT_VERSION)
+                     ]
+                   )
+            }
+            else {
+              echo "update github unstable deactivated"
+            }
           }
         }
-        else {
-          echo "update github master deactivated"
-        }
-      },
-      "Update Github Unstable": {
-        node("master") {
-          if (GITTAG != "devel") {
-            build( job: 'RELEASE__UpdateGithubUnstable',
-                   parameters: [
-                     string(name: 'GITTAG', value: GIT_VERSION)
-                   ]
-                 )
-          }
-          else {
-            echo "update github unstable deactivated"
-          }
-        }
-      }
-    ])
+      ])
+  }
 }
 
 stage("publish website") {
