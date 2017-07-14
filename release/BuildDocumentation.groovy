@@ -104,7 +104,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     ARANGODB_VERSION_MINOR=`grep 'set(ARANGODB_VERSION_MINOR' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
     ARANGODB_VERSION_REVISION=`grep 'set(ARANGODB_VERSION_REVISION' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
 
-    INSTALLED_GITBOOK_VERSION=$(gitbook ls |grep '*'|sed \"s;.*\* ;;\")
+    INSTALLED_GITBOOK_VERSION=\$(gitbook ls |grep '*'|sed \"s;.*\* ;;\")
     export GITBOOK_ARGS=\"--gitbook \${INSTALLED_GITBOOK_VERSION}\"
 
     if test \"\${ARANGODB_VERSION_REVISION}\" = \"devel\"; then
