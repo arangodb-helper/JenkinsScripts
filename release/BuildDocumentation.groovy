@@ -104,7 +104,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     ARANGODB_VERSION_MINOR=`grep 'set(ARANGODB_VERSION_MINOR' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
     ARANGODB_VERSION_REVISION=`grep 'set(ARANGODB_VERSION_REVISION' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
 
-    cp -a /root/.gitbook/ ~
+    cp -a /root/.gitbook/ ~/
+    cp -a /root/.npm/ ~/
 
     /usr/local/bin/gitbook ls
     echo blarg
