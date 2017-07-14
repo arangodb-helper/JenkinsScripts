@@ -106,7 +106,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
     /usr/local/bin/gitbook ls
     echo blarg
-    INSTALLED_GITBOOK_VERSION=`(/usr/local/bin/gitbook ls |grep '*'|sed \"s;.*\\* ;;\"`
+    INSTALLED_GITBOOK_VERSION=\$(/usr/local/bin/gitbook ls |grep '*'|sed \"s;.*\\* ;;\")
     if test -z \"\${INSTALLED_GITBOOK_VERSION}\"; then
         echo \"your container doesn't come with a preloaded version of gitbook, please update it.\"
     fi
