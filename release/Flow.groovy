@@ -245,26 +245,6 @@ done
 
           }
 
-          ///----------------------------------------------------------------------          
-          echo "testing Windows Community Release NSIS Installer"
-          build( job: 'RELEASE__TestWindowsInstaller',
-                 parameters: [
-                   string(name: 'FULL_VERSION', value: "${GIT_VERSION}"),
-                   string(name: 'PACKAGE_BASE', value: "/var/tmp/r/CO/windows/ArangoDB3-"),
-                   string(name: 'COMMUNITY_ENTERPRISE', value: "CO")
-                 ]
-               )
-          
-          echo "testing Windows Enterprise Release NSIS Installer"
-          build( job: 'RELEASE__TestWindowsInstaller',
-                 parameters: [
-                   string(name: 'FULL_VERSION', value: "${GIT_VERSION}"),
-                   string(name: 'PACKAGE_BASE', value: "/var/tmp/r/EP/windows/ArangoDB3e-"),
-                   string(name: 'COMMUNITY_ENTERPRISE', value: "EP")
-                 ]
-               )
-          
-          
           ///----------------------------------------------------------------------
 
           echo "running Windows Community Release Single unittests"
@@ -323,6 +303,26 @@ done
                  ]
                )
           */
+          ///----------------------------------------------------------------------          
+          echo "testing Windows Community Release NSIS Installer"
+          build( job: 'RELEASE__TestWindowsInstaller',
+                 parameters: [
+                   string(name: 'FULL_VERSION', value: "${GIT_VERSION}"),
+                   string(name: 'PACKAGE_BASE', value: "/var/tmp/r/CO/windows/ArangoDB3-"),
+                   string(name: 'COMMUNITY_ENTERPRISE', value: "CO")
+                 ]
+               )
+          
+          echo "testing Windows Enterprise Release NSIS Installer"
+          build( job: 'RELEASE__TestWindowsInstaller',
+                 parameters: [
+                   string(name: 'FULL_VERSION', value: "${GIT_VERSION}"),
+                   string(name: 'PACKAGE_BASE', value: "/var/tmp/r/EP/windows/ArangoDB3e-"),
+                   string(name: 'COMMUNITY_ENTERPRISE', value: "EP")
+                 ]
+               )
+          
+          
         },
         ////////////////////////////////////////////////////////////////////////////////
         "documentation": {
