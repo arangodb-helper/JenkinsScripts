@@ -157,6 +157,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         def lines=new File("nohup.out").readLines()
         def lastline=lines.get(lines.size()-1)
         if (lastline ==~/(?s).*exit [1-9].*/) {
+          echo "last line contains bad exit statement: ${lastline}"
           throw err
         }
       }
