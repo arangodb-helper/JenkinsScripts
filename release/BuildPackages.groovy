@@ -154,6 +154,11 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           sleep 5
         }
         sh "tail -n 100 nohup.out"
+        def lines=new File("nohup.out").readLines()
+        def lastline=lines.get(lines.size()-1)
+        if (lastline ==~/(?s).*exit [1-9].*/) {
+          throw err
+        }
       }
     }
     else {
