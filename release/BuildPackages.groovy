@@ -154,10 +154,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           sleep 5
         }
         sh "tail -n 100 nohup.out"
-        def lines=readFile("nohup.out")
-        //def lastline=lines.get(lines.size()-1)
-        if (lines ==~/(?s).*exit [1-9].*/) {
-          echo "last line contains bad exit statement: ${lastline}"
+        def line=sh(returnStdout: true, script: "tail -n 1 nohup.out")
+        if (line ==~/(?s).*exit [1-9].*/) {
+          echo "last line contains bad exit statement: ${line}"
           throw err
         }
       }
