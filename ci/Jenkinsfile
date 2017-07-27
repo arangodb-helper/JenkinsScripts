@@ -53,6 +53,19 @@ def CONTAINERS=[
   [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "CYGWIN_NT-10.0", 'buildArgs': "--msvc",     'cluster': false, 'LOCALFS': 'c:/mnt/workspace/tmp/', 'FS': '/var/tmp/r', 'reliable': true, 'BUILD': "../../${testPathPrefix}_", 'CBUILD': "../../${testPathPrefix}c_", 'SYMSRV': '/cygdrive/e/symsrv/', 'testArgs': "--ruby c:/tools/ruby23/bin/ruby.exe --rspec c:/tools/ruby23/bin/rspec"]
 ]
 
+if (params['GITTAG'] == 'devel') {
+  GITBRANCH="dev"
+}
+else {
+  def parts=params['GITTAG'].tokenize(".")
+  if (parts.length == 3) {
+    GITBRANCH="${parts[0]}.${parts[1]}"
+  }
+  else {
+    GITBRANCH="dev"
+  }
+}
+
 if (preferBuilder.size() > 0) {
   found=false
   for (int c  = 0; c < CONTAINERS.size(); c++) {
@@ -329,10 +342,10 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     print(buildEnv)
     def buildDir = ""
     if (buildEnv['BUILD'].size() == 0) {
-      buildDir = "build-${XEP}package-${buildEnv['name']}"
+      buildDir = "build-${XEP}package-${buildEnv['name']}-${GITBRANCH}"
     }
     else {
-      buildDir = "${buildEnv['BUILD']}${XEP}"
+      buildDir = "${buildEnv['BUILD']}${XEP}-${GITBRANCH}"
     }
     def cBuildDir = ""
     if (buildEnv['CBUILD'].size() != 0) {
