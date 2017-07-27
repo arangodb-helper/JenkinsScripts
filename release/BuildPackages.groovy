@@ -48,7 +48,7 @@ if (params['GITTAG'] == 'devel') {
 }
 else {
   def parts=params['GITTAG'].tokenize(".")
-  if (parts.length == 3) {
+  if (parts.size() == 3) {
     GITBRANCH="${parts[0]}.${parts[1]}"
   }
   else {
