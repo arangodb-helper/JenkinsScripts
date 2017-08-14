@@ -207,7 +207,8 @@ def runTests(where, testWorkingDirectory) {
          mkdir -p \${TMPDIR}
          echo 0 > ${RCFile}
          ls -l
-         bash -x ${where['localExtractDir']}/scripts/unittest ${where['unitTests']} \
+         cd ${where['localExtractDir']}/
+         bash -x ./scripts/unittest ${where['unitTests']} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
                 --testOutput ${TESTWD} \
