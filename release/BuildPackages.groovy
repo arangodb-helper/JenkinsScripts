@@ -230,6 +230,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
         docker.image(myBuildImage.imageName()).inside("""\
  --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw\
  --volume /jenkins:/mnt/:rw \
+ --volume /jenkins/workspace:/home/jenkins/:rw \
 """) {
           //           docker.image(myBuildImage.imageName()).withRun("""\
           //  -u 1000:1000 \
