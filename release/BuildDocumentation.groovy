@@ -107,6 +107,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     ln -s /usr/local/nodeshit/gitbook ~/.gitbook
     ln -s /usr/local/nodeshit/npm ~/.npm
 
+    ls -l ~/.gitbook/
+
     /usr/local/bin/gitbook ls
     echo blarg
     INSTALLED_GITBOOK_VERSION=\$(/usr/local/bin/gitbook ls |grep '*'|sed \"s;.*\\* ;;\")
