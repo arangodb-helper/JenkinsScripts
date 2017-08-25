@@ -433,7 +433,7 @@ stage("updating other repos") {
         ////////////////////////////////////////////////////////////////////////////////
         "homeBrew": {
           node('macos') {
-            if (IS_RELEASE == 'true') {
+            if ((IS_RELEASE == 'true') && (PUBLISH_HOMEBREW == 'true')) {
               build( job: 'RELEASE__BuildHomebrew',
                      parameters: [
                        string(name: 'GITTAG', value: GIT_VERSION),
