@@ -35,8 +35,9 @@ stage("building documentation") {
 
 //================================================================================
 stage("create repositories") {
-  echo "syncing docu into packages"
-  sh """
+  node('master') {
+    echo "syncing docu into packages"
+    sh """
  ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
                 ${INTERMEDIATE_DIR}                    \
                 /mnt/data/localstage/enterprise/${REPO_TL_DIR}  \
@@ -45,7 +46,8 @@ stage("create repositories") {
                 ${ENTERPRISE_SECRET}/${REPO_TL_DIR}             \
                 repositories/${REPO_TL_DIR}
 """
-}    
+  }
+}
 
 
 stage("publish documentation") {
