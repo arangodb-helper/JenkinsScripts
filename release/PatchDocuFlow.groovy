@@ -38,7 +38,7 @@ stage("create repositories") {
   node('master') {
     echo "syncing docu into packages"
     sh """
- ${ARANGO_SCRIPT_DIR}/publish/copyFiles.sh \
+ ${ARANGO_SCRIPT_DIR}/publish/copyDocumentation.sh \
                 ${INTERMEDIATE_DIR}                    \
                 /mnt/data/localstage/enterprise/${REPO_TL_DIR}  \
                 /mnt/data/localstage/community/${REPO_TL_DIR}   \
