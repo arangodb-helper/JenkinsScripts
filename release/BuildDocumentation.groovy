@@ -131,7 +131,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     fi
     if test -d \"\${NODE_MODULES_DIR}\" ; then 
       echo 'building cookbook: '
-      (cd Cookbook; NODE_MODULES_DIR=\${NODE_MODULES_DIR} ./build.sh;)
+      (cd Cookbook; pwd; NODE_MODULES_DIR=\${NODE_MODULES_DIR} ./build.sh;)
       echo 'building documentation: '
       cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} NODE_MODULES_DIR=\${NODE_MODULES_DIR} COOKBOOK_DIR=../../Cookbook/cookbook/
     else
@@ -178,6 +178,8 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
         docker.image(myBuildImage.imageName()).inside("""\
  --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw\
  --volume /jenkins:/mnt/:rw \
+ --volume /jenkins/workspace:/home/jenkins/:rw \
+ --volume /jenkins/workspace:/home/node/:rw \
 """) {
           //           docker.image(myBuildImage.imageName()).withRun("""\
           //  -u 1000:1000 \
