@@ -38,7 +38,7 @@ stage("create repositories") {
   node('master') {
     echo "syncing docu into packages"
     sh """
-export GITCHECKOUT="v${PRETEND_GITVERSION}"
+export GITTAG="v${PRETEND_GITVERSION}"
 ${ARANGO_SCRIPT_DIR}/publish/copyDocumentation.sh \
                 ${INTERMEDIATE_DIR}                    \
                 /mnt/data/localstage/enterprise/${REPO_TL_DIR}  \
