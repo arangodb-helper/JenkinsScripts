@@ -109,7 +109,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     ARANGODB_VERSION_REVISION=`grep 'set(ARANGODB_VERSION_REVISION' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
 
     ls -l /usr/local/ /usr/local/nodeshit/
-    ln -s /usr/local/nodeshit/gitbook ~/.gitbook
+    rm -f ~/.gitbook
+    rm -f ~/.npm
+
     ln -s /usr/local/nodeshit/gitbook ~/.gitbook
     ln -s /usr/local/nodeshit/npm ~/.npm
 
