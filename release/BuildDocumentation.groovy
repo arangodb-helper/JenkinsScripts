@@ -98,7 +98,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       outDir = getReleaseOutDir(enterpriseUrl, envName)
     }
     print(buildEnv)
-
+    if (params['FORCE_GITBRANCH'] != "") {
+      sh "echo '${params['FORCE_GITBRANCH']} > VERSION"
+    }
     def BUILDSCRIPT ="""
     ARANGODB_VERSION_MAJOR=`grep 'set(ARANGODB_VERSION_MAJOR' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
     ARANGODB_VERSION_MINOR=`grep 'set(ARANGODB_VERSION_MINOR' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
@@ -142,6 +144,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       sh BUILDSCRIPT
     }
     
+    if (params['FORCE_GITBRANCH'] != "") {
+      sh "git checkout VERSION"
+    }
     if (VERBOSE) {
       sh "ls -l ${outDir}"
     }
