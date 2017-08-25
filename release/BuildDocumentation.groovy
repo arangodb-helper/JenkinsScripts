@@ -135,7 +135,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       echo 'building cookbook: '
       (cd Cookbook; pwd; rm -rf recipes/node_modules; NODE_MODULES_DIR=\${NODE_MODULES_DIR} ./build.sh;)
       echo 'building documentation: '
-      cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} NODE_MODULES_DIR=\${NODE_MODULES_DIR} COOKBOOK_DIR=../../Cookbook/cookbook/
+      # cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} NODE_MODULES_DIR=\${NODE_MODULES_DIR} COOKBOOK_DIR=../../Cookbook/cookbook/
+      cd Documentation/Books; ./build.sh build-dist-books --outputDir ${outDir} --nodeModulesDir \${NODE_MODULES_DIR} --cookBook ../../Cookbook/cookbook/
     else
       echo 'building cookbook: '
       (cd Cookbook; NODE_MODULES_DIR=\${NODE_MODULES_DIR} ./build.sh;)
