@@ -42,7 +42,7 @@ stage("create repositories") {
                 ${INTERMEDIATE_DIR}                    \
                 /mnt/data/localstage/enterprise/${REPO_TL_DIR}  \
                 /mnt/data/localstage/community/${REPO_TL_DIR}   \
-                ${GITTAG}                                       \
+                ${PRETEND_GITVERSION}                           \
                 ${ENTERPRISE_SECRET}/${REPO_TL_DIR}             \
                 repositories/${REPO_TL_DIR}
 """
