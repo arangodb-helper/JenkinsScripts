@@ -8,7 +8,7 @@ if (params['GITTAG'] == 'devel') {
   GITTAG="devel"
 }
 else {
-  def parts=params['GITTAG'].tokenize(".")
+  def parts=params['PRETEND_GITVERSION'].tokenize(".")
   VERSION_MAJOR=parts[0]
   VERSION_MINOR=parts[1]
   VERSION_MAJOR_MINOR="${VERSION_MAJOR}.${VERSION_MINOR}"
@@ -38,7 +38,8 @@ stage("create repositories") {
   node('master') {
     echo "syncing docu into packages"
     sh """
- ${ARANGO_SCRIPT_DIR}/publish/copyDocumentation.sh \
+export GITCHECKOUT="v${PRETEND_GIT_VERSION}"
+${ARANGO_SCRIPT_DIR}/publish/copyDocumentation.sh \
                 ${INTERMEDIATE_DIR}                    \
                 /mnt/data/localstage/enterprise/${REPO_TL_DIR}  \
                 /mnt/data/localstage/community/${REPO_TL_DIR}   \
