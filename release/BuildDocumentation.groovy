@@ -261,7 +261,7 @@ def CloneSource(inDocker){
   sh "mkdir -p Cookbook"
   dir ('Cookbook') {
     checkout([$class: 'GitSCM',
-              branches: [[name:"master"]],
+              branches: [[name: params['GIT_BRANCH'] ]],
               doGenerateSubmoduleConfigurations: false,
               extensions: [[$class: 'SubmoduleOption',
                             disableSubmodules: false,

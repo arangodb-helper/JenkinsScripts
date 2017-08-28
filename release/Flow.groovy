@@ -24,6 +24,7 @@ if (params['GITTAG'] == 'devel') {
   // if we build devel, we don't have any v's at all:
   GITTAG="devel"
   GIT_VERSION="devel"
+  GIT_BRANCH="devel"
 }
 else {
   TRAVIS_DEB_FILE="xUbuntu_12.04/amd64/arangodb3-${GITTAG}-*_amd64.deb"
@@ -36,6 +37,7 @@ else {
   GITTAG="v${params['GITTAG']}"
   // while this one is the human readable value:
   GIT_VERSION="${params['GITTAG']}"
+  GIT_BRANCH="${parts[0]}.${parts[1]}"
 }
 //================================================================================
 stage("building packages") {
@@ -334,6 +336,7 @@ done
                    string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
                    string(name: 'FORCE_GITBRANCH', value:''),
 		   string(name: 'REPORT_TO', value: "slack"),
+                   string(name: 'GIT_BRANCH' value: "${GIT_BRANCH}"),
                    booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
                    booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
