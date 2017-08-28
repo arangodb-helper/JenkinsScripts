@@ -53,6 +53,9 @@ ${ARANGO_SCRIPT_DIR}/publish/copyDocumentation.sh \
 
 stage("publish documentation") {
   node('master') {
-    sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
+    sh """
+export GITTAG="${PRETEND_GITVERSION}"
+export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh
+"""
   }
 }
