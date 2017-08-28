@@ -18,27 +18,27 @@ else {
   // while this one is the human readable value:
 }
 //================================================================================
-stage("building documentation") {
-  build( job: 'RELEASE__BuildDocumentation',
-         parameters: [
-           string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-           string(name: 'DOCKER_HOST', value: "docker"),
-           string(name: 'GITTAG', value: "${GITTAG}"),
-           string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
-           string(name: 'FORCE_GITBRANCH', value: params['PRETEND_GITVERSION']),
-           string(name: 'REPORT_TO', value: "slack"),
-           booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
-           booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
-         ]
-       )
-}
+//stage("building documentation") {
+//  build( job: 'RELEASE__BuildDocumentation',
+//         parameters: [
+//           string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+//           string(name: 'DOCKER_HOST', value: "docker"),
+//           string(name: 'GITTAG', value: "${GITTAG}"),
+//           string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
+//           string(name: 'FORCE_GITBRANCH', value: params['PRETEND_GITVERSION']),
+//           string(name: 'REPORT_TO', value: "slack"),
+//           booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+//           booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+//         ]
+//       )
+//}
 
 //================================================================================
 stage("create repositories") {
   node('master') {
     echo "syncing docu into packages"
     sh """
-export GITTAG="v${PRETEND_GITVERSION}"
+export GITTAG="${PRETEND_GITVERSION}"
 ${ARANGO_SCRIPT_DIR}/publish/copyDocumentation.sh \
                 ${INTERMEDIATE_DIR}                    \
                 /mnt/data/localstage/enterprise/${REPO_TL_DIR}  \
