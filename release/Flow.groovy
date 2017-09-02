@@ -159,6 +159,7 @@ stage("building packages") {
                    booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
                )
+	  /*
           echo "running MacOS X Community Release Cluster unittests"
           build( job: 'RELEASE__BuildTest',
                  parameters: [
@@ -172,6 +173,7 @@ stage("building packages") {
                    booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
                )
+	  */
           echo "running MacOS X Release Enterprise Single unittests"
           build( job: 'RELEASE__BuildTest',
                  parameters: [
@@ -185,6 +187,7 @@ stage("building packages") {
                    booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
                )
+	  /*
           echo "running MacOS X Release Enterprise Cluster unittests"
           build( job: 'RELEASE__BuildTest',
                  parameters: [
@@ -198,6 +201,7 @@ stage("building packages") {
                    booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                  ]
                )
+	  */
                },
         ////////////////////////////////////////////////////////////////////////////////
         "Windows": {
