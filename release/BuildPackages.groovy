@@ -223,7 +223,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
   if (buildEnvironment['buildType'] == 'docker') {
     node(DOCKER_HOST) {
       sh "set"
-      docker.withRegistry(REGISTRY_URL, '') {
+      // docker.withRegistry(REGISTRY_URL, '') {
         def myBuildImage = docker.image("${buildEnvironment['name']}/build")
         myBuildImage.pull()
         echo "hello before docker ${RELEASE_OUT_DIR}"
@@ -251,7 +251,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
           outDir = "${WORKSPACE}/out${EPDIR}"
           compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir, buildEnvironment['name'], Reliable)
         }
-      }
+        //}
     }
   }
   else {
