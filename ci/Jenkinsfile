@@ -275,7 +275,7 @@ def runThisTest(which, buildEnvironment)
         }
         // docker.withRegistry(REGISTRY_URL, '') {
           def myRunImage = docker.image("${buildEnvironment['name']}/run")
-          myRunImage.pull()
+          // myRunImage.pull()
           docker.image(myRunImage.imageName()).inside("--volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw --volume /jenkins:/mnt/:rw --volume /var/lib/systemd/coredump:/var/lib/systemd/coredump:rw") {
             def buildHost=sh(returnStdout: true, script: "cat /mnt/workspace/issue").trim()
             buildHost = buildHost[32..35]
@@ -448,7 +448,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
       sh "set"
       docker.withRegistry(REGISTRY_URL, '') {
         def myBuildImage = docker.image("${buildEnvironment['name']}/build")
-        myBuildImage.pull()
+        // myBuildImage.pull()
         echo "hello before docker ${RELEASE_OUT_DIR}"
         docker.image(myBuildImage.imageName()).inside("""\
  --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw\
