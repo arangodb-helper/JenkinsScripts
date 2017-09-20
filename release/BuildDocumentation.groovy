@@ -132,16 +132,12 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         export NODE_MODULES_DIR=\"/tmp/\${ARANGODB_VERSION_MAJOR}.\${ARANGODB_VERSION_MINOR}/node_modules\"
     fi
     if test -d \"\${NODE_MODULES_DIR}\" ; then 
-      echo 'building cookbook: '
-      (cd Cookbook; pwd; rm -rf recipes/node_modules; NODE_MODULES_DIR=\${NODE_MODULES_DIR} ./build.sh;)
       echo 'building documentation: '
-      # cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} NODE_MODULES_DIR=\${NODE_MODULES_DIR} COOKBOOK_DIR=../../Cookbook/cookbook/
-      cd Documentation/Books; bash -x -e ./build.sh build-dist-books --outputDir ${outDir} --nodeModulesDir \${NODE_MODULES_DIR} --cookBook ../../Cookbook/cookbook/
+      # cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} NODE_MODULES_DIR=\${NODE_MODULES_DIR}
+      cd Documentation/Books; bash -x -e ./build.sh build-dist-books --outputDir ${outDir} --nodeModulesDir \${NODE_MODULES_DIR}
     else
-      echo 'building cookbook: '
-      (cd Cookbook; NODE_MODULES_DIR=\${NODE_MODULES_DIR} ./build.sh;)
       echo 'building documentation: '
-      cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} COOKBOOK_DIR=../../Cookbook/cookbook/
+      cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir}
     fi
 """
     print(buildEnv)
@@ -258,21 +254,7 @@ def CloneSource(inDocker){
   }
   currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
 
-  sh "mkdir -p Cookbook"
-  dir ('Cookbook') {
-    checkout([$class: 'GitSCM',
-              branches: [[name: params['GIT_BRANCH'] ]],
-              doGenerateSubmoduleConfigurations: false,
-              extensions: [[$class: 'SubmoduleOption',
-                            disableSubmodules: false,
-                            parentCredentials: false,
-                            recursiveSubmodules: true,
-                            reference: '',
-                            trackingSubmodules: false]],
-              submoduleCfg: [],
-              userRemoteConfigs:
-              [[url: 'https://github.com/arangodb/Cookbook.git']]])
-  }  print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
+  print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
 }
 
 stage("cloning source") {
