@@ -18,8 +18,8 @@ else {
 }
 
 if (params['GITTAG'] == 'devel') {
-  TRAVIS_DEB_FILE="xUbuntu_12.04/amd64/arangodb3-3.2.devel-*_amd64.deb"
-  VERSION_MAJOR_MINOR="3.2"
+  TRAVIS_DEB_FILE="xUbuntu_12.04/amd64/arangodb3-3.3.devel-*_amd64.deb"
+  VERSION_MAJOR_MINOR="3.3"
   REPO_TL_DIR="nightly"
   // if we build devel, we don't have any v's at all:
   GITTAG="devel"
