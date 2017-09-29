@@ -43,6 +43,7 @@ def CONTAINERS=[
   [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "CYGWIN_NT-10.0", 'buildArgs': "--msvc",     'cluster': false, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/var/tmp/r', 'reliable': true, 'BUILD': "../../${testPathPrefix}_", 'CBUILD': "../${testPathPrefix}c_", 'SYMSRV': '/cygdrive/e/symsrv/', 'testArgs': "--ruby c:/tools/ruby23/bin/ruby.exe --rspec c:/tools/ruby23/bin/rspec"]
 ]
 
+GITRAW=33
 if (params['GITTAG'] == 'devel') {
   GITBRANCH="dev"
 }
@@ -50,6 +51,7 @@ else {
   def parts=params['GITTAG'].tokenize(".")
   if (parts.size() == 3) {
     GITBRANCH="${parts[0]}.${parts[1]}"
+    GITRAW="${parts[0]}.${parts[1]}".toInteger()
   }
   else {
     GITBRANCH="dev"
@@ -108,8 +110,11 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     def EP=""
     def XEP=""
     if (enterpriseUrl.size() > 10) {
-      EP="--enterprise ${ENTERPRISE_URL}"
+      EP="--enterprise https://${ENTERPRISE_URL}@github.com/arangodb/enterprise"
       XEP="EP"
+      if (GITRAW >= 33) {
+        EP="${EP} --downloadSyncer ${ENTERPRISE_URL}"
+      }
     }
     if (!buildUnittestTarball) {
       outDir = getReleaseOutDir(enterpriseUrl, envName)
