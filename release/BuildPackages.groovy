@@ -51,7 +51,7 @@ else {
   def parts=params['GITTAG'].tokenize(".")
   if (parts.size() == 3) {
     GITBRANCH="${parts[0]}.${parts[1]}"
-    GITRAW="${parts[0]}.${parts[1]}".toInteger()
+    GITRAW="${parts[0].drop(1)}.${parts[1]}".toInteger()
   }
   else {
     GITBRANCH="dev"
