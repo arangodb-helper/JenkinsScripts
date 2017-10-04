@@ -284,6 +284,9 @@ def CloneSource(inDocker){
       }
 
       sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
+      // follow deletion of upstream tags:
+      sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
+      sh "git pull --all"
       checkout([$class: 'GitSCM',
                 branches: [[name: "${GITTAG}"]],
                 /*
@@ -303,8 +306,6 @@ def CloneSource(inDocker){
                 userRemoteConfigs:
                 [[url: 'https://github.com/arangodb/arangodb.git']]])
 
-      // follow deletion of upstream tags:
-      sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
       currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
       if (fileExists(lastKnownGoodGitFile)) {
         lastKnownGitRev=readFile(lastKnownGoodGitFile)
