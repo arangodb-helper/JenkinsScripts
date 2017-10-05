@@ -214,6 +214,7 @@ def runTests(where, testWorkingDirectory) {
          bash -x ./scripts/unittest ${where['unitTests']} \
                 --skipNondeterministic true \
                 --skipTimeCritical true \
+                --build . \
                 --testOutput ${TESTWD} \
                 ${EXTREME_VERBOSITY} \
                 ${TEST_ARGS} \
