@@ -423,7 +423,10 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       try {
         MD5SUM = readFile("${BUILT_FILE}.md5").trim()
       }
-      catch (x) {} 
+      catch (x) {
+        echo "No MD5 File there - you mustn't tick 'skip build' if you don't have a previous build"
+        throw (x)
+      } 
 
       if (VERBOSE) {
         echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
