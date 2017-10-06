@@ -158,6 +158,11 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           print(BUILDSCRIPT)
         }
         sh BUILDSCRIPT
+        def line=sh(returnStdout: true, script: "tail -n 1 nohup.out")
+        if ((line ==~/(?s).*exit [1-9].*/) || (line ==~/(?s).*Terminated.*/)){
+          echo "last line contains bad exit statement: ${line}"
+          throw new Exception("last line contains bad exit statement: ${line}")
+        }
       }
       catch (err) {
         RUNNING_PID=readFile("pid").trim()
