@@ -53,6 +53,7 @@ else {
 }
 
 
+/*
 if (preferBuilder.size() > 0) {
   found=false
   for (int c  = 0; c < CONTAINERS.size(); c++) {
@@ -80,6 +81,7 @@ if (preferBuilder.size() > 0) {
     }
   }
 }
+*/
 
 OS = DOCKER_CONTAINER['OS']
 DOCKER_CONTAINER['cluster'] = (RUN_CLUSTER_TESTS == "true")
