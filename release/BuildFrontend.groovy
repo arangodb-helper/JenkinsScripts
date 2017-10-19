@@ -94,9 +94,6 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     }
 
     def buildMode = "standard"
-    if (MAINTAINERMODE == "true") {
-      buildMode = "maintainer"
-    }
 
     // def BUILDSCRIPT = "./Installation/Jenkins/build.sh ${buildMode} --parallel ${PARALLEL_BUILD} --buildDir ${buildDir} ${cBuildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
     def BUILDSCRIPT = "cd build; cmake ..; make frontend_clean; make frontend"; 
