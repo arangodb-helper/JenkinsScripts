@@ -105,10 +105,10 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       git diff-index --quiet HEAD --
       if [ \$? -eq 0 ]; then
           echo "No changes detected. Not pushing frontend build."
-          retval=$?
+          retval=\$?
       else
           echo "Changes detected. Setting up commit and pushing to devel branch."
-          retval=$?
+          retval=\$?
       fi
 
       if [ $retval -ne 0 ]; then
