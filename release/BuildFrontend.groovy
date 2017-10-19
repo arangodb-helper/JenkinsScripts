@@ -34,7 +34,7 @@ testParams = [:]
 testPathPrefix = 'j'
 //currentBuild.result = 'SUCCESS'
 def CONTAINERS=[
-  [ 'name': 'arangodb/documentation-builder', 'OS': "Linux", 'cluster': false, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/'],
+  [ 'name': 'arangodb/documentation-builder', 'OS': "Linux", 'cluster': false, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/']
 ]
 
 GITRAW=33
@@ -127,8 +127,10 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
     // myBuildImage.pull()
     echo "hello before docker ${RELEASE_OUT_DIR}"
     docker.image(myBuildImage.imageName()).inside("""\
---volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw\
---volume /jenkins:/mnt/:rw \
+ --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw\
+ --volume /jenkins:/mnt/:rw \
+ --volume /jenkins/workspace:/home/jenkins/:rw \
+ --volume /jenkins/workspace:/home/node/:rw \
 """) {
       echo "hello from docker"
       if (VERBOSE && Reliable) {
