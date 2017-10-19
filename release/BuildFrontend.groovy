@@ -34,7 +34,8 @@ testParams = [:]
 testPathPrefix = 'j'
 //currentBuild.result = 'SUCCESS'
 def CONTAINERS=[
-  [ 'name': 'arangodb/documentation-builder', 'OS': "Linux", 'cluster': false, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/']
+  //[ 'name': 'arangodb/documentation-builder', 'OS': "Linux", 'cluster': false, 'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/']
+  [ 'buildType': 'docker', 'testType': 'docker', 'name': 'arangodb/documentation-builder',        'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--rpath --jemalloc", 'cluster': false,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': '']
 ]
 
 GITRAW=33
