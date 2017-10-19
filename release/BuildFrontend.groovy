@@ -123,8 +123,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
   print(buildEnvironment)
   node(DOCKER_HOST) {
     sh "set"
-    def myBuildImage = docker.image("${buildEnvironment['name']}/build")
-    // myBuildImage.pull()
+    def myBuildImage = docker.image("${buildEnvironment['name']}")
     echo "hello before docker ${RELEASE_OUT_DIR}"
     docker.image(myBuildImage.imageName()).inside("""\
  --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw\
