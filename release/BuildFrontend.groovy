@@ -105,16 +105,15 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       git diff-index --quiet HEAD --
       if [ \$? -eq 0 ]; then
           echo "No changes detected. Not pushing frontend build."
-          retval=\$?
       else
           echo "Changes detected. Setting up commit and pushing to devel branch."
           retval=\$?
-      fi
-      if [ $retval -ne 0 ]; then
-        echo "Error. Something went wrong.."
-        throw new hudson.AbortException("Something went wrong...")
-        else
-          echo "Done."
+          if [ $retval -ne 0 ]; then
+            echo "Error. Something went wrong.."
+            throw new hudson.AbortException("Something went wrong...")
+            else
+              echo "Done."
+          fi
       fi
     """
 
