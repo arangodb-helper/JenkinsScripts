@@ -103,7 +103,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       make frontend 
       cd ..
       git diff-index --quiet HEAD --
-      if [ $? -eq 0 ]; then
+      if [ \$? -eq 0 ]; then
           echo "No changes detected. Not pushing frontend build."
           retval=$?
       else
