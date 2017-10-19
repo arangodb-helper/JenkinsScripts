@@ -95,8 +95,29 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
     def buildMode = "standard"
 
-    // def BUILDSCRIPT = "./Installation/Jenkins/build.sh ${buildMode} --parallel ${PARALLEL_BUILD} --buildDir ${buildDir} ${cBuildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
-    def BUILDSCRIPT = "export PATH=\$PATH:/opt/arangodb/bin; mkdir -p build; cd build; cmake ..; make frontend"; 
+    def BUILDSCRIPT = """
+      export PATH=/opt/arangodb/bin/:\$PATH
+      mkdir -p build
+      cd build
+      cmake ..
+      make frontend 
+      cd ..
+      git diff-index --quiet HEAD --
+      if [ $? -eq 0 ]; then
+          echo "No changes detected. Not pushing frontend build."
+          retval=$?
+      else
+          echo "Changes detected. Setting up commit and pushing to devel branch."
+          retval=$?
+      fi
+
+      if [ $retval -ne 0 ]; then
+        echo "Error. Something went wrong.."
+        throw new hudson.AbortException("Something went wrong...")
+        else
+          echo "Done."
+      fi
+    """
 
     if (VERBOSE) {
       print(BUILDSCRIPT)
@@ -173,7 +194,7 @@ def CloneSource(inDocker){
                   [$class: 'CloneOption', timeout: 20]
                 ],
                 userRemoteConfigs:
-                [[url: 'https://github.com/arangodb/arangodb.git']]])
+                [[url: 'https://${ENTERPRISE_URL}@github.com/arangodb/arangodb.git']]])
 
       // follow deletion of upstream tags:
       sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
