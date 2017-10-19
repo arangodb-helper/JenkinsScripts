@@ -100,6 +100,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       mkdir -p build
       cd build
       cmake ..
+      make frontend_clean
       make frontend 
       cd ..
       git diff-index --quiet HEAD --
