@@ -96,7 +96,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     def buildMode = "standard"
 
     // def BUILDSCRIPT = "./Installation/Jenkins/build.sh ${buildMode} --parallel ${PARALLEL_BUILD} --buildDir ${buildDir} ${cBuildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
-    def BUILDSCRIPT = "sudo apt-get install gcc; mkdir build; cd build; cmake ..; make frontend"; 
+    def BUILDSCRIPT = "export PATH=\$PATH:/opt/arangodb/bin; mkdir build; cd build; cmake ..; make frontend"; 
 
     if (VERBOSE) {
       print(BUILDSCRIPT)
