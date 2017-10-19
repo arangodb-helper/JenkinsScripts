@@ -111,9 +111,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       else
           echo "Changes detected. Setting up commit and pushing to devel branch."
           if [ \$? -ne 0 ]; then
-            echo "Error. Something went wrong.."
-            throw new hudson.AbortException("Something went wrong...")
-            else
+              echo "Error. Something went wrong.."
+              exit 1
+          else
               echo "Done."
           fi
       fi
