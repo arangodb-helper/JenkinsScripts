@@ -123,26 +123,24 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
   print(buildEnvironment)
   node(DOCKER_HOST) {
     sh "set"
-    docker.withRegistry(REGISTRY_URL, '') {
-      def myBuildImage = docker.image("${buildEnvironment['name']}/build")
-      // myBuildImage.pull()
-      echo "hello before docker ${RELEASE_OUT_DIR}"
-      docker.image(myBuildImage.imageName()).inside("""\
+    def myBuildImage = docker.image("${buildEnvironment['name']}/build")
+    // myBuildImage.pull()
+    echo "hello before docker ${RELEASE_OUT_DIR}"
+    docker.image(myBuildImage.imageName()).inside("""\
 --volume /mnt/data/fileserver:${RELEASE_OUT_DIR}:rw\
 --volume /jenkins:/mnt/:rw \
 """) {
-        echo "hello from docker"
-        if (VERBOSE && Reliable) {
-          sh "mount"
-          sh "pwd"
-          sh "cat /etc/issue /mnt/workspace/issue /etc/passwd"
-        }
-
-        sh 'pwd > workspace.loc'
-        WORKSPACE = readFile('workspace.loc').trim()
-        outDir = "${WORKSPACE}/out${EPDIR}"
-        compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir, buildEnvironment['name'], Reliable)
+      echo "hello from docker"
+      if (VERBOSE && Reliable) {
+        sh "mount"
+        sh "pwd"
+        sh "cat /etc/issue /mnt/workspace/issue /etc/passwd"
       }
+
+      sh 'pwd > workspace.loc'
+      WORKSPACE = readFile('workspace.loc').trim()
+      outDir = "${WORKSPACE}/out${EPDIR}"
+      compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir, buildEnvironment['name'], Reliable)
     }
   }
 }
