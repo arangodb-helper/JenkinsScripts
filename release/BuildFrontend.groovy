@@ -110,6 +110,10 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           echo "No changes detected. Not pushing frontend build."
       else
           echo "Changes detected. Setting up commit and pushing to devel branch."
+          git add js/apps/system/_admin/aardvark/APP/frontend/src/*
+          git add js/apps/system/_admin/aardvark/APP/frontend/build/*
+          git commit -m "nightly frontend build"
+          git push
           if [ \$? -ne 0 ]; then
               echo "Error. Something went wrong.."
               exit 1
