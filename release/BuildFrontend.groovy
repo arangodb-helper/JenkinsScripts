@@ -107,8 +107,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           echo "No changes detected. Not pushing frontend build."
       else
           echo "Changes detected. Setting up commit and pushing to devel branch."
-          retval=\$?
-          if [ $retval -ne 0 ]; then
+          if [ \$? -ne 0 ]; then
             echo "Error. Something went wrong.."
             throw new hudson.AbortException("Something went wrong...")
             else
