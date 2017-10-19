@@ -97,6 +97,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
     def BUILDSCRIPT = """
       export PATH=/opt/arangodb/bin/:\$PATH
+      git checkout devel
       mkdir -p build
       cd build
       cmake ..
