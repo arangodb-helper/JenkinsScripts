@@ -96,7 +96,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     def buildMode = "standard"
 
     // def BUILDSCRIPT = "./Installation/Jenkins/build.sh ${buildMode} --parallel ${PARALLEL_BUILD} --buildDir ${buildDir} ${cBuildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
-    def BUILDSCRIPT = "cd build; cmake ..; make frontend_clean; make frontend"; 
+    def BUILDSCRIPT = "sh mount; cd build; cmake ..; make frontend_clean; make frontend"; 
 
     if (VERBOSE) {
       print(BUILDSCRIPT)
