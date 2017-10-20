@@ -98,6 +98,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     def BUILDSCRIPT = """
       export PATH=/opt/arangodb/bin/:\$PATH
       git checkout devel
+      git remote set-url origin https://${ENTERPRISE_URL}@github.org/repo.git
       mkdir -p build
       cd build
       cmake ..
