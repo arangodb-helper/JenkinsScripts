@@ -99,7 +99,6 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       export PATH=/opt/arangodb/bin/:\$PATH
       git checkout devel
       git remote set-url origin https://${ENTERPRISE_URL}@github.com/arangodb/arangodb.git
-      git remote set-url devel https://${ENTERPRISE_URL}@github.com/arangodb/arangodb.git
       mkdir -p build
       cd build
       cmake ..
