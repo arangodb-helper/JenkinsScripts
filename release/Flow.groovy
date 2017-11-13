@@ -470,6 +470,7 @@ stage("updating other repos") {
             }
           }
         },
+        /*
         "SNAPPY": {
           if (GITTAG != "devel") {
             node('master') {
@@ -485,6 +486,7 @@ stage("updating other repos") {
             echo "publish snappy deactivated"
           }
         },
+        */
         "Docker": {
           node('master') {
             echo "(${SKIP_DOCKER_PUBLISH} == 'false' && ${IS_RELEASE} == 'true') ${GITTAG}"
