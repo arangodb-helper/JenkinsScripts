@@ -329,6 +329,7 @@ done
         ////////////////////////////////////////////////////////////////////////////////
         "documentation": {
           try {
+            echo "trying: "
             retry(5) {
               build( job: 'RELEASE__BuildDocumentation',
                      parameters: [
@@ -350,7 +351,8 @@ done
             if (GIT_VERSION == 'devel') {
               // channel = '#devel'
             }
-            slackSend channel: channel, color: '#439FE0', message: "Building documentation for ${GITVERSION} failed"
+            echo "failed: ${err}"
+            slackSend channel: channel, color: '#439FE0', message: "Building documentation for ${GITVERSION} failed - ${err}"
                       
           }
         }
