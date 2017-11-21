@@ -328,20 +328,30 @@ done
         },
         ////////////////////////////////////////////////////////////////////////////////
         "documentation": {
-          retry(5) {
-            build( job: 'RELEASE__BuildDocumentation',
-                   parameters: [
-                     string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                     string(name: 'DOCKER_HOST', value: DOCKER_HOST),
-                     string(name: 'GITTAG', value: "${GITTAG}"),
-                     string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
-                     string(name: 'FORCE_GITBRANCH', value:''),
-                     string(name: 'REPORT_TO', value: "slack"),
-                     string(name: 'GIT_BRANCH', value: "${GIT_BRANCH}"),
-                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
-                     booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
-                   ]
-                 )
+          try {
+            retry(5) {
+              build( job: 'RELEASE__BuildDocumentation',
+                     parameters: [
+                       string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                       string(name: 'DOCKER_HOST', value: DOCKER_HOST),
+                       string(name: 'GITTAG', value: "${GITTAG}"),
+                       string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
+                       string(name: 'FORCE_GITBRANCH', value:''),
+                       string(name: 'REPORT_TO', value: "slack"),
+                       string(name: 'GIT_BRANCH', value: "${GIT_BRANCH}"),
+                       booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                       booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+                     ]
+                   )
+            }
+          }
+          catch (err) {
+            def channel = '#release'
+            if (GIT_VERSION == 'devel') {
+              // channel = '#devel'
+            }
+            slackSend channel: channel, color: '#439FE0', message: "Building documentation for ${GITVERSION} failed"
+                      
           }
         }
       ]
