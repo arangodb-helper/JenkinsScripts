@@ -352,7 +352,7 @@ done
               // channel = '#devel'
             }
             echo "failed: ${err}"
-            slackSend channel: channel, color: '#439FE0', message: "Building documentation for ${GITVERSION} failed - ${err}"
+            slackSend channel: channel, color: '#439FE0', message: "Building documentation for ${GITTAG} failed - ${err}"
                       
           }
         }
