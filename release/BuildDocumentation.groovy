@@ -187,13 +187,6 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
           // --volume /var/lib/jenkins/workspace/ArangoDB_Release:/var/lib/jenkins/workspace/ArangoDB_Release:rw \
           // """) { c->
           echo "hello from docker"
-          if (VERBOSE && Reliable) {
-            sh "mount"
-            sh "pwd"
-            sh "cat /etc/issue /mnt/workspace/issue /etc/passwd"
-            
-          }
-
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
           outDir = "${WORKSPACE}/out${EPDIR}"
@@ -216,15 +209,6 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
 }
 
 def CloneSource(inDocker){
-  if (VERBOSE) {
-    sh "pwd"
-    if (inDocker) {
-      sh "cat /etc/issue /jenkins/workspace/issue"
-    }
-    else {
-      sh "uname -a"
-    }
-  }
 
   sh "rm -f 3rdParty/rocksdb/rocksdb/util/build_version.cc"
   checkout([$class: 'GitSCM',
