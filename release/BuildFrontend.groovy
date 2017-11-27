@@ -100,7 +100,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
     def BUILDSCRIPT = """
       export PATH=/opt/arangodb/bin/:\$PATH
-      # git pull
+      git pull
       git checkout devel
       git remote set-url origin https://${ENTERPRISE_URL}@github.com/arangodb/arangodb.git
       git config --global user.email "admin@arangodb.com"
