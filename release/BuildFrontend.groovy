@@ -218,6 +218,8 @@ def CloneSource(inDocker){
       } else {
         sh "echo ${currentUISum} > ${lastKnownUISumFile} ;"
       }
+      print("Current UI MD5: ${currentUISum}");
+      print("Last known UI MD5: ${lastKnownUISum}");
       currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
       print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
 }
