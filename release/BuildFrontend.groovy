@@ -97,7 +97,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
     def BUILDSCRIPT = """
       export PATH=/opt/arangodb/bin/:\$PATH
-      OLDMDFIVE=`find -s js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \; | md5sum`
+      OLDMDFIVE=`find -s js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \\; | md5sum`
       git pull
       git checkout devel
       git remote set-url origin https://${ENTERPRISE_URL}@github.com/arangodb/arangodb.git
@@ -118,7 +118,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           git add js/apps/system/_admin/aardvark/APP/frontend/src/*
           git add js/apps/system/_admin/aardvark/APP/frontend/build/*
           set -e
-          NEWMDFIVE=`find -s js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \; | md5sum`
+          NEWMDFIVE=`find -s js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \\; | md5sum`
 
           if [ $OLDMDFIVE == $NEWMDFIVE ]; then
               echo "No changes detected. Not pushing frontend build."
