@@ -120,7 +120,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           set -e
           NEWMDFIVE=`find -s js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \\; | md5sum`
 
-          if [ $OLDMDFIVE == $NEWMDFIVE ]; then
+          if [ OLDMDFIVE == NEWMDFIVE ]; then
               echo "No changes detected. Not pushing frontend build."
           else
               echo "Changes detected. Setting up commit and pushing to devel branch."
