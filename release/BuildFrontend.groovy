@@ -97,8 +97,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
     def BUILDSCRIPT = """
       export PATH=/opt/arangodb/bin/:\$PATH
-      git checkout devel
+      OLDMDFIVE=`find -s js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \; | md5sum`
       git pull
+      git checkout devel
       git remote set-url origin https://${ENTERPRISE_URL}@github.com/arangodb/arangodb.git
       git config --global user.email "admin@arangodb.com"
       git config --global user.name "ArangoDB Release Bot"
@@ -113,18 +114,24 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       if [ RETVAL -eq 0 ]; then
           echo "No changes detected. Not pushing frontend build."
       else
-          echo "Changes detected. Setting up commit and pushing to devel branch."
           set +e
           git add js/apps/system/_admin/aardvark/APP/frontend/src/*
           git add js/apps/system/_admin/aardvark/APP/frontend/build/*
           set -e
-          git commit -m "nightly frontend build"
-          git push
-          if [ \$? -ne 0 ]; then
-              echo "Error. Something went wrong.."
-              exit 1
+          NEWMDFIVE=`find -s js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \; | md5sum`
+
+          if [ $OLDMDFIVE == $NEWMDFIVE ]; then
+              echo "No changes detected. Not pushing frontend build."
           else
-              echo "Done."
+              echo "Changes detected. Setting up commit and pushing to devel branch."
+              # git commit -m "nightly frontend build"
+              # git push
+              if [ \$? -ne 0 ]; then
+                  echo "Error. Something went wrong.."
+                  exit 1
+              else
+                  echo "Done."
+              fi
           fi
       fi
     """
