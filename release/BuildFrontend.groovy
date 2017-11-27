@@ -116,10 +116,11 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       set -e
 
       echo "Changes detected. Setting up commit and pushing to devel branch."
-      git commit -m "nightly frontend build"
-      git push
+      #git commit -m "nightly frontend build"
+      #git push
 
-      echo "${currentUISum}" > ${lastKnownUISumFile}
+      NEWMDSUM=`js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \\; | sort -k 2 | md5sum`
+      echo "${NEWMDSUM}" > ${lastKnownUISumFile}
 
       if [ \$? -ne 0 ]; then
           echo "Error. Something went wrong.."
