@@ -116,8 +116,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       set -e
 
       echo "Changes detected. Setting up commit and pushing to devel branch."
-      # git commit -m "nightly frontend build"
-      # git push
+      git commit -m "nightly frontend build"
+      git push
 
       sh "echo ${currentUISum} > ${lastKnownUISumFile} ;"
 
