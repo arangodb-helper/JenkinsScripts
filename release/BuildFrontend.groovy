@@ -64,7 +64,7 @@ LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
 OS = DOCKER_CONTAINER['OS']
 
 lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
-lastKnownUISumFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.uisum"
+lastKnownUISumFile="${RELEASE_OUT_DIR}${env.JOB_NAME}.uisum"
 
 DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz".replace("/cygdrive/c", "c:")
 echo(DIST_FILE)
