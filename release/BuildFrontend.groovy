@@ -118,6 +118,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       echo "Changes detected. Setting up commit and pushing to devel branch."
       # git commit -m "nightly frontend build"
       # git push
+
+      sh "echo ${currentUISum} > ${lastKnownUISumFile} ;"
+
       if [ \$? -ne 0 ]; then
           echo "Error. Something went wrong.."
           exit 1
@@ -228,7 +231,7 @@ stage("cloning source") {
 
 stage("building ArangoDB") {
   if (lastKnownUISum != currentUISum) {
-    sh "echo \"Changes detected. Continuing with build\"";
+    print("Changes detected. Continuing with build")
     EPDIR=""
     if (ENTERPRISE_URL != "") {
       EPDIR="EP"
@@ -236,7 +239,6 @@ stage("building ArangoDB") {
     try {
       print(DOCKER_CONTAINER)
       setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL, EPDIR, DOCKER_CONTAINER['reliable'])
-      sh "echo ${currentUISum} > ${lastKnownUISumFile} ;"
     } catch (err) {
       stage('Send Notification for build') {
         mail (to: ADMIN_ACCOUNT,
@@ -247,6 +249,6 @@ stage("building ArangoDB") {
       throw(err)
     }
   } else {
-    sh "No changes detected. No need for build yet.";
+    print("No changes detected. No need for build yet.")
   }
 }
