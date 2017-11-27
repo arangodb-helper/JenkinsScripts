@@ -119,7 +119,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       #git commit -m "nightly frontend build"
       #git push
 
-      sh "echo ${currentUISum} > ${lastKnownUISumFile}"
+      echo "${currentUISum}" > ${lastKnownUISumFile}
 
       if [ \$? -ne 0 ]; then
           echo "Error. Something went wrong.."
