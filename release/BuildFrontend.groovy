@@ -119,8 +119,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       #git commit -m "nightly frontend build"
       #git push
 
-      NEWMDSUM=`js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \\; | sort -k 2 | md5sum`
-      echo "$NEWMDSUM" > ${lastKnownUISumFile}
+      find js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \\; | sort -k 2 | md5sum > ${lastKnownUISumFile}
 
       if [ \$? -ne 0 ]; then
           echo "Error. Something went wrong.."
