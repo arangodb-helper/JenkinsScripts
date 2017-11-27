@@ -213,7 +213,7 @@ def CloneSource(inDocker){
       if (fileExists(lastKnownUISumFile)) {
         lastKnownUISum=readFile(lastKnownUISumFile)
       } else {
-        sh "echo ${currentUISum} > ${lastKnownUISumFile}";
+        sh "echo ${currentUISum} > ${lastKnownUISumFile} ;"
       }
       currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
       print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
@@ -228,7 +228,7 @@ stage("cloning source") {
 
 stage("building ArangoDB") {
   if (lastKnownUISum != currentUISum) {
-    sh "Changes detected. Continuing with build";
+    sh "echo \"Changes detected. Continuing with build\"";
     EPDIR=""
     if (ENTERPRISE_URL != "") {
       EPDIR="EP"
@@ -236,7 +236,7 @@ stage("building ArangoDB") {
     try {
       print(DOCKER_CONTAINER)
       setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL, EPDIR, DOCKER_CONTAINER['reliable'])
-      sh "echo ${currentUISum} > ${lastKnownUISumFile}";
+      sh "echo ${currentUISum} > ${lastKnownUISumFile} ;"
     } catch (err) {
       stage('Send Notification for build') {
         mail (to: ADMIN_ACCOUNT,
