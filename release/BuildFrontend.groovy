@@ -13,8 +13,9 @@ branches = [:]
 failures = ""
 ADMIN_ACCOUNT = "release-bot@arangodb.com"
 parallelJobNames = []
-ADMIN_ACCOUNT = "willi@arangodb.com"
+ADMIN_ACCOUNT = "heiko@arangodb.com"
 lastKnownGitRev = ""
+lastKnownUISum = ""
 currentGitRev = ""
 WORKSPACE = ""
 BUILT_FILE = ""
@@ -62,6 +63,7 @@ LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
 OS = DOCKER_CONTAINER['OS']
 
 lastKnownGoodGitFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.githash"
+lastKnownUISumFile="${RELEASE_OUT_DIR}/${env.JOB_NAME}.uisum"
 
 DIST_FILE = "${RELEASE_OUT_DIR}/arangodb-${OS}.tar.gz".replace("/cygdrive/c", "c:")
 echo(DIST_FILE)
@@ -97,8 +99,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
     def BUILDSCRIPT = """
       export PATH=/opt/arangodb/bin/:\$PATH
-      OLDMDFIVE=`find -s js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \\; | md5sum`
-      git pull
+      # git pull
       git checkout devel
       git remote set-url origin https://${ENTERPRISE_URL}@github.com/arangodb/arangodb.git
       git config --global user.email "admin@arangodb.com"
@@ -109,30 +110,18 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       make frontend 
       cd ..
       set +e
-      RETVAL=`git diff-index --quiet HEAD --`
+      git add js/apps/system/_admin/aardvark/APP/frontend/src/*
+      git add js/apps/system/_admin/aardvark/APP/frontend/build/*
       set -e
-      if [ RETVAL -eq 0 ]; then
-          echo "No changes detected. Not pushing frontend build."
-      else
-          set +e
-          git add js/apps/system/_admin/aardvark/APP/frontend/src/*
-          git add js/apps/system/_admin/aardvark/APP/frontend/build/*
-          set -e
-          NEWMDFIVE=`find -s js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \\; | md5sum`
 
-          if [ OLDMDFIVE == NEWMDFIVE ]; then
-              echo "No changes detected. Not pushing frontend build."
-          else
-              echo "Changes detected. Setting up commit and pushing to devel branch."
-              # git commit -m "nightly frontend build"
-              # git push
-              if [ \$? -ne 0 ]; then
-                  echo "Error. Something went wrong.."
-                  exit 1
-              else
-                  echo "Done."
-              fi
-          fi
+      echo "Changes detected. Setting up commit and pushing to devel branch."
+      # git commit -m "nightly frontend build"
+      # git push
+      if [ \$? -ne 0 ]; then
+          echo "Error. Something went wrong.."
+          exit 1
+      else
+          echo "Done."
       fi
     """
 
@@ -216,8 +205,14 @@ def CloneSource(inDocker){
       // follow deletion of upstream tags:
       sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
       currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+      currentUISum = sh(returnStdout: true, script: 'find js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \\; | sort -k 2 | md5sum').trim()
       if (fileExists(lastKnownGoodGitFile)) {
         lastKnownGitRev=readFile(lastKnownGoodGitFile)
+      }
+      if (fileExists(lastKnownUISumFile)) {
+        lastKnownUISum=readFile(lastKnownUISumFile)
+      } else {
+        sh "echo ${currentUISum} > ${lastKnownUISumFile}";
       }
       currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
       print("GIT_AUTHOR_EMAIL: ${env} ${currentGitRev}")
@@ -231,24 +226,26 @@ stage("cloning source") {
 }
 
 stage("building ArangoDB") {
-  EPDIR=""
-  if (ENTERPRISE_URL != "") {
-    EPDIR="EP"
-  }
-  try {
-    print(DOCKER_CONTAINER)
-    setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL, EPDIR, DOCKER_CONTAINER['reliable'])
-  } catch (err) {
-    stage('Send Notification for build' ) {
-      mail (to: ADMIN_ACCOUNT,
-            subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
-            body: err.getMessage());
-      currentBuild.result = 'FAILURE'
+  if (lastKnownUISum != currentUISum) {
+    sh "Changes detected. Continuing with build";
+    EPDIR=""
+    if (ENTERPRISE_URL != "") {
+      EPDIR="EP"
     }
-    throw(err)
+    try {
+      print(DOCKER_CONTAINER)
+      setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL, EPDIR, DOCKER_CONTAINER['reliable'])
+      sh "echo ${currentUISum} > ${lastKnownUISumFile}";
+    } catch (err) {
+      stage('Send Notification for build') {
+        mail (to: ADMIN_ACCOUNT,
+              subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 
+              body: err.getMessage());
+        currentBuild.result = 'FAILURE'
+      }
+      throw(err)
+    }
+  } else {
+    sh "No changes detected. No need for build yet.";
   }
-}
-
-stage("checking push") {
-
 }
