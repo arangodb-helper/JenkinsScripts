@@ -119,12 +119,6 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       #git commit -m "nightly frontend build"
       #git push
 
-      echo "TEST"
-      find js/apps/system/_admin/aardvark/APP/frontend -path js/apps/system/_admin/aardvark/APP/frontend/build -prune -o -type f -exec md5sum {} \\; | sort -k 2 | md5sum
-      find js/apps/system/_admin/aardvark/APP/frontend -path js/apps/system/_admin/aardvark/APP/frontend/build -prune -o -type f -exec md5sum {} \\; | sort -k 2 | md5sum > ${lastKnownUISumFile}
-      echo "VERSIONNOW"
-      cat ${lastKnownUISumFile}
-
       if [ \$? -ne 0 ]; then
           echo "Error. Something went wrong.."
           exit 1
@@ -138,6 +132,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     }
     // run shell script
     sh BUILDSCRIPT
+    sh "echo ${currentUISum} > ${lastKnownUISumFile}"
   } catch (err) {
     stage('Send Notification for failed build' ) {
       gitCommitter = sh(returnStdout: true, script: 'git --no-pager show -s --format="%ae"')
