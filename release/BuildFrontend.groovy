@@ -116,8 +116,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       set -e
 
       echo "Changes detected. Setting up commit and pushing to devel branch."
-      #git commit -m "nightly frontend build"
-      #git push
+      git commit -m "nightly frontend build"
+      git push
 
       if [ \$? -ne 0 ]; then
           echo "Error. Something went wrong.."
@@ -231,8 +231,8 @@ stage("cloning source") {
 }
 
 stage("building ArangoDB") {
-  print("Last    MD5" + lastKnownUISum.split("\n")[0]);
-  print("Current MD5" + currentUISum)
+  print("Last    MD5 : " + lastKnownUISum.split("\n")[0]);
+  print("Current MD5 : " + currentUISum)
   if (lastKnownUISum.split("\n")[0] != currentUISum) {
     print("Changes detected. Continuing with build")
     EPDIR=""
