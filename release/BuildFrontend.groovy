@@ -209,7 +209,7 @@ def CloneSource(inDocker){
       // follow deletion of upstream tags:
       sh "git fetch --prune origin +refs/tags/*:refs/tags/*"
       currentGitRev = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-      currentUISum = sh(returnStdout: true, script: 'find js/apps/system/_admin/aardvark/APP/frontend/ -type f -exec md5sum {} \\; | sort -k 2 | md5sum').trim()
+      currentUISum = sh(returnStdout: true, script: 'find js/apps/system/_admin/aardvark/APP/frontend/ -path js/apps/system/_admin/aardvark/APP/frontend/build -prune -o -type f -exec md5sum {} \\; | sort -k 2 | md5sum').trim()
       if (fileExists(lastKnownGoodGitFile)) {
         lastKnownGitRev=readFile(lastKnownGoodGitFile)
       }
