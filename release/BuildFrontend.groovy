@@ -120,8 +120,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       #git push
 
       echo "TEST"
-      js/apps/system/_admin/aardvark/APP/frontend/ -path js/apps/system/_admin/aardvark/APP/frontend/build -prune -o -type f -exec md5sum {} \\; | sort -k 2 | md5sum
-      find js/apps/system/_admin/aardvark/APP/frontend/ -path js/apps/system/_admin/aardvark/APP/frontend/build -prune -o -type f -exec md5sum {} \\; | sort -k 2 | md5sum > ${lastKnownUISumFile}
+      find js/apps/system/_admin/aardvark/APP/frontend -path js/apps/system/_admin/aardvark/APP/frontend/build -prune -o -type f -exec md5sum {} \\; | sort -k 2 | md5sum
+      find js/apps/system/_admin/aardvark/APP/frontend -path js/apps/system/_admin/aardvark/APP/frontend/build -prune -o -type f -exec md5sum {} \\; | sort -k 2 | md5sum > ${lastKnownUISumFile}
       echo "VERSIONNOW"
       cat ${lastKnownUISumFile}
 
