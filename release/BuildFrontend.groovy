@@ -116,8 +116,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       set -e
 
       echo "Changes detected. Setting up commit and pushing to devel branch."
-      #git commit -m "nightly frontend build"
-      #git push
+      git commit -m "nightly frontend build"
+      git push
 
       find js/apps/system/_admin/aardvark/APP/frontend/ -path js/apps/system/_admin/aardvark/APP/frontend/build -prune -o -type f -exec md5sum {} \\; | sort -k 2 | md5sum > ${lastKnownUISumFile}
 
