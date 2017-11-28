@@ -231,8 +231,8 @@ stage("cloning source") {
 }
 
 stage("building ArangoDB") {
-  print(lastKnownUISum)
-  print(currentUISum)
+  print("Last    MD5" + lastKnownUISum.split("\n")[0]);
+  print("Current MD5" + currentUISum)
   if (lastKnownUISum.split("\n")[0] != currentUISum) {
     print("Changes detected. Continuing with build")
     EPDIR=""
