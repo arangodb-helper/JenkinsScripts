@@ -233,7 +233,7 @@ stage("cloning source") {
 stage("building ArangoDB") {
   print(lastKnownUISum)
   print(currentUISum)
-  if (lastKnownUISum != currentUISum) {
+  if (lastKnownUISum.split("\n")[0] != currentUISum) {
     print("Changes detected. Continuing with build")
     EPDIR=""
     if (ENTERPRISE_URL != "") {
