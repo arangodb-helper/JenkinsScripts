@@ -124,7 +124,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         echo \"your container doesn't come with a preloaded version of gitbook, please update it.\"
         exit 1
     fi
-    export GITBOOK_ARGS=\"--gitbook \${INSTALLED_GITBOOK_VERSION}\"
+    export GITBOOK_ARGS=(\"--gitbook\" \"\${INSTALLED_GITBOOK_VERSION}\"
 
     if test \"\${ARANGODB_VERSION_REVISION}\" = \"devel\"; then
         export NODE_MODULES_DIR=\"/tmp/devel/node_modules\"
@@ -142,7 +142,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 """
     print(buildEnv)
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
-      sh BUILDSCRIPT
+      retry(5) {
+        sh BUILDSCRIPT
+      }
     }
     
     if (params['FORCE_GITBRANCH'] != "") {

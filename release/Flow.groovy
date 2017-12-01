@@ -1,6 +1,6 @@
 def LinuxTargets
 def DOCKER_HOST_2
-def DOCKER_HOST="docker"
+def DOCKER_HOST="docker_host"
 VERSION_MAJOR_MINOR=""
 REPO_TL_DIR=""
 
@@ -8,12 +8,12 @@ REPO_TL_DIR=""
 echo "${params['HAVE_MORE_BUILDERS']}"
 if (HAVE_MORE_BUILDERS == "true") {
   echo "Have 2 docker hosts!"
-  DOCKER_HOST_2='docker2'
+  DOCKER_HOST_2='docker_host_2'
   LinuxTargets="LinuxEnterprise"
 }
 else {
   echo "building with one docker host"
-  DOCKER_HOST_2='docker'
+  DOCKER_HOST_2='docker_host'
   LinuxTargets="linuxPackages"
 }
 
@@ -38,6 +38,7 @@ else {
   // while this one is the human readable value:
   GIT_VERSION="${params['GITTAG']}"
   GIT_BRANCH="${parts[0]}.${parts[1]}"
+  slackSend channel: '#release', color: '#00ff00', message: "Starting release build for ${GIT_VERSION}"
 }
 //================================================================================
 stage("building packages") {
@@ -330,21 +331,19 @@ done
         "documentation": {
           try {
             echo "trying: "
-            retry(5) {
-              build( job: 'RELEASE__BuildDocumentation',
-                     parameters: [
-                       string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                       string(name: 'DOCKER_HOST', value: DOCKER_HOST),
-                       string(name: 'GITTAG', value: "${GITTAG}"),
-                       string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
-                       string(name: 'FORCE_GITBRANCH', value:''),
-                       string(name: 'REPORT_TO', value: "slack"),
-                       string(name: 'GIT_BRANCH', value: "${GIT_BRANCH}"),
-                       booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
-                       booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
-                     ]
-                   )
-            }
+            build( job: 'RELEASE__BuildDocumentation',
+                   parameters: [
+                     string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                     string(name: 'DOCKER_HOST', value: DOCKER_HOST),
+                     string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
+                     string(name: 'FORCE_GITBRANCH', value:''),
+                     string(name: 'REPORT_TO', value: "slack"),
+                     string(name: 'GIT_BRANCH', value: "${GIT_BRANCH}"),
+                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                     booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+                   ]
+                 )
           }
           catch (err) {
             def channel = '#release'
