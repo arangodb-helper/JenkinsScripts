@@ -127,7 +127,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         exit 1
     fi
     echo foo
-    export GITBOOK_ARGS=(\"--gitbook\" \"\${INSTALLED_GITBOOK_VERSION}\")
+    GITBOOK_ARGS=(\"--gitbook\" \"\${INSTALLED_GITBOOK_VERSION}\")
+    export GITBOOK_ARGS
     echo bar
     if test \"\${ARANGODB_VERSION_REVISION}\" = \"devel\"; then
         export NODE_MODULES_DIR=\"/tmp/devel/node_modules\"
