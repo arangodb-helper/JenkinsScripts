@@ -147,7 +147,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     print(BUILDSCRIPT)
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
       retry(5) {
-        sh BUILDSCRIPT
+        bash BUILDSCRIPT
       }
     }
     
