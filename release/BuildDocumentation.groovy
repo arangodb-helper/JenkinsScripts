@@ -103,7 +103,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     }
     def BUILDSCRIPT ="""
     id
-    declare -A GITBOOK_ARGS
+    ps -eaf
+    declare GITBOOK_ARGS
     echo ~
     ARANGODB_VERSION_MAJOR=`grep 'set(ARANGODB_VERSION_MAJOR' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
     ARANGODB_VERSION_MINOR=`grep 'set(ARANGODB_VERSION_MINOR' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
