@@ -104,7 +104,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     def BUILDSCRIPT ="""#!/bin/bash
     id
     ps -eaf
-    declare MY_GITBOOK_ARGS
+    declare GITBOOK_ARGS
     echo ~
     ARANGODB_VERSION_MAJOR=`grep 'set(ARANGODB_VERSION_MAJOR' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
     ARANGODB_VERSION_MINOR=`grep 'set(ARANGODB_VERSION_MINOR' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
@@ -127,7 +127,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         exit 1
     fi
     echo foo
-    MY_GITBOOK_ARGS=(\"--gitbook\" \"\${INSTALLED_GITBOOK_VERSION}\")
+    GITBOOK_ARGS=(\"--gitbook\" \"\${INSTALLED_GITBOOK_VERSION}\")
     echo bar
     if test \"\${ARANGODB_VERSION_REVISION}\" = \"devel\"; then
         export NODE_MODULES_DIR=\"/tmp/devel/node_modules\"
@@ -137,7 +137,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if test -d \"\${NODE_MODULES_DIR}\" ; then 
       echo 'building documentation: '
       # cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} NODE_MODULES_DIR=\${NODE_MODULES_DIR}
-      cd Documentation/Books; GITBOOK_ARGS=\"\${MY_GITBOOK_ARGS[@]@Q}\" ./build.sh build-dist-books --outputDir ${outDir} --nodeModulesDir \${NODE_MODULES_DIR}
+      cd Documentation/Books; source ./build.sh build-dist-books --outputDir ${outDir} --nodeModulesDir \${NODE_MODULES_DIR}
     else
       echo 'building documentation: '
       cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir}
