@@ -101,7 +101,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (params['FORCE_GITBRANCH'] != "") {
       sh """echo "${params['FORCE_GITBRANCH']}" > VERSION"""
     }
-    def BUILDSCRIPT ="""
+    def BUILDSCRIPT ="""#!/bin/bash
     id
     ps -eaf
     declare GITBOOK_ARGS
@@ -147,7 +147,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     print(BUILDSCRIPT)
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
       retry(5) {
-        bash BUILDSCRIPT
+        sh BUILDSCRIPT
       }
     }
     
