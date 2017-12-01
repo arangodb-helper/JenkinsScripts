@@ -103,6 +103,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     }
     def BUILDSCRIPT ="""
     id
+    declare -A GITBOOK_ARGS
     echo ~
     ARANGODB_VERSION_MAJOR=`grep 'set(ARANGODB_VERSION_MAJOR' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
     ARANGODB_VERSION_MINOR=`grep 'set(ARANGODB_VERSION_MINOR' CMakeLists.txt | sed 's;.*\"\\(.*\\)\".*;\\1;'`
@@ -124,8 +125,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         echo \"your container doesn't come with a preloaded version of gitbook, please update it.\"
         exit 1
     fi
+    echo foo
     export GITBOOK_ARGS=(\"--gitbook\" \"\${INSTALLED_GITBOOK_VERSION}\")
-
+    echo bar
     if test \"\${ARANGODB_VERSION_REVISION}\" = \"devel\"; then
         export NODE_MODULES_DIR=\"/tmp/devel/node_modules\"
     else
