@@ -138,7 +138,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if test -d \"\${NODE_MODULES_DIR}\" ; then 
       echo 'building documentation: '
       # cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir} NODE_MODULES_DIR=\${NODE_MODULES_DIR}
-      cd Documentation/Books; bash -x -e ./build.sh build-dist-books --outputDir ${outDir} --nodeModulesDir \${NODE_MODULES_DIR}
+      cd Documentation/Books; . ./build.sh build-dist-books --outputDir ${outDir} --nodeModulesDir \${NODE_MODULES_DIR}
     else
       echo 'building documentation: '
       cd Documentation/Books; make build-dist-books OUTPUT_DIR=${outDir}
