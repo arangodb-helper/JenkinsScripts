@@ -337,7 +337,7 @@ stage("generating Documentation Build report") {
 
       if (REPORT_TO == "slack") {
         // Accusing: ${gitCommitters} \n
-        slackMsg = """Branch '${GITTAG}' on '${preferBuilder}' failed: (${env.BUILD_URL}) \n  ```${failures}```"""
+        slackMsg = """Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB Documentation' failed to run - Branch '${GITTAG}' on '${preferBuilder}' failed: (${env.BUILD_URL}) \n  ```${failures}```"""
         slackSend channel: '#status-packaging', color: '#FF0000', message: slackMsg
 
       }
