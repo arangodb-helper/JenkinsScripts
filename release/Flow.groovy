@@ -40,323 +40,332 @@ else {
   GIT_BRANCH="${parts[0]}.${parts[1]}"
   slackSend channel: '#release', color: '#00ff00', message: "Starting release build for ${GIT_VERSION}"
 }
+
+
 //================================================================================
 stage("building packages") {
   if (SKIP_BUILD == "false") {
-    echo "Now starting to build:"
-    parallel(
-      [
+    try {
+      echo "Now starting to build:"
+      parallel(
+        [
 
-        ////////////////////////////////////////////////////////////////////////////////
-        "sourceTarballs": {
-          node("master") {
-            sh "export GITTAG=${GIT_VERSION}; ${ARANGO_SCRIPT_DIR}/source/build.sh"
+          ////////////////////////////////////////////////////////////////////////////////
+          "sourceTarballs": {
+            node("master") {
+              sh "export GITTAG=${GIT_VERSION}; ${ARANGO_SCRIPT_DIR}/source/build.sh"
 
-          }
-        },
-        ////////////////////////////////////////////////////////////////////////////////
-        "LinuxTargets": {
-          ///----------------------------------------------------------------------
-          echo "building Linux Enterprise Release"
-          build( job: 'RELEASE__BuildPackages',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: params['preferBuilder']),
-		   string(name: 'DOCKER_HOST', value: DOCKER_HOST),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-
-          ///----------------------------------------------------------------------
-	  if (HAVE_MORE_BUILDERS == "false") {
-            echo "building Linux Community Release"
+            }
+          },
+          ////////////////////////////////////////////////////////////////////////////////
+          "LinuxTargets": {
+            ///----------------------------------------------------------------------
+            echo "building Linux Enterprise Release"
             build( job: 'RELEASE__BuildPackages',
                    parameters: [
-                     string(name: 'ENTERPRISE_URL', value: ''),
+                     string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                      string(name: 'GITTAG', value: "${GITTAG}"),
                      string(name: 'preferBuilder', value: params['preferBuilder']),
-		     string(name: 'DOCKER_HOST', value: DOCKER_HOST),
+                     string(name: 'DOCKER_HOST', value: DOCKER_HOST),
                      booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                    ]
                  )
-	  }
 
-        },
-        ////////////////////////////////////////////////////////////////////////////////
-        "linuxCommunityPackages": {
-          ///----------------------------------------------------------------------
-	  if (HAVE_MORE_BUILDERS == "true") {
-            echo "building Linux Community Release"
-            node(DOCKER_HOST_2) {
+            ///----------------------------------------------------------------------
+            if (HAVE_MORE_BUILDERS == "false") {
+              echo "building Linux Community Release"
               build( job: 'RELEASE__BuildPackages',
                      parameters: [
                        string(name: 'ENTERPRISE_URL', value: ''),
                        string(name: 'GITTAG', value: "${GITTAG}"),
                        string(name: 'preferBuilder', value: params['preferBuilder']),
-                       string(name: 'DOCKER_HOST', value: DOCKER_HOST_2),
+                       string(name: 'DOCKER_HOST', value: DOCKER_HOST),
                        booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                      ]
                    )
-              echo "uploading to master"
-              sh "rsync -ua ${INTERMEDIATE_DIR}/CO ${JENKINSMASTER}:${INTERMEDIATE_DIR}"
             }
-          }
 
-        },
-        ////////////////////////////////////////////////////////////////////////////////
-        "macintosh": {
-          echo "building MacOS X Enterprise Release"
-          ///----------------------------------------------------------------------
-          node("macos") {
-            sh "mkdir -p /Users/jenkins/net/fileserver/; rm -rf /Users/jenkins/net/fileserver/*"
-          }
-          ///----------------------------------------------------------------------
-          build( job: 'RELEASE__BuildPackages',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: 'macos'),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-
-          ///----------------------------------------------------------------------
-          echo "building MacOS X Community Release"
-          build( job: 'RELEASE__BuildPackages',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: ''),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: 'macos'),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-          ///----------------------------------------------------------------------
-          echo "codesigning dmg's"
-          node("macos") {
-            retry(5) {
-              sleep 5
-              sh 'codesign --force --deep -s W7UC4UQXPV --sign "Developer ID Application: ArangoDB GmbH (W7UC4UQXPV)" /Users/jenkins/net/fileserver/CO/macos/*.dmg'
-              sleep 5
-              sh 'codesign --force --deep -s W7UC4UQXPV --sign "Developer ID Application: ArangoDB GmbH (W7UC4UQXPV)" /Users/jenkins/net/fileserver/EP/macos/*.dmg'
+          },
+          ////////////////////////////////////////////////////////////////////////////////
+          "linuxCommunityPackages": {
+            ///----------------------------------------------------------------------
+            if (HAVE_MORE_BUILDERS == "true") {
+              echo "building Linux Community Release"
+              node(DOCKER_HOST_2) {
+                build( job: 'RELEASE__BuildPackages',
+                       parameters: [
+                         string(name: 'ENTERPRISE_URL', value: ''),
+                         string(name: 'GITTAG', value: "${GITTAG}"),
+                         string(name: 'preferBuilder', value: params['preferBuilder']),
+                         string(name: 'DOCKER_HOST', value: DOCKER_HOST_2),
+                         booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                       ]
+                     )
+                echo "uploading to master"
+                sh "rsync -ua ${INTERMEDIATE_DIR}/CO ${JENKINSMASTER}:${INTERMEDIATE_DIR}"
+              }
             }
-          }
-          ///----------------------------------------------------------------------
-          echo "uploading dmg's"
-          node("macos") {
-            sh "scp -r /Users/jenkins/net/fileserver/* ${env.JENKINSMASTER}:${env.INTERMEDIATE_DIR}"
-          }
-          ///----------------------------------------------------------------------
-          echo "running MacOS X Community Release Single unittests"
-          build( job: 'RELEASE__BuildTest',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: ''),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: 'macos'),
-                   string(name: 'REPORT_TO', value: "slack"),
-                   booleanParam(name: 'SKIP_BUILD', value: false),
-                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
-                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-          echo "running MacOS X Community Release Cluster unittests"
-          build( job: 'RELEASE__BuildTest',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: ''),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: 'macos'),
-                   string(name: 'REPORT_TO', value: "slack"),
-                   booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
-                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
-                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-          echo "running MacOS X Release Enterprise Single unittests"
-          build( job: 'RELEASE__BuildTest',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: 'macos'),
-                   string(name: 'REPORT_TO', value: "slack"),
-                   booleanParam(name: 'SKIP_BUILD', value: false),
-                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
-                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-          echo "running MacOS X Release Enterprise Cluster unittests"
-          build( job: 'RELEASE__BuildTest',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: 'macos'),
-                   string(name: 'REPORT_TO', value: "slack"),
-                   booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
-                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
-                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-        },
-        ////////////////////////////////////////////////////////////////////////////////
-        "Windows": {
 
-          node('windows') {
-            sh "rm -rf /var/tmp/r/; mkdir -p /var/tmp/r/"
-          }
-          // Windows doesn't like if we compile multiple times at once...
-          ///----------------------------------------------------------------------
-          echo "building Windows Enterprise Release"
-          build( job: 'RELEASE__BuildPackages',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: 'windows'),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
+          },
+          ////////////////////////////////////////////////////////////////////////////////
+          "macintosh": {
+            echo "building MacOS X Enterprise Release"
+            ///----------------------------------------------------------------------
+            node("macos") {
+              sh "mkdir -p /Users/jenkins/net/fileserver/; rm -rf /Users/jenkins/net/fileserver/*"
+            }
+            ///----------------------------------------------------------------------
+            build( job: 'RELEASE__BuildPackages',
+                   parameters: [
+                     string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                     string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'preferBuilder', value: 'macos'),
+                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                   ]
+                 )
 
-          ///----------------------------------------------------------------------
-          echo "building Windows Community Release"
-          build( job: 'RELEASE__BuildPackages',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: ''),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: 'windows'),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-          node('windows') {
-            sh """
+            ///----------------------------------------------------------------------
+            echo "building MacOS X Community Release"
+            build( job: 'RELEASE__BuildPackages',
+                   parameters: [
+                     string(name: 'ENTERPRISE_URL', value: ''),
+                     string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'preferBuilder', value: 'macos'),
+                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                   ]
+                 )
+            ///----------------------------------------------------------------------
+            echo "codesigning dmg's"
+            node("macos") {
+              retry(5) {
+                sleep 5
+                sh 'codesign --force --deep -s W7UC4UQXPV --sign "Developer ID Application: ArangoDB GmbH (W7UC4UQXPV)" /Users/jenkins/net/fileserver/CO/macos/*.dmg'
+                sleep 5
+                sh 'codesign --force --deep -s W7UC4UQXPV --sign "Developer ID Application: ArangoDB GmbH (W7UC4UQXPV)" /Users/jenkins/net/fileserver/EP/macos/*.dmg'
+              }
+            }
+            ///----------------------------------------------------------------------
+            echo "uploading dmg's"
+            node("macos") {
+              sh "scp -r /Users/jenkins/net/fileserver/* ${env.JENKINSMASTER}:${env.INTERMEDIATE_DIR}"
+            }
+            ///----------------------------------------------------------------------
+            echo "running MacOS X Community Release Single unittests"
+            build( job: 'RELEASE__BuildTest',
+                   parameters: [
+                     string(name: 'ENTERPRISE_URL', value: ''),
+                     string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'preferBuilder', value: 'macos'),
+                     string(name: 'REPORT_TO', value: "slack"),
+                     booleanParam(name: 'SKIP_BUILD', value: false),
+                     booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
+                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                     booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+                   ]
+                 )
+            echo "running MacOS X Community Release Cluster unittests"
+            build( job: 'RELEASE__BuildTest',
+                   parameters: [
+                     string(name: 'ENTERPRISE_URL', value: ''),
+                     string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'preferBuilder', value: 'macos'),
+                     string(name: 'REPORT_TO', value: "slack"),
+                     booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
+                     booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
+                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                     booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+                   ]
+                 )
+            echo "running MacOS X Release Enterprise Single unittests"
+            build( job: 'RELEASE__BuildTest',
+                   parameters: [
+                     string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                     string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'preferBuilder', value: 'macos'),
+                     string(name: 'REPORT_TO', value: "slack"),
+                     booleanParam(name: 'SKIP_BUILD', value: false),
+                     booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
+                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                     booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+                   ]
+                 )
+            echo "running MacOS X Release Enterprise Cluster unittests"
+            build( job: 'RELEASE__BuildTest',
+                   parameters: [
+                     string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                     string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'preferBuilder', value: 'macos'),
+                     string(name: 'REPORT_TO', value: "slack"),
+                     booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
+                     booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
+                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                     booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+                   ]
+                 )
+          },
+          ////////////////////////////////////////////////////////////////////////////////
+          "Windows": {
+
+            node('windows') {
+              sh "rm -rf /var/tmp/r/; mkdir -p /var/tmp/r/"
+            }
+            // Windows doesn't like if we compile multiple times at once...
+            ///----------------------------------------------------------------------
+            echo "building Windows Enterprise Release"
+            build( job: 'RELEASE__BuildPackages',
+                   parameters: [
+                     string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                     string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'preferBuilder', value: 'windows'),
+                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                   ]
+                 )
+
+            ///----------------------------------------------------------------------
+            echo "building Windows Community Release"
+            build( job: 'RELEASE__BuildPackages',
+                   parameters: [
+                     string(name: 'ENTERPRISE_URL', value: ''),
+                     string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'preferBuilder', value: 'windows'),
+                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
+                   ]
+                 )
+            node('windows') {
+              sh """
 retries=0
-while test \"\${retries}\" -lt 10; do 
+while test \"\${retries}\" -lt 10; do
     set +e
     /usr/bin/rsync -ua --progress /var/tmp/r/*  ${JENKINSMASTER}:/mnt/data/fileserver/ && exit 0
     retries=\$(( \${retries} + 1 ))
 done
 """
-            sh """
+              sh """
 retries=0
-while test \"\${retries}\" -lt 10; do 
+while test \"\${retries}\" -lt 10; do
     set +e
     /usr/bin/rsync -ua --progress  /cygdrive/e/symsrv ${JENKINSMASTER}:${PUBLIC_CO_DIR} && exit 0
     retries=\$(( \${retries} + 1 ))
 done
 """
 
-          }
+            }
 
-          ///----------------------------------------------------------------------
+            ///----------------------------------------------------------------------
 
-          echo "running Windows Community Release Single unittests"
-          build( job: 'RELEASE__BuildTest',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: ''),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: 'windows'),
-                   string(name: 'REPORT_TO', value: "slack"),
-                   booleanParam(name: 'SKIP_BUILD', value: false),
-                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
-                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-          /*
-          echo "running Windows Community Release Cluster unittests"
-          build( job: 'RELEASE__BuildTest',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: ''),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: 'windows'),
-                   string(name: 'REPORT_TO', value: "slack"),
-                   booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
-                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
-                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-          */
-          echo "running Windows Release Enterprise Single unittests"
-          build( job: 'RELEASE__BuildTest',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: 'windows'),
-                   string(name: 'REPORT_TO', value: "slack"),
-                   booleanParam(name: 'SKIP_BUILD', value: false),
-                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
-                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-          /*
-          echo "running Windows Release Enterprise Cluster unittests"
-          build( job: 'RELEASE__BuildTest',
-                 parameters: [
-                   string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                   string(name: 'GITTAG', value: "${GITTAG}"),
-                   string(name: 'preferBuilder', value: 'windows'),
-                   string(name: 'REPORT_TO', value: "slack"),
-                   booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
-                   booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
-                   booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
-                   booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
-                 ]
-               )
-          */
-          ///----------------------------------------------------------------------          
-          echo "testing Windows Community Release NSIS Installer"
-          build( job: 'RELEASE__TestWindowsInstaller',
-                 parameters: [
-                   string(name: 'FULL_VERSION', value: "${GIT_VERSION}"),
-                   string(name: 'PACKAGE_BASE', value: "/var/tmp/r/CO/windows/ArangoDB3-"),
-                   string(name: 'COMMUNITY_ENTERPRISE', value: "CO")
-                 ]
-               )
-          
-          echo "testing Windows Enterprise Release NSIS Installer"
-          build( job: 'RELEASE__TestWindowsInstaller',
-                 parameters: [
-                   string(name: 'FULL_VERSION', value: "${GIT_VERSION}"),
-                   string(name: 'PACKAGE_BASE', value: "/var/tmp/r/EP/windows/ArangoDB3e-"),
-                   string(name: 'COMMUNITY_ENTERPRISE', value: "EP")
-                 ]
-               )
-          
-          
-        },
-        ////////////////////////////////////////////////////////////////////////////////
-        "documentation": {
-          try {
-            echo "trying: "
-            build( job: 'RELEASE__BuildDocumentation',
+            echo "running Windows Community Release Single unittests"
+            build( job: 'RELEASE__BuildTest',
                    parameters: [
-                     string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                     string(name: 'DOCKER_HOST', value: DOCKER_HOST),
+                     string(name: 'ENTERPRISE_URL', value: ''),
                      string(name: 'GITTAG', value: "${GITTAG}"),
-                     string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
-                     string(name: 'FORCE_GITBRANCH', value:''),
+                     string(name: 'preferBuilder', value: 'windows'),
                      string(name: 'REPORT_TO', value: "slack"),
-                     string(name: 'GIT_BRANCH', value: "${GIT_BRANCH}"),
+                     booleanParam(name: 'SKIP_BUILD', value: false),
+                     booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
                      booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
                      booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                    ]
                  )
-          }
-          catch (err) {
-            def channel = '#release'
-            if (GIT_VERSION == 'devel') {
-              // channel = '#devel'
+            /*
+              echo "running Windows Community Release Cluster unittests"
+              build( job: 'RELEASE__BuildTest',
+              parameters: [
+              string(name: 'ENTERPRISE_URL', value: ''),
+              string(name: 'GITTAG', value: "${GITTAG}"),
+              string(name: 'preferBuilder', value: 'windows'),
+              string(name: 'REPORT_TO', value: "slack"),
+              booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
+              booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
+              booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+              booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+              ]
+              )
+            */
+            echo "running Windows Release Enterprise Single unittests"
+            build( job: 'RELEASE__BuildTest',
+                   parameters: [
+                     string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                     string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'preferBuilder', value: 'windows'),
+                     string(name: 'REPORT_TO', value: "slack"),
+                     booleanParam(name: 'SKIP_BUILD', value: false),
+                     booleanParam(name: 'RUN_CLUSTER_TESTS', value: false),
+                     booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                     booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+                   ]
+                 )
+            /*
+              echo "running Windows Release Enterprise Cluster unittests"
+              build( job: 'RELEASE__BuildTest',
+              parameters: [
+              string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+              string(name: 'GITTAG', value: "${GITTAG}"),
+              string(name: 'preferBuilder', value: 'windows'),
+              string(name: 'REPORT_TO', value: "slack"),
+              booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
+              booleanParam(name: 'RUN_CLUSTER_TESTS', value: true),
+              booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+              booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+              ]
+              )
+            */
+            ///----------------------------------------------------------------------          
+            echo "testing Windows Community Release NSIS Installer"
+            build( job: 'RELEASE__TestWindowsInstaller',
+                   parameters: [
+                     string(name: 'FULL_VERSION', value: "${GIT_VERSION}"),
+                     string(name: 'PACKAGE_BASE', value: "/var/tmp/r/CO/windows/ArangoDB3-"),
+                     string(name: 'COMMUNITY_ENTERPRISE', value: "CO")
+                   ]
+                 )
+
+            echo "testing Windows Enterprise Release NSIS Installer"
+            build( job: 'RELEASE__TestWindowsInstaller',
+                   parameters: [
+                     string(name: 'FULL_VERSION', value: "${GIT_VERSION}"),
+                     string(name: 'PACKAGE_BASE', value: "/var/tmp/r/EP/windows/ArangoDB3e-"),
+                     string(name: 'COMMUNITY_ENTERPRISE', value: "EP")
+                   ]
+                 )
+
+          },
+          ////////////////////////////////////////////////////////////////////////////////
+          "documentation": {
+            try {
+              echo "trying: "
+              build( job: 'RELEASE__BuildDocumentation',
+                     parameters: [
+                       string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+                       string(name: 'DOCKER_HOST', value: DOCKER_HOST),
+                       string(name: 'GITTAG', value: "${GITTAG}"),
+                       string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
+                       string(name: 'FORCE_GITBRANCH', value:''),
+                       string(name: 'REPORT_TO', value: "slack"),
+                       string(name: 'GIT_BRANCH', value: "${GIT_BRANCH}"),
+                       booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+                       booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+                     ]
+                   )
             }
-            echo "failed: ${err}"
-            slackSend channel: channel, color: '#ff0000', message: "Building documentation for ${GITTAG} ${REPO_TL_DIR} failed - ${err}"
-                      
+            catch (err) {
+              def channel = '#release'
+              if (GIT_VERSION == 'devel') {
+                channel = '#devel'
+              }
+              echo "failed: ${err}"
+              slackSend channel: channel, color: '#ff0000', message: "Building documentation for ${GITTAG} ${REPO_TL_DIR} failed - ${err}"
+            }
           }
-        }
-      ]
-    )
+        ]
+      )
+    }
+    catch (err) {
+      slackSend channel: "#release", color: '#ff0000', message: "Building ${GITTAG} ${REPO_TL_DIR} failed - ${err}"
+      throw err;
+    }
+    if (GIT_VERSION != 'devel') {
+      slackSend channel: '#release', color: '#00ff00', message: "Building ArangoDB ${GIT_VERSION} finished - continuing to the repository building and package testing."
+    }
   }
   else {
     echo "Compile step deactivated"
@@ -371,14 +380,13 @@ stage("create repositories") {
             string(name: 'GITTAG', value: GIT_VERSION),
             string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
             booleanParam(name: 'DEBUG', value: false)
-            
           ]
     )
   }
   else {
     echo "Create Repositories step deactivated"
   }
-}    
+}
 
 stage("Build Travis CI") {
   node('master') {
@@ -422,8 +430,9 @@ stage("Generating HTML snippets & test it with the packages") {
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 if (GIT_VERSION != 'devel') {
-  slackSend channel: '#release', color: '#00ff00', message: "Private part of release process finished - Hit Continue to publish"
+  slackSend channel: '#release', color: '#00ff00', message: "Private part of release '${GIT_VERSION}' process finished - Hit Continue to publish"
   input("message": "Everything we did so far was private. DC/OS checked? Proceed to the publish step now?")
+  slackSend channel: '#release', color: '#00ff00', message: "'${GIT_VERSION}' - Continuing publish stage 1"
   echo "Continuing publish stage 1"
 }
 else {
@@ -584,11 +593,15 @@ stage("publish website") {
   if (GIT_VERSION != 'devel') {
     slackSend channel: '#release', color: '#00ff00', message: "Invisible parts have been published - Hit Continue to publish websites"
     input("message": "Invisible parts have been published - Hit Continue to publish websites!")
+    slackSend channel: '#release', color: '#00ff00', message: "'${GIT_VERSION}' - Continuing publish stage 2"
     echo "Continuing publish stage 2"
   }
   node('master') {
     sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_snippets.sh"
     sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
     sh "echo '${GIT_VERSION}' > ${env.PUBLIC_CO_DIR}VERSION"
+  }
+  if (GIT_VERSION != 'devel') {
+    slackSend channel: '#release', color: '#00ff00', message: "Finished publishing of ArangoDB ${GIT_VERSION} - bye."
   }
 }
