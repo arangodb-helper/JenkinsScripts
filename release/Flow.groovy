@@ -102,7 +102,14 @@ stage("building packages") {
                        ]
                      )
                 echo "uploading to master"
-                sh "rsync -ua ${INTERMEDIATE_DIR}/CO ${JENKINSMASTER}:${INTERMEDIATE_DIR}"
+                sh """
+retries=0
+while test \"\${retries}\" -lt 10; do
+    set +e
+    rsync -ua  --timeout=600 ${INTERMEDIATE_DIR}/CO ${JENKINSMASTER}:${INTERMEDIATE_DIR} && exit 0
+    retries=\$(( \${retries} + 1 ))
+done
+"""
               }
             }
 
@@ -236,7 +243,7 @@ stage("building packages") {
 retries=0
 while test \"\${retries}\" -lt 10; do
     set +e
-    /usr/bin/rsync -ua --progress /var/tmp/r/*  ${JENKINSMASTER}:/mnt/data/fileserver/ && exit 0
+    /usr/bin/rsync -ua --timeout=600 --progress /var/tmp/r/*  ${JENKINSMASTER}:/mnt/data/fileserver/ && exit 0
     retries=\$(( \${retries} + 1 ))
 done
 """
@@ -244,7 +251,7 @@ done
 retries=0
 while test \"\${retries}\" -lt 10; do
     set +e
-    /usr/bin/rsync -ua --progress  /cygdrive/e/symsrv ${JENKINSMASTER}:${PUBLIC_CO_DIR} && exit 0
+    /usr/bin/rsync -ua --timeout=600 --progress  /cygdrive/e/symsrv ${JENKINSMASTER}:${PUBLIC_CO_DIR} && exit 0
     retries=\$(( \${retries} + 1 ))
 done
 """
