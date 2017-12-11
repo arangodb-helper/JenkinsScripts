@@ -66,5 +66,7 @@ stage("publish documentation") {
 export GITTAG="${PRETEND_GITVERSION}"
 export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh
 """
+    slackSend channel: '#documentation', color: '#00ff00', message: "@here - we published a patched release ${PRETEND_GITVERSION} on behalf of ${GITTAG}"
+
   }
 }
