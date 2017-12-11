@@ -1,12 +1,18 @@
 VERSION_MAJOR_MINOR=""
 REPO_TL_DIR=""
 
+PRETEND_GITVERSION_BUILD = params['PRETEND_GITVERSION']
+
 if (params['GITTAG'] == 'devel') {
   VERSION_MAJOR_MINOR="3.3"
   REPO_TL_DIR="nightly"
   // if we build devel, we don't have any v's at all:
   GITTAG="devel"
   GIT_BRANCH="devel"
+  
+  if (params['PRETEND_GITVERSION'] == 'devel') {
+    PRETEND_GITVERSION_BUILD = ""
+  }
 }
 else {
   def parts=params['PRETEND_GITVERSION'].tokenize(".")
@@ -24,10 +30,10 @@ stage("building documentation") {
   build( job: 'RELEASE__BuildDocumentation',
          parameters: [
            string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-           string(name: 'DOCKER_HOST', value: "docker"),
+           string(name: 'DOCKER_HOST', value: "docker_host"),
            string(name: 'GITTAG', value: "${GITTAG}"),
            string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
-           string(name: 'FORCE_GITBRANCH', value: params['PRETEND_GITVERSION']),
+           string(name: 'FORCE_GITBRANCH', value: ${PRETEND_GITVERSION_BUILD}),
            string(name: 'REPORT_TO', value: "slack"),
            string(name: 'GIT_BRANCH', value: "${GIT_BRANCH}"),
            booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
