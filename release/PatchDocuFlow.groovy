@@ -33,7 +33,7 @@ stage("building documentation") {
            string(name: 'DOCKER_HOST', value: "docker_host"),
            string(name: 'GITTAG', value: "${GITTAG}"),
            string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
-           string(name: 'FORCE_GITBRANCH', value: ${PRETEND_GITVERSION_BUILD}),
+           string(name: 'FORCE_GITBRANCH', value: "${PRETEND_GITVERSION_BUILD}"),
            string(name: 'REPORT_TO', value: "slack"),
            string(name: 'GIT_BRANCH', value: "${GIT_BRANCH}"),
            booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
