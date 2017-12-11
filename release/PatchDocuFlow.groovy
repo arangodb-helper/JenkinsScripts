@@ -2,7 +2,7 @@ VERSION_MAJOR_MINOR=""
 REPO_TL_DIR=""
 
 if (params['GITTAG'] == 'devel') {
-  VERSION_MAJOR_MINOR="3.2"
+  VERSION_MAJOR_MINOR="3.3"
   REPO_TL_DIR="nightly"
   // if we build devel, we don't have any v's at all:
   GITTAG="devel"
