@@ -257,13 +257,15 @@ def runTests(where, testWorkingDirectory) {
   }
   return res
 }
-def execTest(where, buildHost, testWorkingDirectory) {
+def execTest(which, where, buildHost, testWorkingDirectory) {
   // GO!  
   try {
-    copyExtractTarBall(where, buildHost, testWorkingDirectory)
+    lock("extract-${where}") {
+      copyExtractTarBall(where, buildHost, testWorkingDirectory)
+    }
   }
   catch (err) {
-    slackMsg = """Branch '${GITTAG}' on '${preferBuilder}' failed to extract test tarball: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
+    slackMsg = """Branch '${GITTAG}' test ${which} on '${preferBuilder}' failed to extract test tarball: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
     slackSend channel: '#status-packaging', color: '#FF0000', message: slackMsg
 
     throw(err)
@@ -272,7 +274,7 @@ def execTest(where, buildHost, testWorkingDirectory) {
     setupTestArea(where, testWorkingDirectory)
   }
   catch (err) {
-    slackMsg = """Branch '${GITTAG}' on '${preferBuilder}' failed to prepare testbed: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
+    slackMsg = """Branch '${GITTAG}' test ${which} on '${preferBuilder}' failed to prepare testbed: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
     slackSend channel: '#status-packaging', color: '#FF0000', message: slackMsg
     throw(err)
   }
@@ -311,7 +313,7 @@ def runThisTest(which, buildEnvironment)
             }
             
             // GO!
-            rc = execTest(where, buildHost, testWorkingDirectory)
+            rc = execTest(which, where, buildHost, testWorkingDirectory)
           }
           //}
       }
@@ -336,7 +338,7 @@ def runThisTest(which, buildEnvironment)
           echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
         }
         def buildHost=buildEnvironment['name']
-        rc = execTest(where, buildHost, testWorkingDirectory)
+        rc = execTest(which, where, buildHost, testWorkingDirectory)
       }
     }
   }
