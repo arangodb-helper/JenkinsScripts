@@ -260,7 +260,7 @@ def runTests(where, testWorkingDirectory) {
 def execTest(which, where, buildHost, testWorkingDirectory) {
   // GO!  
   try {
-    lock("extract-${where}") {
+    lock("extract-${env.NODE_NAME}") {
       copyExtractTarBall(where, buildHost, testWorkingDirectory)
     }
   }
