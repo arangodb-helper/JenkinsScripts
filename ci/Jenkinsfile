@@ -170,16 +170,18 @@ def setupTestArea(where, testWorkingDirectory) {
   def createNewSymlinks = "ln -s ${where['localExtractDir']}/* ${testWorkingDirectory}/ || true"
   if (VERBOSE) {
     sh "cat /mnt/workspace/issue"
-    print(cleanOutFiles)
     print(createDirectory)
     print(cleanOutFiles)
     print(removeOldSymlinks)
     print(createNewSymlinks)
   }
-  sh cleanOutFiles
+  echo "creating workingdirectory ${testWorkingDirectory}/out/"
   sh createDirectory
+  echo "flushing old results"
   sh cleanOutFiles
+  echo "removing old symlinks"
   sh removeOldSymlinks
+  echo "creating new symlinks"
   sh createNewSymlinks
 }
 
