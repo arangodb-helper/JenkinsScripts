@@ -257,6 +257,27 @@ def runTests(where, testWorkingDirectory) {
   }
   return res
 }
+def execTest(where, buildHost, testWorkingDirectory) {
+  // GO!  
+  try {
+    copyExtractTarBall(where, buildHost, testWorkingDirectory)
+  }
+  catch (err) {
+    slackMsg = """Branch '${GITTAG}' on '${preferBuilder}' failed to extract test tarball: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
+    slackSend channel: '#status-packaging', color: '#FF0000', message: slackMsg
+
+    throw(err)
+  }
+  try {
+    setupTestArea(where, testWorkingDirectory)
+  }
+  catch (err) {
+    slackMsg = """Branch '${GITTAG}' on '${preferBuilder}' failed to prepare testbed: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
+    slackSend channel: '#status-packaging', color: '#FF0000', message: slackMsg
+    throw(err)
+  }
+  return runTests(where, testWorkingDirectory)
+}
 
 def runThisTest(which, buildEnvironment)
 {
@@ -288,10 +309,9 @@ def runThisTest(which, buildEnvironment)
               sh "pwd"
               echo "${env} ${buildHost}"
             }
+            
             // GO!
-            copyExtractTarBall(where, buildHost, testWorkingDirectory)
-            setupTestArea(where, testWorkingDirectory)
-            rc = runTests(where, testWorkingDirectory)
+            rc = execTest(where, buildHost, testWorkingDirectory)
           }
           //}
       }
@@ -316,10 +336,7 @@ def runThisTest(which, buildEnvironment)
           echo "Hi, I'm [${where['testRunName']}] - ${where['unitTests']}"
         }
         def buildHost=buildEnvironment['name']
-        // GO!
-        copyExtractTarBall(where, buildHost, testWorkingDirectory)
-        setupTestArea(where, testWorkingDirectory)
-        rc = runTests(where, testWorkingDirectory)
+        rc = execTest(where, buildHost, testWorkingDirectory)
       }
     }
   }
