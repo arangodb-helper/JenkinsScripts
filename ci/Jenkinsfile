@@ -235,7 +235,7 @@ def runTests(where, testWorkingDirectory) {
   }
   if (VERBOSE) {
     echo "${where['testRunName']}: recording results [ ${TESTWD}/*.xml ]:"
-    sh "ls -l out/UNITTEST_RESULT_*.xml"
+    sh "ls -l out/UNITTEST_RESULT_*.xml || true"
   }
 
   junit keepLongStdio: true, testResults: "out/*.xml"
