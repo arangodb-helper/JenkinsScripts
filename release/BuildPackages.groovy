@@ -357,7 +357,7 @@ stage("building ArangoDB") {
     }
   } catch (err) {
     stage('Send Notification for build' ) {
-      slackSend channel: '#status-packaging', color: '#439FE0', message: err.getMessage()
+      slackSend channel: '#status-packaging', color: '#439FE0', message: "package build for ${GITTAG} failed: ${err.getMessage()} in ${DOCKER_CONTAINER['name']}"
         /*
       msgBody = 
       if (msgBody.size() > 0) {
