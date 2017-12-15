@@ -233,12 +233,14 @@ def runTests(where, testWorkingDirectory) {
   if (shellRC != "0") {
     failures = "${failures};test ${where['testRunName']} exited with ${shellRC}"
   }
+  resultFiles = sh(returnStdout: true, script:"ls -l out/UNITTEST_RESULT_*.xml || true")
   if (VERBOSE) {
-    echo "${where['testRunName']}: recording results [ ${TESTWD}/*.xml ]:"
-    sh "ls -l out/UNITTEST_RESULT_*.xml || true"
+    echo "${where['testRunName']}: recording results [ ${TESTWD}/*.xml ]: \n ${resultFiles}"
   }
 
-  junit keepLongStdio: true, testResults: "out/*.xml"
+  if(resultFiles != "") {
+    junit keepLongStdio: true, testResults: "out/*.xml"
+  }
   print("The currentBuild.result is: ${currentBuild.result}")
   def crashy = readFile("${TESTWD}/UNITTEST_RESULT_CRASHED.json")
   def testFailuresFile = "${TESTWD}/testfailures.txt"
