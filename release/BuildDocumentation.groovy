@@ -28,6 +28,10 @@ testParams = [:]
 //  env.getEnvironment().each { name, value -> println "Name: $name -> Value $value" }
 //}
 //printParams()
+def nodeName
+node("master") {
+  nodeName = env.NODE_NAME
+}
 
 testPathPrefix = 'j'
 //currentBuild.result = 'SUCCESS'
@@ -337,7 +341,7 @@ stage("generating Documentation Build report") {
 
       if (REPORT_TO == "slack") {
         // Accusing: ${gitCommitters} \n
-        slackMsg = """Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB Documentation' failed to run - Branch '${GITTAG}' on '${preferBuilder}' failed: (${env.BUILD_URL}) \n  ```${failures}```"""
+        slackMsg = """Job 'https://${nodeName}/job/${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB Documentation' failed to run - Branch '${GITTAG}' on '${preferBuilder}' failed: (${env.BUILD_URL}) \n  ```${failures}```"""
         slackSend channel: '#status-packaging', color: '#FF0000', message: slackMsg
 
       }
@@ -358,7 +362,7 @@ stage("generating Documentation Build report") {
       sh "echo ${currentGitRev} > ${lastKnownGoodGitFile}";
 
       if (REPORT_TO == "slack") {
-	// no success messages for now. slackSend channel: '#status-packaging', color: '#00FF00', message: "${GITTAG} on ${preferBuilder} succeeded (${env.BUILD_URL}) OK"
+	// no success messages for now. slackSend channel: '#status-packaging', color: '#00FF00', message: "https://${nodeName}/job/${env.JOB_NAME} - ${GITTAG} on ${preferBuilder} succeeded (${env.BUILD_URL}) OK"
       }
       else if (REPORT_TO == "mail") {
       }

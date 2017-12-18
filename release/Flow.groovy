@@ -5,7 +5,11 @@ VERSION_MAJOR_MINOR=""
 REPO_TL_DIR=""
 
 reportChannel = '#release'
+def nodeName
 
+node("master") {
+  nodeName = env.NODE_NAME
+}
 echo "${params['HAVE_MORE_BUILDERS']}"
 if (HAVE_MORE_BUILDERS == "true") {
   echo "Have 2 docker hosts!"
@@ -40,7 +44,7 @@ else {
   // while this one is the human readable value:
   GIT_VERSION="${params['GITTAG']}"
   GIT_BRANCH="${parts[0]}.${parts[1]}"
-  slackSend channel: reportChannel, color: '#00ff00', message: "https://${env.NODE_NAME}/job/${env.JOB_NAME} - Starting release build for ${GIT_VERSION}"
+  slackSend channel: reportChannel, color: '#00ff00', message: "https://${nodeName}/job/${env.JOB_NAME} - Starting release build for ${GIT_VERSION}"
 }
 
 
@@ -362,18 +366,18 @@ done
                 channel = '#devel'
               }
               echo "failed: ${err}"
-              slackSend channel: channel, color: '#ff0000', message: "Building documentation for ${GITTAG} ${REPO_TL_DIR} failed - ${err}"
+              slackSend channel: channel, color: '#ff0000', message: "https://${nodeName} Building documentation for ${GITTAG} ${REPO_TL_DIR} failed - ${err}"
             }
           }
         ]
       )
     }
     catch (err) {
-      slackSend channel: reportChannel, color: '#ff0000', message: "https://${env.NODE_NAME} - Building ${GITTAG} ${REPO_TL_DIR} failed - ${err}"
+      slackSend channel: reportChannel, color: '#ff0000', message: "https://${nodeName} - Building ${GITTAG} ${REPO_TL_DIR} failed - ${err}"
       throw err;
     }
     if (GIT_VERSION != 'devel') {
-      slackSend channel: reportChannel, color: '#00ff00', message: "https://${env.NODE_NAME}/job/${env.JOB_NAME} - Building ArangoDB ${GIT_VERSION} finished - continuing to the repository building and package testing."
+      slackSend channel: reportChannel, color: '#00ff00', message: "https://${nodeName}/job/${env.JOB_NAME} - Building ArangoDB ${GIT_VERSION} finished - continuing to the repository building and package testing."
     }
   }
   else {
@@ -439,7 +443,7 @@ stage("Generating HTML snippets & test it with the packages") {
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 if (GIT_VERSION != 'devel') {
-  slackSend channel: reportChannel, color: '#00ff00', message: "https://${env.NODE_NAME}/job/${env.JOB_NAME} - Private part of release '${GIT_VERSION}' process finished - Hit Continue to publish"
+  slackSend channel: reportChannel, color: '#00ff00', message: "https://${nodeName}/job/${env.JOB_NAME} - Private part of release '${GIT_VERSION}' process finished - Hit Continue to publish"
   input("message": "Everything we did so far was private. DC/OS checked? Proceed to the publish step now?")
   slackSend channel: reportChannel, color: '#00ff00', message: "'${GIT_VERSION}' - Continuing publish stage 1"
   echo "Continuing publish stage 1"
@@ -600,7 +604,7 @@ stage("updating other repos") {
 
 stage("publish website") {
   if (GIT_VERSION != 'devel') {
-    slackSend channel: reportChannel, color: '#00ff00', message: "https://${env.NODE_NAME}/job/${env.JOB_NAME} - Invisible parts have been published - Hit Continue to publish websites"
+    slackSend channel: reportChannel, color: '#00ff00', message: "https://${nodeName}/job/${env.JOB_NAME} - Invisible parts have been published - Hit Continue to publish websites"
     input("message": "Invisible parts have been published - Hit Continue to publish websites!")
     slackSend channel: reportChannel, color: '#00ff00', message: "'${GIT_VERSION}' - Continuing publish stage 2"
     echo "Continuing publish stage 2"
@@ -611,6 +615,6 @@ stage("publish website") {
     sh "echo '${GIT_VERSION}' > ${env.PUBLIC_CO_DIR}VERSION"
   }
   if (GIT_VERSION != 'devel') {
-    slackSend channel: reportChannel, color: '#00ff00', message: "https://${env.NODE_NAME}/job/${env.JOB_NAME} - Finished publishing of ArangoDB ${GIT_VERSION} - bye."
+    slackSend channel: reportChannel, color: '#00ff00', message: "https://${nodeName}/job/${env.JOB_NAME} - Finished publishing of ArangoDB ${GIT_VERSION} - bye."
   }
 }
