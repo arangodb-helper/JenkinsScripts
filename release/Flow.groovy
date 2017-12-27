@@ -363,7 +363,7 @@ done
             catch (err) {
               def channel = reportChannel
               if (GIT_VERSION == 'devel') {
-                channel = '#devel'
+		      //channel = '#devel'
               }
               echo "failed: ${err}"
               slackSend channel: channel, color: '#ff0000', message: "https://${nodeName} Building documentation for ${GITTAG} ${REPO_TL_DIR} failed - ${err}"
