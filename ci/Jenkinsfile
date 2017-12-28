@@ -25,11 +25,6 @@ VERBOSE = true
 
 testParams = [:]
 
-def nodeName
-node("master") {
-  nodeName = env.NODE_NAME
-}
-
 //@NonCPS
 //def printParams() {
 //  env.getEnvironment().each { name, value -> println "Name: $name -> Value $value" }
@@ -274,7 +269,7 @@ def execTest(which, where, buildHost, testWorkingDirectory) {
     }
   }
   catch (err) {
-    slackMsg = """https://${nodeName}/job/${env.JOB_NAME} - Branch '${GITTAG}' test ${which} on '${preferBuilder}' failed to extract test tarball: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
+    slackMsg = """${JENKINS_URL}/job/${env.JOB_NAME} - Branch '${GITTAG}' test ${which} on '${preferBuilder}' failed to extract test tarball: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
     slackSend channel: '#status-packaging', color: '#FF0000', message: slackMsg
 
     throw(err)
@@ -283,7 +278,7 @@ def execTest(which, where, buildHost, testWorkingDirectory) {
     setupTestArea(where, testWorkingDirectory)
   }
   catch (err) {
-    slackMsg = """https://${nodeName}/job/${env.JOB_NAME} - Branch '${GITTAG}' test ${which} on '${preferBuilder}' failed to prepare testbed: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
+    slackMsg = """${JENKINS_URL}/job/${env.JOB_NAME} - Branch '${GITTAG}' test ${which} on '${preferBuilder}' failed to prepare testbed: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
     slackSend channel: '#status-packaging', color: '#FF0000', message: slackMsg
     throw(err)
   }
@@ -745,7 +740,7 @@ stage("generating test report") {
 
       if (REPORT_TO == "slack") {
         // Accusing: ${gitCommitters} \n
-        slackMsg = """https://${nodeName}/job/${env.JOB_NAME} - Branch '${GITTAG}' on '${preferBuilder}' failed: (${env.BUILD_URL}) \n  ```${failures}```"""
+        slackMsg = """${JENKINS_URL}/job/${env.JOB_NAME} - Branch '${GITTAG}' on '${preferBuilder}' failed: (${env.BUILD_URL}) \n  ```${failures}```"""
         slackSend channel: '#status-packaging', color: '#FF0000', message: slackMsg
 
       }
@@ -766,7 +761,7 @@ stage("generating test report") {
       sh "echo ${currentGitRev} > ${lastKnownGoodGitFile}";
 
       if (REPORT_TO == "slack") {
-	// no success messages for now. slackSend channel: '#status-packaging', color: '#00FF00', message: "https://${nodeName}/job/${env.JOB_NAME} ${GITTAG} on ${preferBuilder} succeeded (${env.BUILD_URL}) OK"
+	// no success messages for now. slackSend channel: '#status-packaging', color: '#00FF00', message: "${JENKINS_URL}/job/${env.JOB_NAME} ${GITTAG} on ${preferBuilder} succeeded (${env.BUILD_URL}) OK"
       }
       else if (REPORT_TO == "mail") {
       }
