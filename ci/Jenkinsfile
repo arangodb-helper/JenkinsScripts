@@ -268,7 +268,13 @@ def execTest(which, where, buildHost, testWorkingDirectory) {
       copyExtractTarBall(where, buildHost, testWorkingDirectory)
     }
   }
-  catch (err) {
+  catch (hudson.AbortException ex) {
+      print "Silently ignoring abort. bye."
+      throw ex
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+      print "Silently ignoring abort. bye."
+      throw ex
+  } catch (Exception err) {
     slackMsg = """${JENKINS_URL}/job/${env.JOB_NAME} - Branch '${GITTAG}' test ${which} on '${preferBuilder}' failed to extract test tarball: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
     slackSend channel: '#status-packaging', color: '#FF0000', message: slackMsg
 
@@ -277,7 +283,13 @@ def execTest(which, where, buildHost, testWorkingDirectory) {
   try {
     setupTestArea(where, testWorkingDirectory)
   }
-  catch (err) {
+  catch (hudson.AbortException ex) {
+      print "Silently ignoring abort. bye."
+      throw ex
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+      print "Silently ignoring abort. bye."
+      throw ex
+  } catch (Exception err) {
     slackMsg = """${JENKINS_URL}/job/${env.JOB_NAME} - Branch '${GITTAG}' test ${which} on '${preferBuilder}' failed to prepare testbed: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
     slackSend channel: '#status-packaging', color: '#FF0000', message: slackMsg
     throw(err)
@@ -410,7 +422,13 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         }
         sh BUILDSCRIPT
       }
-      catch (err) {
+     catch (hudson.AbortException ex) {
+        print "Silently ignoring abort. bye."
+        throw ex
+     } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+        print "Silently ignoring abort. bye."
+        throw ex
+     } catch (Exception err) {
         RUNNING_PID=readFile("pid").trim()
         def stillRunning=true
         while (stillRunning) {
@@ -420,7 +438,13 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
             echo "script: ${scripT}"
             processStat = sh(returnStdout: true, script: scripT).trim()
           }
-          catch (x){}
+          catch (hudson.AbortException ex) {
+              print "Silently ignoring abort. bye."
+              throw ex
+          } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+              print "Silently ignoring abort. bye."
+              throw ex
+          } catch (Exception err) {}
           stillRunning=(processStat != "")
           sleep 5
         }
@@ -447,9 +471,15 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       try {
         MD5SUM = readFile("${BUILT_FILE}.md5").trim()
       }
-      catch (x) {
+      catch (hudson.AbortException ex) {
+          print "Silently ignoring abort. bye."
+          throw ex
+      } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+          print "Silently ignoring abort. bye."
+          throw ex
+      } catch (Exception err) {
         echo "No MD5 File there - you mustn't tick 'skip build' if you don't have a previous build"
-        throw (x)
+        throw (err)
       } 
 
       if (VERBOSE) {
@@ -464,7 +494,13 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (VERBOSE) {
       sh "ls -l ${RELEASE_OUT_DIR}"
     }
-  } catch (err) {
+  } catch (hudson.AbortException ex) {
+      print "Silently ignoring abort. bye."
+      throw ex
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+      print "Silently ignoring abort. bye."
+      throw ex
+  } catch (Exception err) {
     stage('Send Notification for failed build' ) {
       gitCommitter = sh(returnStdout: true, script: 'git --no-pager show -s --format="%ae"')
 
@@ -688,7 +724,13 @@ stage("running unittest") {
     parallel branches
     print("The currentBuild.result is now after the parallel: ${currentBuild.result}")
 
-  } catch (err) {
+  } catch (hudson.AbortException ex) {
+      print "Silently ignoring abort. bye."
+      throw ex
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+      print "Silently ignoring abort. bye."
+      throw ex
+  } catch (Exception err) {
     stage('Send Notification unittest') {
       mail (to: ADMIN_ACCOUNT,
             subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'running unittest' has had a FATAL error.", 

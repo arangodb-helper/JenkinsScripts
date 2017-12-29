@@ -123,7 +123,13 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (VERBOSE) {
       sh "ls -l ${RELEASE_OUT_DIR}"
     }
-  } catch (err) {
+  } catch (hudson.AbortException ex) {
+      print "Silently ignoring abort. bye."
+      throw ex
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+       print "Silently ignoring abort. bye."
+       throw ex
+  } catch (Exception err) {
     stage('Send Notification for failed build' ) {
       gitCommitter = sh(returnStdout: true, script: 'git --no-pager show -s --format="%ae"')
 
@@ -248,7 +254,13 @@ stage("building ArangoDB") {
   try {
     print(DOCKER_CONTAINER)
     setupEnvCompileSource(DOCKER_CONTAINER, true, ENTERPRISE_URL, EPDIR, DOCKER_CONTAINER['reliable'])
-  } catch (err) {
+  } catch (hudson.AbortException ex) {
+     print "Silently ignoring abort. bye."
+     throw ex
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+     print "Silently ignoring abort. bye."
+      throw ex
+  } catch (Exception err) {
     stage('Send Notification for build' ) {
       mail (to: ADMIN_ACCOUNT,
             subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) 'building ArangoDB' has had a FATAL error.", 

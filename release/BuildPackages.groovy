@@ -165,7 +165,13 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           throw new Exception("last line contains bad exit statement: ${line}")
         }
       }
-      catch (err) {
+      catch (hudson.AbortException ex) {
+          print "Silently ignoring abort. bye."
+          throw ex
+      } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+          print "Silently ignoring abort. bye."
+          throw ex
+      } catch (Exception err) {
         RUNNING_PID=readFile("pid").trim()
         def stillRunning=true
         while (stillRunning) {
@@ -175,7 +181,13 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
             echo "script: ${scripT}"
             processStat = sh(returnStdout: true, script: scripT).trim()
           }
-          catch (x){}
+          catch (hudson.AbortException ex) {
+            print "Silently ignoring abort. bye."
+            throw ex
+          } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+            print "Silently ignoring abort. bye."
+            throw ex
+          } catch (x){}
           stillRunning=(processStat != "")
           sleep 5
         }
@@ -215,7 +227,13 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (VERBOSE) {
       sh "ls -l ${RELEASE_OUT_DIR}"
     }
-  } catch (err) {
+  } catch (hudson.AbortException ex) {
+      print "Silently ignoring abort. bye."
+      throw ex
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+      print "Silently ignoring abort. bye."
+      throw ex
+  } catch (Exception err) {
     stage('Send Notification for failed build' ) {
       gitCommitter = sh(returnStdout: true, script: 'git --no-pager show -s --format="%ae"')
 
@@ -355,7 +373,13 @@ stage("building ArangoDB") {
         }
       }
     }
-  } catch (err) {
+  } catch (hudson.AbortException ex) {
+      print "Silently ignoring abort. bye."
+      throw ex
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+      print "Silently ignoring abort. bye."
+      throw ex
+  } catch (Exception err) {
     stage('Send Notification for build' ) {
       slackSend channel: '#status-packaging', color: '#439FE0', message: "${JENKINS_URL} package build for ${GITTAG} failed: ${err.getMessage()} in ${DOCKER_CONTAINER['name']}"
         /*
