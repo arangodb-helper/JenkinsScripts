@@ -444,7 +444,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
               print "Silently ignoring abort. bye."
               throw ex
-          } catch (Exception err) {}
+          } catch (Exception dontcareErr) {}
           stillRunning=(processStat != "")
           sleep 5
         }
