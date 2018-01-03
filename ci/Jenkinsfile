@@ -269,7 +269,7 @@ def execTest(which, where, buildHost, testWorkingDirectory) {
     }
   }
   catch (hudson.AbortException ex) {
-      print "Silentlyy ignoring abort. bye."
+      print "1Silentlyy ignoring abort. bye.. ${ex}"
       throw ex
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
       print "Silently1 ignoring abort. bye.. ${ex}"
@@ -284,7 +284,7 @@ def execTest(which, where, buildHost, testWorkingDirectory) {
     setupTestArea(where, testWorkingDirectory)
   }
   catch (hudson.AbortException ex) {
-      print "Silentlyy ignoring abort. bye."
+      print "2Silentlyy ignoring abort. bye.. ${ex}"
       throw ex
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
       print "Silently2 ignoring abort. bye.. ${ex}"
@@ -423,7 +423,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         sh BUILDSCRIPT
       }
      catch (hudson.AbortException ex) {
-        print "Silentlyy ignoring abort. bye."
+        print "3Silentlyy ignoring abort. bye.. ${ex}"
         throw ex
      } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
         print "Silently3 ignoring abort. bye.. ${ex}"
@@ -439,7 +439,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
             processStat = sh(returnStdout: true, script: scripT).trim()
           }
           catch (hudson.AbortException ex) {
-              print "Silentlyy ignoring abort. bye."
+              print "4Silentlyy ignoring abort. bye.. ${ex}"
               throw ex
           } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
               print "Silently4 ignoring abort. bye.. ${ex}"
@@ -472,7 +472,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         MD5SUM = readFile("${BUILT_FILE}.md5").trim()
       }
       catch (hudson.AbortException ex) {
-          print "Silentlyy ignoring abort. bye."
+          print "5Silentlyy ignoring abort. bye.. ${ex}"
           throw ex
       } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
           print "5Silently ignoring abort. bye.. ${ex}"
@@ -495,7 +495,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       sh "ls -l ${RELEASE_OUT_DIR}"
     }
   } catch (hudson.AbortException ex) {
-      print "Silentlyy ignoring abort. bye."
+      print "6Silentlyy ignoring abort. bye.. ${ex}"
       throw ex
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
       print "6Silently ignoring abort. bye.. ${ex}"
@@ -725,7 +725,7 @@ stage("running unittest") {
     print("The currentBuild.result is now after the parallel: ${currentBuild.result}")
 
   } catch (hudson.AbortException ex) {
-      print "Silentlyy ignoring abort. bye."
+      print "7Silentlyy ignoring abort. bye.. ${ex}"
       throw ex
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
       print "7Silently ignoring abort. bye. ${ex}"
