@@ -267,12 +267,8 @@ def execTest(which, where, buildHost, testWorkingDirectory) {
     lock("extract-${env.NODE_NAME}") {
       copyExtractTarBall(where, buildHost, testWorkingDirectory)
     }
-  }
-  catch (hudson.AbortException ex) {
-      print "1Silentlyy ignoring abort. bye.. ${ex}"
-      throw ex
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-      print "Silently1 ignoring abort. bye.. ${ex}"
+      print "Silently ignoring abort. bye -  ${ex}"
       throw ex
   } catch (Exception err) {
     slackMsg = """${JENKINS_URL}/job/${env.JOB_NAME} - Branch '${GITTAG}' test ${which} on '${preferBuilder}' failed to extract test tarball: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
@@ -282,12 +278,8 @@ def execTest(which, where, buildHost, testWorkingDirectory) {
   }
   try {
     setupTestArea(where, testWorkingDirectory)
-  }
-  catch (hudson.AbortException ex) {
-      print "2Silentlyy ignoring abort. bye.. ${ex}"
-      throw ex
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-      print "Silently2 ignoring abort. bye.. ${ex}"
+      print "Silently ignoring abort. bye - ${ex}"
       throw ex
   } catch (Exception err) {
     slackMsg = """${JENKINS_URL}/job/${env.JOB_NAME} - Branch '${GITTAG}' test ${which} on '${preferBuilder}' failed to prepare testbed: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
@@ -421,14 +413,10 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           print(BUILDSCRIPT)
         }
         sh BUILDSCRIPT
-      }
-     catch (hudson.AbortException ex) {
-        print "3Silentlyy ignoring abort. bye.. ${ex}"
+      } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+        print "Silently ignoring abort. bye - ${ex}"
         throw ex
-     } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-        print "Silently3 ignoring abort. bye.. ${ex}"
-        throw ex
-     } catch (Exception err) {
+      } catch (Exception err) {
         RUNNING_PID=readFile("pid").trim()
         def stillRunning=true
         while (stillRunning) {
@@ -437,13 +425,9 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
             scripT="cat /proc/${RUNNING_PID}/stat 2>/dev/null"
             echo "script: ${scripT}"
             processStat = sh(returnStdout: true, script: scripT).trim()
-          }
-          catch (hudson.AbortException ex) {
-              print "4Silentlyy ignoring abort. bye.. ${ex}"
-              throw ex
           } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-              print "Silently4 ignoring abort. bye.. ${ex}"
-              throw ex
+            print "Silently ignoring abort. bye - ${ex}"
+            throw ex
           } catch (Exception dontcareErr) {}
           stillRunning=(processStat != "")
           sleep 5
@@ -457,7 +441,15 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         print(BUILDSCRIPT)
       }
       if (SKIP_BUILD != "true") {
-        sh BUILDSCRIPT
+        try {
+          sh BUILDSCRIPT
+        } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+          print "Silently ignoring abort. bye - ${ex}"
+          throw ex
+        } catch (Exception scriptErr) {
+          echo "Build failed - ${scriptErr}"
+          throw (scriptErr)
+        } 
       }
     }
     if (buildUnittestTarball) {
@@ -470,12 +462,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       MD5SUM = ""
       try {
         MD5SUM = readFile("${BUILT_FILE}.md5").trim()
-      }
-      catch (hudson.AbortException ex) {
-          print "5Silentlyy ignoring abort. bye.. ${ex}"
-          throw ex
       } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-          print "5Silently ignoring abort. bye.. ${ex}"
+          print "Silently ignoring abort. bye - ${ex}"
           throw ex
       } catch (Exception err) {
         echo "No MD5 File there - you mustn't tick 'skip build' if you don't have a previous build"
@@ -494,11 +482,8 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
     if (VERBOSE) {
       sh "ls -l ${RELEASE_OUT_DIR}"
     }
-  } catch (hudson.AbortException ex) {
-      print "6Silentlyy ignoring abort. bye.. ${ex}"
-      throw ex
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-      print "6Silently ignoring abort. bye.. ${ex}"
+      print "Silently ignoring abort. bye - ${ex}"
       throw ex
   } catch (Exception err) {
     stage('Send Notification for failed build' ) {
@@ -724,11 +709,8 @@ stage("running unittest") {
     parallel branches
     print("The currentBuild.result is now after the parallel: ${currentBuild.result}")
 
-  } catch (hudson.AbortException ex) {
-      print "7Silentlyy ignoring abort. bye.. ${ex}"
-      throw ex
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-      print "7Silently ignoring abort. bye. ${ex}"
+      print "Silently ignoring abort. bye. ${ex}"
       throw ex
   } catch (Exception err) {
     stage('Send Notification unittest') {
