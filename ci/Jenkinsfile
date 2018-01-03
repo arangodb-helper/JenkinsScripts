@@ -272,7 +272,7 @@ def execTest(which, where, buildHost, testWorkingDirectory) {
       print "Silentlyy ignoring abort. bye."
       throw ex
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-      print "Silently ignoring abort. bye."
+      print "Silently1 ignoring abort. bye.. ${ex}"
       throw ex
   } catch (Exception err) {
     slackMsg = """${JENKINS_URL}/job/${env.JOB_NAME} - Branch '${GITTAG}' test ${which} on '${preferBuilder}' failed to extract test tarball: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
@@ -287,7 +287,7 @@ def execTest(which, where, buildHost, testWorkingDirectory) {
       print "Silentlyy ignoring abort. bye."
       throw ex
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-      print "Silently ignoring abort. bye."
+      print "Silently2 ignoring abort. bye.. ${ex}"
       throw ex
   } catch (Exception err) {
     slackMsg = """${JENKINS_URL}/job/${env.JOB_NAME} - Branch '${GITTAG}' test ${which} on '${preferBuilder}' failed to prepare testbed: (${env.BUILD_URL}) \n  ```${err.getMessage()}```"""
@@ -426,7 +426,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         print "Silentlyy ignoring abort. bye."
         throw ex
      } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-        print "Silently ignoring abort. bye."
+        print "Silently3 ignoring abort. bye.. ${ex}"
         throw ex
      } catch (Exception err) {
         RUNNING_PID=readFile("pid").trim()
@@ -442,7 +442,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
               print "Silentlyy ignoring abort. bye."
               throw ex
           } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-              print "Silently ignoring abort. bye."
+              print "Silently4 ignoring abort. bye.. ${ex}"
               throw ex
           } catch (Exception dontcareErr) {}
           stillRunning=(processStat != "")
@@ -475,7 +475,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
           print "Silentlyy ignoring abort. bye."
           throw ex
       } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-          print "Silently ignoring abort. bye."
+          print "5Silently ignoring abort. bye.. ${ex}"
           throw ex
       } catch (Exception err) {
         echo "No MD5 File there - you mustn't tick 'skip build' if you don't have a previous build"
@@ -498,7 +498,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       print "Silentlyy ignoring abort. bye."
       throw ex
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-      print "Silently ignoring abort. bye."
+      print "6Silently ignoring abort. bye.. ${ex}"
       throw ex
   } catch (Exception err) {
     stage('Send Notification for failed build' ) {
@@ -728,7 +728,7 @@ stage("running unittest") {
       print "Silentlyy ignoring abort. bye."
       throw ex
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
-      print "Silently ignoring abort. bye."
+      print "7Silently ignoring abort. bye. ${ex}"
       throw ex
   } catch (Exception err) {
     stage('Send Notification unittest') {
