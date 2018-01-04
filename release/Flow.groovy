@@ -492,6 +492,7 @@ stage("updating other repos") {
             }
           }
         },
+        /*
         "AMI": {
           node('master') {
             if (IS_RELEASE == 'true') {
@@ -511,6 +512,7 @@ stage("updating other repos") {
             }
           }
         },
+        */
         /*
         "SNAPPY": {
           if (GITTAG != "devel") {
