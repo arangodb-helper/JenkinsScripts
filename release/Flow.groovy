@@ -385,7 +385,7 @@ done
       throw err;
     }
     if (GIT_VERSION != 'devel') {
-      slackSend channel: reportChannel, color: '#00ff00', message: "${JENKINS_URL}/job/${env.JOB_NAME} - Building ArangoDB ${GIT_VERSION} finished - continuing to the repository building and package testing."
+      slackSend channel: reportChannel, color: '#00ff00', message: "${JENKINS_URL}/job/${env.JOB_NAME} - Building ArangoDB ${GIT_VERSION} finished and available via 'Stage 1' - continuing to the repository building."
     }
   }
   else {
@@ -409,45 +409,61 @@ stage("create repositories") {
   }
 }
 
-stage("Build Travis CI") {
-  node('master') {
-    build(
-      job: 'RELEASE__BuildTravisCI',
-          parameters: [
-            string(name: 'GITTAG', value: GIT_VERSION),
-            string(name: 'DEBFILE', value: "${env.INTERMEDIATE_CO_DIR}/${REPO_TL_DIR}/${TRAVIS_DEB_FILE}"),
-            booleanParam(name: 'UPDATE_LINK', value: true),
-            booleanParam(name: 'DEBUG', value: false)
-          ]
-    )
-  }
-}
 
-stage("Generating HTML snippets & test it with the packages") {
-  build(
-    job: 'RELEASE__CreateDownloadSnippets',
-        parameters: [
-          string(name: 'GITTAG', value: GIT_VERSION),
-          string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}")
-        ]
-  )
-
-  if (SKIP_INSTALL_TEST == "false") {
-    build(
-      job: 'RELEASE__TestPackages',
-          parameters: [
-            string(name: 'preferBuilder', value: ''),
-            string(name: 'GITTAG', value: GIT_VERSION),
-            string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
-            booleanParam(name: 'DEBUG', value: false),
-            booleanParam(name: 'testLiveDownloads', value: false)
-          ]
-    )
-  }
-  else {
-    echo "Install Test deactivated"
-  }
+if (GIT_VERSION != 'devel') {
+  slackSend channel: reportChannel, color: '#00ff00', message: "${JENKINS_URL}/job/${env.JOB_NAME} - Building ArangoDB ${GIT_VERSION} repository building finished and available via 'Stage 2', starting silent upload and testing packages."
 }
+parallel(
+  [
+    "Uploading Packages silently": {
+      if (GIT_VERSION != 'devel') {
+        sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh false true"
+      }
+    },
+    "Snippets And Test": {
+      stage("Build Travis CI") {
+        node('master') {
+          build(
+            job: 'RELEASE__BuildTravisCI',
+                parameters: [
+                  string(name: 'GITTAG', value: GIT_VERSION),
+                  string(name: 'DEBFILE', value: "${env.INTERMEDIATE_CO_DIR}/${REPO_TL_DIR}/${TRAVIS_DEB_FILE}"),
+                  booleanParam(name: 'UPDATE_LINK', value: true),
+                  booleanParam(name: 'DEBUG', value: false)
+                ]
+          )
+        }
+      }
+
+      stage("Generating HTML snippets & test it with the packages") {
+        build(
+          job: 'RELEASE__CreateDownloadSnippets',
+              parameters: [
+                string(name: 'GITTAG', value: GIT_VERSION),
+                string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}")
+              ]
+        )
+
+        if (SKIP_INSTALL_TEST == "false") {
+          build(
+            job: 'RELEASE__TestPackages',
+                parameters: [
+                  string(name: 'preferBuilder', value: ''),
+                  string(name: 'GITTAG', value: GIT_VERSION),
+                  string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
+                  booleanParam(name: 'DEBUG', value: false),
+                  booleanParam(name: 'testLiveDownloads', value: false)
+                ]
+          )
+        }
+        else {
+          echo "Install Test deactivated"
+        }
+      }
+    }
+    ]
+)
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 if (GIT_VERSION != 'devel') {
@@ -465,9 +481,9 @@ else {
 stage("upload packages") {
   node('master') {
     if (GIT_VERSION != 'devel') {
-      sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh true"
+      sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh true false"
     } else {
-      sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh false"
+      sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh false false"
     }
   }
 }
