@@ -417,7 +417,9 @@ parallel(
   [
     "Uploading Packages silently": {
       if (GIT_VERSION != 'devel') {
-        sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh false true"
+        node('master') {
+          sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/stage2public.sh false true"
+        }
       }
     },
     "Snippets And Test": {
