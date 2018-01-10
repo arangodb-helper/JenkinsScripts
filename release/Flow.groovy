@@ -445,7 +445,9 @@ parallel(
                 string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}")
               ]
         )
-
+        node("master") {
+          sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_snippets.sh dev"
+        }
         if (SKIP_INSTALL_TEST == "false") {
           build(
             job: 'RELEASE__TestPackages',
@@ -638,7 +640,9 @@ stage("publish website") {
     echo "Continuing publish stage 2"
   }
   node('master') {
-    sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_snippets.sh"
+    if (GIT_VERSION != 'devel') {
+      sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_snippets.sh live"
+    }
     sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
     sh "echo '${GIT_VERSION}' > ${env.PUBLIC_CO_DIR}VERSION"
   }
