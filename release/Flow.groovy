@@ -355,9 +355,6 @@ done
                        booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
                      ]
                    )
-            }
-            catch (hudson.AbortException ex) {
-                print "Silently ignoring abort. bye."
             } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
                 print "Silently ignoring abort. bye."
                 throw ex
