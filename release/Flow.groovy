@@ -358,7 +358,6 @@ done
             }
             catch (hudson.AbortException ex) {
                 print "Silently ignoring abort. bye."
-                throw ex
             } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
                 print "Silently ignoring abort. bye."
                 throw ex
