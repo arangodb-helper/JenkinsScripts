@@ -47,6 +47,7 @@ stage("create repositories") {
   node('master') {
     echo "syncing docu into packages"
     sh """
+export REPO_TL_DIR=${REPO_TL_DIR};
 export GITTAG="${PRETEND_GITVERSION}"
 ${ARANGO_SCRIPT_DIR}/publish/copyDocumentation.sh \
                 ${INTERMEDIATE_DIR}                    \
@@ -64,7 +65,8 @@ stage("publish documentation") {
   node('master') {
     sh """
 export GITTAG="${PRETEND_GITVERSION}"
-export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh
+export REPO_TL_DIR=${REPO_TL_DIR};
+${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh
 """
     def job = Jenkins.getInstance().getItemByFullName(env.JOB_BASE_NAME, Job.class)
     def build = job.getBuildByNumber(env.BUILD_ID as int)
