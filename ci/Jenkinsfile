@@ -50,7 +50,7 @@ def CONTAINERS=[
   // [ 'buildType': 'docker', 'testType': 'docker', 'name': 'debianjessiearmhfxc', 'packageFormat': 'DEB',    'OS': "Linux",   'buildArgs': "--xcArm /usr/bin/arm-linux-gnueabihf --noopt", 'cluster': true,  'LOCALFS': '/mnt/workspace/tmp/', 'FS': '/mnt/data/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
 
   [ 'buildType': 'native', 'testType': 'native', 'name': 'macos',               'packageFormat': 'Bundle', 'OS': "Darwin",  'buildArgs': "--clang --staticOpenSSL",    'cluster': false, 'LOCALFS': '/Users/jenkins/mnt/workspace/tmp/', 'FS': '/Users/jenkins/net/fileserver/', 'reliable': true, 'BUILD': '', 'CBUILD':'', 'SYMSRV':'', 'testArgs': ''],
-  [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "CYGWIN_NT-10.0", 'buildArgs': "--msvc",     'cluster': false, 'LOCALFS': 'c:/mnt/workspace/tmp/', 'FS': '/var/tmp/r', 'reliable': true, 'BUILD': "../../${testPathPrefix}_", 'CBUILD': "../../${testPathPrefix}c_", 'SYMSRV': '/cygdrive/e/symsrv/', 'testArgs': "--ruby c:/tools/ruby23/bin/ruby.exe --rspec c:/tools/ruby23/bin/rspec"]
+  [ 'buildType': 'native', 'testType': 'native', 'name': 'windows',             'packageFormat': 'NSIS',   'OS': "CYGWIN_NT-10.0", 'buildArgs': "--msvc",     'cluster': false, 'LOCALFS': 'c:/mnt/workspace/tmp/', 'FS': '/var/tmp/r', 'reliable': true, 'BUILD': "../../${testPathPrefix}_", 'CBUILD': "../../${testPathPrefix}c_", 'SYMSRV': '/cygdrive/e/symsrv', 'testArgs': "--ruby c:/tools/ruby23/bin/ruby.exe --rspec c:/tools/ruby23/bin/rspec"]
 ]
 
 GITRAW=33
@@ -398,7 +398,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} --downloadStarter"
     }
     if (buildEnv['SYMSRV'].size() != 0) {
-      BUILDSCRIPT="${BUILDSCRIPT} --symsrv ${buildEnv['SYMSRV']}_${REPO_TL_DIR} "
+      BUILDSCRIPT="${BUILDSCRIPT} --symsrv ${buildEnv['SYMSRV']}_${REPO_TL_DIR}/ "
     }
     if (CLEAN_BUILDENV == "true") {
       BUILDSCRIPT="rm -rf ${buildDir} ; ${BUILDSCRIPT}"
