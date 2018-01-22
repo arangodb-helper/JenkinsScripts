@@ -264,7 +264,7 @@ done
 retries=0
 while test \"\${retries}\" -lt 10; do
     set +e
-    /usr/bin/rsync -ua --timeout=600 --progress  /cygdrive/e/symsrv ${JENKINSMASTER}:${PUBLIC_CO_DIR} && exit 0
+    /usr/bin/rsync -ua --timeout=600 --progress  /cygdrive/e/symsrv_${REPO_TL_DIR} ${JENKINSMASTER}:${PUBLIC_CO_DIR} && exit 0
     retries=\$(( \${retries} + 1 ))
 done
 """
