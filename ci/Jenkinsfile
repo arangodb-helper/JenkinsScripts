@@ -398,7 +398,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       BUILDSCRIPT="${BUILDSCRIPT} --package ${buildEnv['packageFormat']} --downloadStarter"
     }
     if (buildEnv['SYMSRV'].size() != 0) {
-      BUILDSCRIPT="${BUILDSCRIPT} --symsrv ${buildEnv['SYMSRV']} "
+      BUILDSCRIPT="${BUILDSCRIPT} --symsrv ${buildEnv['SYMSRV']}_${REPO_TL_DIR} "
     }
     if (CLEAN_BUILDENV == "true") {
       BUILDSCRIPT="rm -rf ${buildDir} ; ${BUILDSCRIPT}"

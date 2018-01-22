@@ -69,6 +69,7 @@ stage("building packages") {
                      string(name: 'GITTAG', value: "${GITTAG}"),
                      string(name: 'preferBuilder', value: params['preferBuilder']),
                      string(name: 'DOCKER_HOST', value: DOCKER_HOST),
+                     string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
                      booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                    ]
                  )
@@ -82,6 +83,7 @@ stage("building packages") {
                        string(name: 'GITTAG', value: "${GITTAG}"),
                        string(name: 'preferBuilder', value: params['preferBuilder']),
                        string(name: 'DOCKER_HOST', value: DOCKER_HOST),
+                       string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
                        booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                      ]
                    )
@@ -100,6 +102,7 @@ stage("building packages") {
                          string(name: 'GITTAG', value: "${GITTAG}"),
                          string(name: 'preferBuilder', value: params['preferBuilder']),
                          string(name: 'DOCKER_HOST', value: DOCKER_HOST_2),
+                         string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
                          booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                        ]
                      )
@@ -129,6 +132,7 @@ done
                      string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                      string(name: 'GITTAG', value: "${GITTAG}"),
                      string(name: 'preferBuilder', value: 'macos'),
+                     string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
                      booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                    ]
                  )
@@ -140,6 +144,7 @@ done
                      string(name: 'ENTERPRISE_URL', value: ''),
                      string(name: 'GITTAG', value: "${GITTAG}"),
                      string(name: 'preferBuilder', value: 'macos'),
+                     string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
                      booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                    ]
                  )
@@ -226,6 +231,7 @@ done
                      string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                      string(name: 'GITTAG', value: "${GITTAG}"),
                      string(name: 'preferBuilder', value: 'windows'),
+                     string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
                      booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                    ]
                  )
@@ -237,6 +243,7 @@ done
                      string(name: 'ENTERPRISE_URL', value: ''),
                      string(name: 'GITTAG', value: "${GITTAG}"),
                      string(name: 'preferBuilder', value: 'windows'),
+                     string(name: 'REPO_TL_DIR', value: REPO_TL_DIR),
                      booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV'])
                    ]
                  )
