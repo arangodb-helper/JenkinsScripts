@@ -169,6 +169,7 @@ done
                    parameters: [
                      string(name: 'ENTERPRISE_URL', value: ''),
                      string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
                      string(name: 'preferBuilder', value: 'macos'),
                      string(name: 'REPORT_TO', value: "slack"),
                      booleanParam(name: 'SKIP_BUILD', value: false),
@@ -182,6 +183,7 @@ done
                    parameters: [
                      string(name: 'ENTERPRISE_URL', value: ''),
                      string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
                      string(name: 'preferBuilder', value: 'macos'),
                      string(name: 'REPORT_TO', value: "slack"),
                      booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
@@ -195,6 +197,7 @@ done
                    parameters: [
                      string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                      string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
                      string(name: 'preferBuilder', value: 'macos'),
                      string(name: 'REPORT_TO', value: "slack"),
                      booleanParam(name: 'SKIP_BUILD', value: false),
@@ -208,6 +211,7 @@ done
                    parameters: [
                      string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                      string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
                      string(name: 'preferBuilder', value: 'macos'),
                      string(name: 'REPORT_TO', value: "slack"),
                      booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
@@ -274,6 +278,7 @@ done
                    parameters: [
                      string(name: 'ENTERPRISE_URL', value: ''),
                      string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
                      string(name: 'preferBuilder', value: 'windows'),
                      string(name: 'REPORT_TO', value: "slack"),
                      booleanParam(name: 'SKIP_BUILD', value: false),
@@ -288,6 +293,7 @@ done
               parameters: [
               string(name: 'ENTERPRISE_URL', value: ''),
               string(name: 'GITTAG', value: "${GITTAG}"),
+              string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
               string(name: 'preferBuilder', value: 'windows'),
               string(name: 'REPORT_TO', value: "slack"),
               booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
@@ -302,6 +308,7 @@ done
                    parameters: [
                      string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
                      string(name: 'GITTAG', value: "${GITTAG}"),
+                     string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
                      string(name: 'preferBuilder', value: 'windows'),
                      string(name: 'REPORT_TO', value: "slack"),
                      booleanParam(name: 'SKIP_BUILD', value: false),
@@ -316,6 +323,7 @@ done
               parameters: [
               string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
               string(name: 'GITTAG', value: "${GITTAG}"),
+              string(name: 'REPO_TL_DIR', value: "${REPO_TL_DIR}"),
               string(name: 'preferBuilder', value: 'windows'),
               string(name: 'REPORT_TO', value: "slack"),
               booleanParam(name: 'SKIP_BUILD', value: true), // second run - no need to recomile!
