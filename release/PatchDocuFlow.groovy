@@ -49,12 +49,12 @@ stage("create repositories") {
     sh """
 export REPO_TL_DIR=${REPO_TL_DIR};
 export GITTAG="${PRETEND_GITVERSION}"
-${ARANGO_SCRIPT_DIR}/publish/copyDocumentation.sh \
+${ARANGO_SCRIPT_DIR}/publish/copyDocumentation.sh      \
                 ${INTERMEDIATE_DIR}                    \
-                /mnt/data/localstage/enterprise/${REPO_TL_DIR}  \
-                /mnt/data/localstage/community/${REPO_TL_DIR}   \
-                ${PRETEND_GITVERSION}                           \
-                ${ENTERPRISE_SECRET}/${REPO_TL_DIR}             \
+                ${INTERMEDIATE_EP_DIR}/${REPO_TL_DIR}  \
+                ${INTERMEDIATE_CO_DIR}/${REPO_TL_DIR}  \
+                ${PRETEND_GITVERSION}                  \
+                ${ENTERPRISE_SECRET}/${REPO_TL_DIR}    \
                 repositories/${REPO_TL_DIR}
 """
   }

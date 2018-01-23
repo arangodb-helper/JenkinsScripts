@@ -264,7 +264,7 @@ done
 retries=0
 while test \"\${retries}\" -lt 10; do
     set +e
-    /usr/bin/rsync -ua --timeout=600 --progress  /cygdrive/e/symsrv_${REPO_TL_DIR} ${JENKINSMASTER}:${PUBLIC_CO_DIR} && exit 0
+    /usr/bin/rsync -ua --timeout=600 --progress  /cygdrive/e/symsrv_${REPO_TL_DIR} ${JENKINSMASTER}:${INTERMEDIATE_CO_DIR} && exit 0
     retries=\$(( \${retries} + 1 ))
 done
 """
@@ -431,20 +431,6 @@ parallel(
       }
     },
     "Snippets And Test": {
-      stage("Build Travis CI") {
-        node('master') {
-          build(
-            job: 'RELEASE__BuildTravisCI',
-                parameters: [
-                  string(name: 'GITTAG', value: GIT_VERSION),
-                  string(name: 'DEBFILE', value: "${env.INTERMEDIATE_CO_DIR}/${REPO_TL_DIR}/${TRAVIS_DEB_FILE}"),
-                  booleanParam(name: 'UPDATE_LINK', value: true),
-                  booleanParam(name: 'DEBUG', value: false)
-                ]
-          )
-        }
-      }
-
       stage("Generating HTML snippets & test it with the packages") {
         build(
           job: 'RELEASE__CreateDownloadSnippets',
@@ -652,7 +638,7 @@ stage("publish website") {
       sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_snippets.sh live"
     }
     sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
-    sh "echo '${GIT_VERSION}' > ${env.PUBLIC_CO_DIR}VERSION"
+    sh "echo '${GIT_VERSION}' > ${env.INTERMEDIATE_CO_DIR}VERSION"
   }
   if (GIT_VERSION != 'devel') {
     slackSend channel: reportChannel, color: '#00ff00', message: "${JENKINS_URL}/job/${env.JOB_NAME} - Finished publishing of ArangoDB ${GIT_VERSION} - bye."

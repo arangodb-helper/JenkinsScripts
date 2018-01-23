@@ -149,13 +149,17 @@ fi
 if test ! -d ${where['releaseOutDir']}; then
         mkdir -p ${where['releaseOutDir']}
 fi
-python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']} ${where['localWSDir']} ${where['localTarball']} '${where['testRunName']}_${buildHost}' 'rm -rf ${where['localExtractDir']}; mkdir ${where['localExtractDir']}; cd ${where['localExtractDir']}; tar -xzf ${extract_tarball}'
+"""
+  PYCMD="""
+  python /usr/bin/copyFileLockedIfNewer.py ${where['MD5SUM']} ${where['distFile']} ${where['localWSDir']} ${where['localTarball']} '${where['testRunName']}_${buildHost}' 'rm -rf ${where['localExtractDir']}; mkdir ${where['localExtractDir']}; cd ${where['localExtractDir']}; tar -xzf ${extract_tarball}'
 """
 
   if (VERBOSE) {
     print CMD
+    print PCMD
   }
   sh CMD
+  sh PYCMD
 }
 
 def setupTestArea(where, testWorkingDirectory) {
