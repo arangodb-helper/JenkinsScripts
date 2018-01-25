@@ -632,7 +632,7 @@ stage("running unittest") {
       testCaseSets = [
         //  ["fail", 'fail', ""],
         //    ["fail", 'fail', ""],
-        // ['catch', 'catch', ""],
+        ['catch', 'catch', ""],
         ['http_server', 'http_server', "",
          "--cluster true --testBuckets 4/1 ",
          "--cluster true --testBuckets 4/2 ",
@@ -657,7 +657,7 @@ stage("running unittest") {
         ["fail", 'fail', ""],
         ["overal", 'config.authentication', ""],
         ["fail", 'fail', ""],/*///
-        // ['catch', 'catch', ""],
+        ['catch', 'catch', ""],
         ['http_server', 'http_server', ""],
         ["shell_client", 'shell_client', ""],
         ["shell_server_aql", 'shell_server_aql', ""],
