@@ -60,9 +60,15 @@ ${ARANGO_SCRIPT_DIR}/publish/copyDocumentation.sh      \
   }
 }
 
-@NonCPS
+
 def getUserId() {
-  return build.getCause(Cause.UserIdCause).getUserId()
+  def user
+  node {
+    wrap([$class: 'BuildUser']) {
+      user = env.BUILD_USER_ID
+    }
+  }
+  return user
 }
 
 stage("publish documentation") {
@@ -72,8 +78,6 @@ export GITTAG="${PRETEND_GITVERSION}"
 export REPO_TL_DIR=${REPO_TL_DIR};
 ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh
 """
-    def job = Jenkins.getInstance().getItemByFullName(env.JOB_BASE_NAME, Job.class)
-    def build = job.getBuildByNumber(env.BUILD_ID as int)
     def userId = getUserId()
     slackSend channel: '#documentation', color: '#00ff00', message: "@here - ${userId} published a patched release ${GITTAG} on behalf of ${PRETEND_GITVERSION}"
 
