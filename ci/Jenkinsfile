@@ -169,11 +169,11 @@ fi
   echo "tarSum: <${tarSum}> != <${xsum}> ?"
   if ("${tarSum}" != "${xsum}") {
     extractShell = """
-           echo '${tarSum}' > ${xSumFile}
            rm -rf ${where['localExtractDir']}
            mkdir ${where['localExtractDir']}
            cd ${where['localExtractDir']}
            tar -xzf ${extract_tarball}
+           echo '${tarSum}' > ${xSumFile}
         """
     echo "Extracting: ${extractShell}"
     sh extractShell
