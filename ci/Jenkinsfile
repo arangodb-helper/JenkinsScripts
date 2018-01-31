@@ -155,6 +155,7 @@ fi
     print CMD
   }
   sh CMD
+  xSumFile="${where['localTarball']}.xmd5"
   getMd5Sum = """
         if test -f /bin/md5; then
             md5 ${where['localTarball']} |sed 's;.* ;;'
@@ -164,9 +165,11 @@ fi
    """
   echo getMd5Sum
   tarSum = sh(returnStdout: true, script: getMd5Sum).trim()
-  echo "tarSum: <${tarSum}> != <${where['MD5SUM']}> ?"
-  if ("${tarSum}" != "${where['MD5SUM']}") {
+  xsum = sh(returnStdout: true, script: "cat ${xSumFile} || true").trim()
+  echo "tarSum: <${tarSum}> != <${xsum}> ?"
+  if ("${tarSum}" != "${xsum}") {
     extractShell = """
+           echo '${tarSum}' > ${xSumFile}
            rm -rf ${where['localExtractDir']}
            mkdir ${where['localExtractDir']}
            cd ${where['localExtractDir']}
