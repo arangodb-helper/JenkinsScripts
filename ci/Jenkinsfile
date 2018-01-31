@@ -155,35 +155,29 @@ fi
     print CMD
   }
   sh CMD
-
-   ${where['MD5SUM']}
-   ${where['distFile']}
-   ${where['localWSDir']}
-
-   getMd5Sum = """
+  getMd5Sum = """
         if test -f /bin/md5; then
             md5 ${where['localTarball']}
         else
             md5sum ${where['localTarball']}
         fi
    """
-   echo getMd5Sum
-   tarSum = sh(returnStdout: true, script: getMd5Sum).trim()
-   echo "tarSum: ${tarSum}"
-   if ("${tarSum}" != "${where['MD5SUM']}") {
-       extractShell = """
+  echo getMd5Sum
+  tarSum = sh(returnStdout: true, script: getMd5Sum).trim()
+  echo "tarSum: ${tarSum}"
+  if ("${tarSum}" != "${where['MD5SUM']}") {
+    extractShell = """
            rm -rf ${where['localExtractDir']}
            mkdir ${where['localExtractDir']}
            cd ${where['localExtractDir']}
            tar -xzf ${extract_tarball}
         """
-       echo "Extracting: ${extractShell}"
-       sh extractShell
-   }
-   else {
-     echo "not extracting - is already there"
-   }
-
+    echo "Extracting: ${extractShell}"
+    sh extractShell
+  }
+  else {
+    echo "not extracting - is already there"
+  }
 }
 
 def setupTestArea(where, testWorkingDirectory) {
