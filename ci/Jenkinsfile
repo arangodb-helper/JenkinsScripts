@@ -177,7 +177,7 @@ fi
            cd ${where['localExtractDir']}
            tar -xzf ${extract_tarball}
         """
-       echo "Extracting: ${extractShell"
+       echo "Extracting: ${extractShell}"
        sh extractShell
    }
    else {
