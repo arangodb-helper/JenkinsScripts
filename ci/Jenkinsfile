@@ -157,9 +157,9 @@ fi
   sh CMD
   getMd5Sum = """
         if test -f /bin/md5; then
-            md5 ${where['localTarball']}
+            md5 ${where['localTarball']} |sed 's;.* ;;'
         else
-            md5sum ${where['localTarball']}
+            md5sum ${where['localTarball']} |sed 's; .*;;'
         fi
    """
   echo getMd5Sum
