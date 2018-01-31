@@ -164,7 +164,7 @@ fi
    """
   echo getMd5Sum
   tarSum = sh(returnStdout: true, script: getMd5Sum).trim()
-  echo "tarSum: ${tarSum}"
+  echo "tarSum: <${tarSum}> != <${where['MD5SUM']}> ?"
   if ("${tarSum}" != "${where['MD5SUM']}") {
     extractShell = """
            rm -rf ${where['localExtractDir']}
