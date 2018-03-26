@@ -556,7 +556,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
 
           sh 'pwd > workspace.loc'
           WORKSPACE = readFile('workspace.loc').trim()
-          outDir = "${WORKSPACE}/out${EPDIR}${GITTAG}"
+          outDir = "${WORKSPACE}/out${EPDIR}${REPO_TL_DIR}"
           compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir, buildEnvironment['name'], Reliable)
         }
       }
@@ -569,7 +569,7 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
       echo "building on ${buildEnvironment['name']}"
       sh 'pwd > workspace.loc'
       WORKSPACE = readFile('workspace.loc').trim()
-      outDir = "${WORKSPACE}/out${EPDIR}${GITTAG}"
+      outDir = "${WORKSPACE}/out${EPDIR}${REPO_TL_DIR}"
       compileSource(buildEnvironment, buildUnittestTarball, enterpriseUrl, outDir, buildEnvironment['name'], Reliable)
     }
   }
