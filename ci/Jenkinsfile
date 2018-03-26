@@ -7,7 +7,7 @@ REGISTRY_URL="https://${REGISTRY}/"
 
 DOCKER_CONTAINER=[:]
 RELEASE_OUT_DIR="/net/fileserver/${REPO_TL_DIR}"
-LOCAL_TAR_DIR="/mnt/workspace/tmp//${REPO_TL_DIR}"
+LOCAL_TAR_DIR="/var/tmp/r/${REPO_TL_DIR}"
 TEST_ARGS = ""
 branches = [:]
 failures = ""
