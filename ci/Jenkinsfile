@@ -6,7 +6,7 @@ REGISTRY="192.168.0.1"
 REGISTRY_URL="https://${REGISTRY}/"
 
 DOCKER_CONTAINER=[:]
-RELEASE_OUT_DIR="/net/fileserver/"
+RELEASE_OUT_DIR="/net/fileserver/${REPO_TL_DIR}"
 LOCAL_TAR_DIR="/mnt/workspace/tmp/"
 TEST_ARGS = ""
 branches = [:]
@@ -75,7 +75,7 @@ if (preferBuilder.size() > 0) {
       print("prefering: ${CONTAINERS[c]}")
       found=true
       DOCKER_CONTAINER = CONTAINERS[c]
-      RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
+      RELEASE_OUT_DIR = "${DOCKER_CONTAINER['FS']}/${REPO_TL_DIR}"
       LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
       BUILD_DIR = DOCKER_CONTAINER['BUILD']
       TEST_ARGS = DOCKER_CONTAINER['testArgs']
@@ -88,7 +88,7 @@ if (preferBuilder.size() > 0) {
   for (int c  = 0; c < CONTAINERS.size(); c++) {
     if (CONTAINERS[c]['buildType'] == 'docker') {
       DOCKER_CONTAINER = CONTAINERS[c]
-      RELEASE_OUT_DIR = DOCKER_CONTAINER['FS']
+      RELEASE_OUT_DIR = "${DOCKER_CONTAINER['FS']}/${REPO_TL_DIR}"
       LOCAL_TAR_DIR = DOCKER_CONTAINER['LOCALFS']
       BUILD_DIR = DOCKER_CONTAINER['BUILD']
       TEST_ARGS = DOCKER_CONTAINER['testArgs']
@@ -502,7 +502,12 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
       }
 
-      sh "python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE} ${env.JOB_NAME}"
+      def LOCKNAME = "extract-${env.NODE_NAME}"	
+      lock(LOCKNAME) {
+        echo "Got LOCK ${LOCKNAME} - way we go."
+        sh "python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE} ${env.JOB_NAME}"
+        echo "done with LOCK ${LOCKNAME}"
+      }
     }
     else {
       // TODO: release?
