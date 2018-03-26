@@ -157,7 +157,7 @@ fi
   sh CMD
   xSumFile="${where['localTarball']}.xmd5"
   getMd5Sum = """
-        if test -f /bin/md5; then
+        if test -f /sbin/md5; then
             md5 ${where['localTarball']} |sed 's;.* ;;'
         else
             md5sum ${where['localTarball']} |sed 's; .*;;'
