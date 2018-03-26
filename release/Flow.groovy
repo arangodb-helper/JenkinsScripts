@@ -225,7 +225,7 @@ done
           "Windows": {
 
             node('windows') {
-              sh "rm -rf /var/tmp/r/; mkdir -p /var/tmp/r/"
+              sh "rm -rf /var/tmp/r/${REPO_TL_DIR}; mkdir -p /var/tmp/r/${REPO_TL_DIR}"
             }
             // Windows doesn't like if we compile multiple times at once...
             ///----------------------------------------------------------------------
