@@ -167,7 +167,7 @@ fi
   tarSum = sh(returnStdout: true, script: getMd5Sum).trim()
   xsum = sh(returnStdout: true, script: "cat ${xSumFile} || true").trim()
   echo "tarSum: <${tarSum}> != <${xsum}> ?"
-    if (("${tarSum}".length() <  || "${tarSum}" != "${xsum}") {
+    if (("${tarSum}".length() != 32) || "${tarSum}" != "${xsum}") {
     extractShell = """
            rm -rf ${where['localExtractDir']}
            mkdir ${where['localExtractDir']}
