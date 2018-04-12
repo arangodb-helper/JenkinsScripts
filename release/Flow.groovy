@@ -256,7 +256,7 @@ done
 retries=0
 while test \"\${retries}\" -lt 10; do
     set +e
-    /usr/bin/rsync -ua --timeout=600 --progress /var/tmp/r/EP /var/tmp/r/EP ${JENKINSMASTER}:/mnt/data/fileserver/ && exit 0
+    /usr/bin/rsync -ua --timeout=600 --progress /var/tmp/r/EP /var/tmp/r/CO ${JENKINSMASTER}:/mnt/data/fileserver/ && exit 0
     retries=\$(( \${retries} + 1 ))
 done
 """
