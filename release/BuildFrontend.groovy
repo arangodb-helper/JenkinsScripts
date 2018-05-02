@@ -105,6 +105,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       git remote set-url origin https://${ENTERPRISE_URL}@github.com/arangodb/arangodb.git
       git config --global user.email "admin@arangodb.com"
       git config --global user.name "ArangoDB Release Bot"
+      ./utils/generateSwagger.sh
       mkdir -p build
       cd build
       cmake ..
@@ -113,6 +114,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       set +e
       git add js/apps/system/_admin/aardvark/APP/frontend/src/*
       git add js/apps/system/_admin/aardvark/APP/frontend/build/*
+      git add js/apps/system/_admin/aardvark/APP/api-docs.json
       set -e
 
       echo "Changes detected. Setting up commit and pushing to devel branch."
