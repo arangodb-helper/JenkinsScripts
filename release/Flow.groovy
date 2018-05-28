@@ -274,6 +274,7 @@ done
             ///----------------------------------------------------------------------
 
             echo "running Windows Community Release Single unittests"
+            if (REPO_TL_DIR != 'nightly') {
             build( job: 'RELEASE__BuildTest',
                    parameters: [
                      string(name: 'ENTERPRISE_URL', value: ''),
@@ -332,7 +333,8 @@ done
               booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
               ]
               )
-            */
+                             */
+                        }
             ///----------------------------------------------------------------------          
             echo "testing Windows Community Release NSIS Installer"
             build( job: 'RELEASE__TestWindowsInstaller',
