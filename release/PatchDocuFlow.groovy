@@ -2,7 +2,7 @@ VERSION_MAJOR_MINOR=""
 REPO_TL_DIR=""
 
 PRETEND_GITVERSION_BUILD = params['PRETEND_GITVERSION']
-hilightUsers=""
+hilightUsers = ""
 
 if (params['GITTAG'] == 'devel') {
     VERSION_MAJOR_MINOR="3.3"
@@ -15,7 +15,7 @@ if (params['GITTAG'] == 'devel') {
         PRETEND_GITVERSION_BUILD = ""
     }
     else {
-        hilightUsers"@here"
+        hilightUsers = "@here"
     }
 }
 else {
