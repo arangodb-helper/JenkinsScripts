@@ -13,8 +13,6 @@ if (params['GITTAG'] == 'devel') {
     
     if (params['PRETEND_GITVERSION'] == 'devel') {
         PRETEND_GITVERSION_BUILD = ""
-    }
-    else {
         hilightUsers = "@here"
     }
 }
