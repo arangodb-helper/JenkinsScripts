@@ -4,12 +4,52 @@ REPO_TL_DIR=""
 PRETEND_GITVERSION_BUILD = params['PRETEND_GITVERSION']
 hilightUsers = "@here"
 
+matchDoc = /^documentation\/.*/
+matchFeature = /^feature[0-9.-]*\/.*/
+matchBugFix = /^bug-fix[0-9.-]*\/.*/
+
 if (params['GITTAG'] == 'devel') {
-    VERSION_MAJOR_MINOR="3.3"
+    VERSION_MAJOR_MINOR="3.4"
     REPO_TL_DIR="nightly"
     // if we build devel, we don't have any v's at all:
     GITTAG="devel"
     GIT_BRANCH="devel"
+    
+    if (params['PRETEND_GITVERSION'] == 'devel') {
+        PRETEND_GITVERSION_BUILD = ""
+    }
+    hilightUsers = ""
+}
+else if (params['GITTAG'] ==! matchDoc) {
+    VERSION_MAJOR_MINOR="3.4"
+    REPO_TL_DIR="nightly/${params['GITTAG']}"
+    // if we build devel, we don't have any v's at all:
+    GITTAG="${params['GITTAG']}"
+    GIT_BRANCH="${params['GITTAG']}"
+    
+    if (params['PRETEND_GITVERSION'] == 'devel') {
+        PRETEND_GITVERSION_BUILD = ""
+    }
+    hilightUsers = ""
+}
+else if (params['GITTAG'] ==! matchFeature) {
+    VERSION_MAJOR_MINOR="3.3"
+    REPO_TL_DIR="nightly/${params['GITTAG']}"
+    // if we build devel, we don't have any v's at all:
+    GITTAG="${params['GITTAG']}"
+    GIT_BRANCH="${params['GITTAG']}"
+    
+    if (params['PRETEND_GITVERSION'] == 'devel') {
+        PRETEND_GITVERSION_BUILD = ""
+    }
+    hilightUsers = ""
+}
+else if (params['GITTAG'] ==! matchBugFix) {
+    VERSION_MAJOR_MINOR="3.3"
+    REPO_TL_DIR="nightly/${params['GITTAG']}"
+    // if we build devel, we don't have any v's at all:
+    GITTAG="${params['GITTAG']}"
+    GIT_BRANCH="${params['GITTAG']}"
     
     if (params['PRETEND_GITVERSION'] == 'devel') {
         PRETEND_GITVERSION_BUILD = ""
