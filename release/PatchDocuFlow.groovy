@@ -8,6 +8,7 @@ matchDoc = /^documentation\/.*/
 matchFeature = /^feature[0-9.-]*\/.*/
 matchBugFix = /^bug-fix[0-9.-]*\/.*/
 browseHint = ""
+DIRECTORY=""
 if (params['GITTAG'] == 'devel') {
     VERSION_MAJOR_MINOR="3.4"
     REPO_TL_DIR="nightly"
@@ -27,7 +28,7 @@ else if (params['GITTAG'] ==~ matchDoc) {
     // if we build devel, we don't have any v's at all:
     GITTAG=params['GITTAG']
     GIT_BRANCH=params['GITTAG']
-    
+    DIRECTORY="devel/${GITTAG}"
     if (params['PRETEND_GITVERSION'] == 'devel') {
         PRETEND_GITVERSION_BUILD = ""
     }
@@ -40,6 +41,7 @@ else if (params['GITTAG'] ==~ matchFeature) {
     // if we build devel, we don't have any v's at all:
     GITTAG=params['GITTAG']
     GIT_BRANCH=params['GITTAG']
+    DIRECTORY="devel/${GITTAG}"
     
     if (params['PRETEND_GITVERSION'] == 'devel') {
         PRETEND_GITVERSION_BUILD = ""
@@ -53,6 +55,7 @@ else if (params['GITTAG'] ==~ matchBugFix) {
     // if we build devel, we don't have any v's at all:
     GITTAG=params['GITTAG']
     GIT_BRANCH=params['GITTAG']
+    DIRECTORY="devel/${GITTAG}"
     
     if (params['PRETEND_GITVERSION'] == 'devel') {
         PRETEND_GITVERSION_BUILD = ""
@@ -128,6 +131,7 @@ stage("publish documentation") {
         sh """
 export GITTAG="${PRETEND_GITVERSION}"
 export REPO_TL_DIR=${REPO_TL_DIR};
+export DIRECTORY=${DIRECTORY};
 ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh
 """
         def userId = getUserId()
