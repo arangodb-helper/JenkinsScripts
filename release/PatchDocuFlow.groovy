@@ -75,7 +75,7 @@ else {
     GIT_BRANCH="${parts[0]}.${parts[1]}"
     browseHint = "access it at http://docs.arangodb.com/${VERSION_MAJOR_MINOR}"
 }
-
+/*
 //================================================================================
 try {
     stage("building documentation") {
@@ -97,7 +97,7 @@ try {
     slackSend channel: "#documentation", color: '#ff0000', message: "${JENKINS_URL} - Building ${GITTAG} ${REPO_TL_DIR} documentation failed - ${err}"
     throw err;
 }
-
+*/
 //================================================================================
 stage("create repositories") {
     node('master') {
