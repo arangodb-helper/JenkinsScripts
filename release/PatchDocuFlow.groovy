@@ -28,7 +28,7 @@ else if (params['GITTAG'] ==~ matchDoc) {
     // if we build devel, we don't have any v's at all:
     GITTAG=params['GITTAG']
     GIT_BRANCH=params['GITTAG']
-    DIRECTORY="devel/${GITTAG}"
+    DIRECTORY="review/${GITTAG}"
     if (params['PRETEND_GITVERSION'] == 'devel') {
         PRETEND_GITVERSION_BUILD = ""
     }
@@ -41,7 +41,7 @@ else if (params['GITTAG'] ==~ matchFeature) {
     // if we build devel, we don't have any v's at all:
     GITTAG=params['GITTAG']
     GIT_BRANCH=params['GITTAG']
-    DIRECTORY="devel/${GITTAG}"
+    DIRECTORY="review/${GITTAG}"
     
     if (params['PRETEND_GITVERSION'] == 'devel') {
         PRETEND_GITVERSION_BUILD = ""
@@ -51,7 +51,7 @@ else if (params['GITTAG'] ==~ matchFeature) {
 }
 else if (params['GITTAG'] ==~ matchBugFix) {
     VERSION_MAJOR_MINOR="3.4"
-    REPO_TL_DIR="nightly/${params['GITTAG']}"
+    REPO_TL_DIR="review/${params['GITTAG']}"
     // if we build devel, we don't have any v's at all:
     GITTAG=params['GITTAG']
     GIT_BRANCH=params['GITTAG']
