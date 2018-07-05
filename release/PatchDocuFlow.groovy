@@ -33,7 +33,7 @@ else if (params['GITTAG'] ==~ matchDoc) {
         PRETEND_GITVERSION_BUILD = ""
     }
     hilightUsers = ""
-    browseHint = "access it at http://docs.arangodb.com/devel/${GITTAG}"
+    browseHint = "access it at http://docs.arangodb.com/review/${GITTAG}"
 }
 else if (params['GITTAG'] ==~ matchFeature) {
     VERSION_MAJOR_MINOR="3.4"
@@ -47,7 +47,7 @@ else if (params['GITTAG'] ==~ matchFeature) {
         PRETEND_GITVERSION_BUILD = ""
     }
     hilightUsers = ""
-    browseHint = "access it at http://docs.arangodb.com/devel/${GITTAG}"
+    browseHint = "access it at http://docs.arangodb.com/review/${GITTAG}"
 }
 else if (params['GITTAG'] ==~ matchBugFix) {
     VERSION_MAJOR_MINOR="3.4"
@@ -61,7 +61,7 @@ else if (params['GITTAG'] ==~ matchBugFix) {
         PRETEND_GITVERSION_BUILD = ""
     }
     hilightUsers = ""
-    browseHint = "access it at http://docs.arangodb.com/devel/${GITTAG}"
+    browseHint = "access it at http://docs.arangodb.com/review/${GITTAG}"
 }
 else {
     def parts=params['PRETEND_GITVERSION'].tokenize(".")
