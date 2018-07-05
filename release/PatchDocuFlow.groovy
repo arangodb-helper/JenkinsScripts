@@ -21,44 +21,44 @@ if (params['GITTAG'] == 'devel') {
     hilightUsers = ""
     browseHint = "access it at http://docs.arangodb.com/devel/"
 }
-else if (params['GITTAG'] ==! matchDoc) {
+else if (params['GITTAG'] ==~ matchDoc) {
     VERSION_MAJOR_MINOR="3.4"
     REPO_TL_DIR="nightly/${params['GITTAG']}"
     // if we build devel, we don't have any v's at all:
-    GITTAG="${params['GITTAG']}"
-    GIT_BRANCH="${params['GITTAG']}"
+    GITTAG=params['GITTAG']
+    GIT_BRANCH=params['GITTAG']
     
     if (params['PRETEND_GITVERSION'] == 'devel') {
         PRETEND_GITVERSION_BUILD = ""
     }
     hilightUsers = ""
-    browseHint = "access it at http://docs.arangodb.com/devel/${params['GITTAG']}"
+    browseHint = "access it at http://docs.arangodb.com/devel/${GITTAG}"
 }
-else if (params['GITTAG'] ==! matchFeature) {
-    VERSION_MAJOR_MINOR="3.3"
+else if (params['GITTAG'] ==~ matchFeature) {
+    VERSION_MAJOR_MINOR="3.4"
     REPO_TL_DIR="nightly/${params['GITTAG']}"
     // if we build devel, we don't have any v's at all:
-    GITTAG="${params['GITTAG']}"
-    GIT_BRANCH="${params['GITTAG']}"
+    GITTAG=params['GITTAG']
+    GIT_BRANCH=params['GITTAG']
     
     if (params['PRETEND_GITVERSION'] == 'devel') {
         PRETEND_GITVERSION_BUILD = ""
     }
     hilightUsers = ""
-    browseHint = "access it at http://docs.arangodb.com/devel/${params['GITTAG']}"
+    browseHint = "access it at http://docs.arangodb.com/devel/${GITTAG}"
 }
-else if (params['GITTAG'] ==! matchBugFix) {
-    VERSION_MAJOR_MINOR="3.3"
+else if (params['GITTAG'] ==~ matchBugFix) {
+    VERSION_MAJOR_MINOR="3.4"
     REPO_TL_DIR="nightly/${params['GITTAG']}"
     // if we build devel, we don't have any v's at all:
-    GITTAG="${params['GITTAG']}"
-    GIT_BRANCH="${params['GITTAG']}"
+    GITTAG=params['GITTAG']
+    GIT_BRANCH=params['GITTAG']
     
     if (params['PRETEND_GITVERSION'] == 'devel') {
         PRETEND_GITVERSION_BUILD = ""
     }
     hilightUsers = ""
-    browseHint = "access it at http://docs.arangodb.com/devel/${params['GITTAG']}"
+    browseHint = "access it at http://docs.arangodb.com/devel/${GITTAG}"
 }
 else {
     def parts=params['PRETEND_GITVERSION'].tokenize(".")
