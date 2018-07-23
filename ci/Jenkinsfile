@@ -244,6 +244,7 @@ def runTests(where, testWorkingDirectory) {
                 --testOutput ${TESTWD} \
                 ${EXTREME_VERBOSITY} \
                 ${TEST_ARGS} \
+                --coreCheck true \
                 ${where['cmdLineArgs']} || \
          echo \$? > ${RCFile}"""
 
@@ -286,9 +287,9 @@ def runTests(where, testWorkingDirectory) {
   return res
 }
 def execTest(which, where, buildHost, testWorkingDirectory) {
-  // GO!  
+  // GO!
   try {
-    def LOCKNAME = "extract-${env.NODE_NAME}"	
+    def LOCKNAME = "extract-${env.NODE_NAME}"
     lock(LOCKNAME) {
       echo "Got LOCK ${LOCKNAME} - way we go."
       copyExtractTarBall(where, buildHost, testWorkingDirectory)
@@ -346,7 +347,6 @@ def runThisTest(which, buildEnvironment)
               sh "pwd"
               echo "${env} ${buildHost}"
             }
-            
             // GO!
             rc = execTest(which, where, buildHost, testWorkingDirectory)
           }
@@ -476,7 +476,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
         } catch (Exception scriptErr) {
           echo "Build failed - ${scriptErr}"
           throw (scriptErr)
-        } 
+        }
       }
     }
     if (buildUnittestTarball) {
@@ -495,13 +495,13 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
       } catch (Exception err) {
         echo "No MD5 File there - you mustn't tick 'skip build' if you don't have a previous build"
         throw (err)
-      } 
+      }
 
       if (VERBOSE) {
         echo "copying result files: '${MD5SUM}' '${BUILT_FILE}' '${DIST_FILE}.lock' '${DIST_FILE}'"
       }
 
-      def LOCKNAME = "extract-${env.NODE_NAME}"	
+      def LOCKNAME = "extract-${env.NODE_NAME}"
       lock(LOCKNAME) {
         echo "Got LOCK ${LOCKNAME} - way we go."
         sh "python /usr/bin/copyFileLockedIfNewer.py ${MD5SUM} ${BUILT_FILE} ${DIST_FILE}.lock ${DIST_FILE} ${env.JOB_NAME}"
@@ -555,7 +555,6 @@ def setupEnvCompileSource(buildEnvironment, Boolean buildUnittestTarball, String
             sh "mount"
             sh "pwd"
             sh "cat /etc/issue /mnt/workspace/issue /etc/passwd"
-            
           }
 
           sh 'pwd > workspace.loc'
@@ -763,7 +762,7 @@ stage("generating test report") {
   }
   node(nodeName) {
     def releaseOutDir = getReleaseOutDir(ENTERPRISE_URL, env.JOB_NAME)
-    
+
     def failures = failures + "\n" +  sh(returnStdout: true, script: "cat ${releaseOutDir}/results/* || echo ''").trim()
 
     if (failures.size() > 5) {
@@ -817,7 +816,7 @@ stage("generating test report") {
       sh "echo ${currentGitRev} > ${lastKnownGoodGitFile}";
 
       if (REPORT_TO == "slack") {
-	// no success messages for now. slackSend channel: '#status-packaging', color: '#00FF00', message: "${JENKINS_URL}/job/${env.JOB_NAME} ${GITTAG} on ${preferBuilder} succeeded (${env.BUILD_URL}) OK"
+        // no success messages for now. slackSend channel: '#status-packaging', color: '#00FF00', message: "${JENKINS_URL}/job/${env.JOB_NAME} ${GITTAG} on ${preferBuilder} succeeded (${env.BUILD_URL}) OK"
       }
       else if (REPORT_TO == "mail") {
       }
