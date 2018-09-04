@@ -654,9 +654,9 @@ stage("building ArangoDB") {
 
 stage("running unittest") {
   try {
-    def testCaseSets = [:] ''
+    def testCaseSets = [:] //''
     if (DOCKER_CONTAINER['cluster']) {
-      testCaseSets = [
+            testCaseSets = [
         //  ["fail", 'fail', ""],
         //    ["fail", 'fail', ""],
         ['catch', 'catch', ""],
