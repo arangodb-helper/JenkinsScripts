@@ -708,7 +708,9 @@ stage("running unittest") {
       }
     }
     def m = testCaseSets.size()
-    def int n = 0;
+        def int n = 0;
+    echo "Testcase sets:"
+    echo testCaseSets
     for (def int i = 0; i < m; i++) {
       def unitTestSet = testCaseSets.getAt(i);
       def o = unitTestSet.size()
