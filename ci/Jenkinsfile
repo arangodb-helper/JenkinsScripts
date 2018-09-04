@@ -654,30 +654,30 @@ stage("building ArangoDB") {
 
 stage("running unittest") {
   try {
-    def testCaseSets = [:]
+    def testCaseSets = [:] ''
     if (DOCKER_CONTAINER['cluster']) {
       testCaseSets = [
         //  ["fail", 'fail', ""],
         //    ["fail", 'fail', ""],
         ['catch', 'catch', ""],
-        ['http_server', 'http_server', "",
+        ['http_server', 'http_server',
          "--cluster true --testBuckets 4/1 ",
          "--cluster true --testBuckets 4/2 ",
          "--cluster true --testBuckets 4/3 ",
          "--cluster true --testBuckets 4/4 "],
         ["shell_client", 'shell_client', "",
          "--cluster true "],
-        ["shell_server_aql", 'shell_server_aql', "",
+        ["shell_server_aql", 'shell_server_aql',
          "--cluster true --testBuckets 4/1 ",
          "--cluster true --testBuckets 4/2 ",
          "--cluster true --testBuckets 4/3 ",
          "--cluster true --testBuckets 4/4 "],
-        ["dump_import", 'dump.importing', "", "--cluster true"],
-        ["shell_server", 'shell_server', "",
+        ["dump_import", 'dump.importing', "--cluster true"],
+        ["shell_server", 'shell_server',
          "--cluster true "],
         // ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
         ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
-        ["arangosh", 'arangosh', ""],
+                ["arangosh", 'arangosh', ""],
       ]
     } else {
       testCaseSets = [/*
