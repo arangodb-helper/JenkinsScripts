@@ -654,12 +654,13 @@ stage("building ArangoDB") {
 
 stage("running unittest") {
   try {
-    def testCaseSets = [:] //''
+    def testCaseSets = [:]
+    //''
     if (DOCKER_CONTAINER['cluster']) {
             testCaseSets = [
         //  ["fail", 'fail', ""],
         //    ["fail", 'fail', ""],
-        ['catch', 'catch', ""],
+        ['catch', 'catch', "", ""],
         ['http_server', 'http_server', "",
          "--cluster true --testBuckets 4/1 ",
          "--cluster true --testBuckets 4/2 ",
@@ -673,8 +674,7 @@ stage("running unittest") {
          "--cluster true --testBuckets 4/3 ",
          "--cluster true --testBuckets 4/4 "],
         ["dump_import", 'dump.importing', "", "--cluster true"],
-        ["shell_server", 'shell_server', "",
-         "--cluster true "],
+        ["shell_server", 'shell_server', "", "--cluster true "],
         // ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
         ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
         ["arangosh", 'arangosh', ""],
@@ -716,7 +716,7 @@ stage("running unittest") {
       def o = unitTestSet.size()
       def unitTests = unitTestSet.getAt(1);
       def shortName = unitTestSet.getAt(0);
-      for (def int j = 2; j < o; j ++ ) {
+      for (def int j = 3; j < o; j ++ ) {
         def cmdLineArgs = unitTestSet.getAt(j)
         echo "configuring testcase: ${shortName} ${cmdLineArgs} -  ${j}"
         testRunName = "${shortName}_${j}_${n}"
