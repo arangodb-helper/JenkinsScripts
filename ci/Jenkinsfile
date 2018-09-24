@@ -213,7 +213,7 @@ def runTests(where, testWorkingDirectory) {
   def EXTREME_VERBOSITY=""
   if (VERBOSE) {
     print("${where['testRunName']}: runTests")
-    //EXTREME_VERBOSITY="--extremeVerbosity true"
+    EXTREME_VERBOSITY="--extremeVerbosity true"
   }
 
   def TESTWD = "${testWorkingDirectory}/out".replace("/cygdrive/c", "c:")
@@ -675,15 +675,15 @@ stage("running unittest") {
          "--cluster true --testBuckets 4/4 "],
         ["dump_import", 'dump.importing', "", "--cluster true"],
         ["shell_server", 'shell_server', "", "--cluster true "],
-        // ['ssl_server', 'ssl_server', ""], // FC: don''t need this with clusters.
+        // ['ssl_server', 'ssl_server', "", ""], // FC: don''t need this with clusters.
         ["overal", 'config.upgrade.authentication.authentication_parameters.arangobench', ""],
         ["arangosh", 'arangosh', ""],
       ]
     } else {
       testCaseSets = [/*
-        ["fail", 'fail', ""],
-        ["overal", 'config.authentication', ""],
-        ["fail", 'fail', ""],/*///
+        ["fail", 'fail', "", ""],
+        ["overal", 'config.authentication', "", ""],
+        ["fail", 'fail', "", ""],/*///
         ['catch', 'catch', "", ""],
         ['http_server', 'http_server', "", ""],
         ["shell_client", 'shell_client', "", ""],
