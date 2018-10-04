@@ -416,7 +416,7 @@ def compileSource(buildEnv, Boolean buildUnittestTarball, String enterpriseUrl, 
 
     def buildMode = "standard"
     if (MAINTAINERMODE == "true") {
-      buildMode = "maintainer"
+      buildMode = "debug"
     }
 
     def BUILDSCRIPT = "./Installation/Jenkins/build.sh ${buildMode} --parallel ${PARALLEL_BUILD} --buildDir ${buildDir} ${cBuildDir} ${EP} --targetDir ${outDir} ${buildEnv['buildArgs']}"
@@ -651,6 +651,8 @@ stage("building ArangoDB") {
     throw(err)
   }
 }
+
+
 
 stage("running unittest") {
   try {
