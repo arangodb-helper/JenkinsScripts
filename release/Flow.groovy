@@ -636,9 +636,9 @@ stage("publish website") {
     echo "Continuing publish stage 2"
   }
   node('master') {
-    if (GIT_VERSION != 'devel') {
-      sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_snippets.sh live"
-    }
+    //if (GIT_VERSION != 'devel') {
+    //  sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_snippets.sh live"
+    //}
     sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
     sh "echo '${GIT_VERSION}' > ${env.INTERMEDIATE_CO_DIR}VERSION"
   }
