@@ -356,31 +356,31 @@ done
 
           },
           ////////////////////////////////////////////////////////////////////////////////
-          "documentation": {
-            try {
-              echo "trying: "
-              build( job: 'RELEASE__BuildDocumentation',
-                     parameters: [
-                       string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
-                       string(name: 'DOCKER_HOST', value: DOCKER_HOST),
-                       string(name: 'GITTAG', value: "${GITTAG}"),
-                       string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
-                       string(name: 'FORCE_GITBRANCH', value:''),
-                       string(name: 'REPORT_TO', value: "slack"),
-                       string(name: 'GIT_BRANCH', value: "${GIT_BRANCH}"),
-                       booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
-                       booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
-                     ]
-                   )
-            } catch (Exception err) {
-              def channel = reportChannel
-              if (GIT_VERSION == 'devel') {
-		      //channel = '#devel'
-              }
-              echo "failed: ${err}"
-              slackSend channel: channel, color: '#ff0000', message: "${JENKINS_URL} Building documentation for ${GITTAG} ${REPO_TL_DIR} failed - ${err}"
-            }
-          }
+          // "documentation": {
+          //   try {
+          //     echo "trying: "
+          //     build( job: 'RELEASE__BuildDocumentation',
+          //            parameters: [
+          //              string(name: 'ENTERPRISE_URL', value: params['ENTERPRISE_URL']),
+          //              string(name: 'DOCKER_HOST', value: DOCKER_HOST),
+          //              string(name: 'GITTAG', value: "${GITTAG}"),
+          //              string(name: 'preferBuilder', value: 'arangodb/documentation-builder'),
+          //              string(name: 'FORCE_GITBRANCH', value:''),
+          //              string(name: 'REPORT_TO', value: "slack"),
+          //              string(name: 'GIT_BRANCH', value: "${GIT_BRANCH}"),
+          //              booleanParam(name: 'CLEAN_BUILDENV', value: params['CLEAN_BUILDENV']),
+          //              booleanParam(name: 'CLEAN_CMAKE_STATE', value: params['CLEAN_BUILDENV'])
+          //            ]
+          //          )
+          //   } catch (Exception err) {
+          //     def channel = reportChannel
+          //     if (GIT_VERSION == 'devel') {
+	  //             //channel = '#devel'
+          //     }
+          //     echo "failed: ${err}"
+          //     slackSend channel: channel, color: '#ff0000', message: "${JENKINS_URL} Building documentation for ${GITTAG} ${REPO_TL_DIR} failed - ${err}"
+          //   }
+          // }
         ]
       )
     }
@@ -639,7 +639,7 @@ stage("publish website") {
     //if (GIT_VERSION != 'devel') {
     //  sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_snippets.sh live"
     //}
-    sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
+    // sh "export REPO_TL_DIR=${REPO_TL_DIR}; ${ARANGO_SCRIPT_DIR}/publish/publish_documentation.sh"
     sh "echo '${GIT_VERSION}' > ${env.INTERMEDIATE_CO_DIR}VERSION"
   }
   if (GIT_VERSION != 'devel') {
